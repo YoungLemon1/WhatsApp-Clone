@@ -42,6 +42,13 @@ app.post(
     body("role").notEmpty(),
   ],
   async (req, res) => {
+    const { name, username, birthdate, role } = req.body;
+
+    // Check if username already exists in the database
+    const existingUser = await UserModel.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
     try {
       const user = req.body;
       const newUser = new UserModel(user);

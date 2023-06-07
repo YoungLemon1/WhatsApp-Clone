@@ -45,6 +45,16 @@ td {
 form label {
   display: block;
   font-size: medium;
+  margin-bottom: 0px;
+  padding: 2px;
+}
+
+form input {
+  margin-top: 0px;
+}
+
+form div {
+  height: min-content;
 }
 
 #save-btn {
