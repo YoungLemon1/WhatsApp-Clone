@@ -12,7 +12,9 @@ app.use(cors());
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log(`Listening on port ${PORT}\nConnected to Mongo!`);
+    console.log(`Listening on port ${PORT}`);
+    console.log(`Connected to MongoDB`);
+    console.log(`Connected to database: ${mongoose.connection.name}`);
   })
   .catch((err) => {
     console.error("Error connecting to Mongo", err);
@@ -41,7 +43,7 @@ app.use((err, req, res, next) => {
 
 // 404 route
 app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
+  res.status(404).json({ message: `Cannot GET / Route not found` });
 });
 
 app.listen(PORT);
