@@ -29,6 +29,13 @@ app.get("/getUsers", async (req, res) => {
     res.status(500).json({ error: "Error fetching users" });
   }
 });
+
+app.post("/createUser", async (req, res) => {
+  const user = req.body;
+  const newUser = new UserModel(user);
+  await newUser.save();
+});
+
 // API routes
 /*app.use("/api/auth", require("./routes/auth"));
 app.use("/api/users", require("./routes/users"));
