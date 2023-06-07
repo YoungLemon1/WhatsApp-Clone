@@ -14,6 +14,7 @@ mongoose
   .catch((err) => {
     console.error("Error connecting to Mongo", err);
   });
+
 // API routes
 /*app.use("/api/auth", require("./routes/auth"));
 app.use("/api/users", require("./routes/users"));
