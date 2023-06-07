@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { configDotenv } from "dotenv";
 import UserModel from "./models/users.js";
+import { body, validationResult } from "express-validator";
 
 configDotenv();
 
@@ -23,7 +24,7 @@ mongoose
     console.error("Error connecting to Mongo", err);
   });
 
-app.get("/getUsers", async (req, res) => {
+app.get("/users", async (req, res) => {
   try {
     const users = await UserModel.find({});
     res.json(users);
@@ -33,13 +34,26 @@ app.get("/getUsers", async (req, res) => {
   }
 });
 
-app.post("/createUser", async (req, res) => {
-  const user = req.body;
-  const newUser = new UserModel(user);
-  await newUser.save();
+app.post(
+  "/users",
+  [
+    body("name").notEmpty(),
+    body("username").notEmpty(),
+    body("role").notEmpty(),
+  ],
+  async (req, res) => {
+    try {
+      const user = req.body;
+      const newUser = new UserModel(user);
+      await newUser.save();
 
-  res.json(user);
-});
+      res.json(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
 
 // API routes
 /*app.use("/api/auth", require("./routes/auth"));
