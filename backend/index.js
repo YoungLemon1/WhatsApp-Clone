@@ -1,8 +1,19 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("Connected to Mongo!");
+  })
+  .catch((err) => {
+    console.error("Error connecting to Mongo", err);
+  });
 // API routes
 /*app.use("/api/auth", require("./routes/auth"));
 app.use("/api/users", require("./routes/users"));
@@ -19,8 +30,4 @@ app.use((err, req, res, next) => {
 // 404 route
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
-});
-
-app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}`);
 });
