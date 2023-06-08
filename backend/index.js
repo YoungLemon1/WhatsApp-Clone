@@ -113,10 +113,9 @@ app.put(
 
 app.delete("/users/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, username, birthdate, role } = req.body;
   try {
     const deletedUser = await UserModel.findByIdAndDelete(id);
-    if (!existingUser) {
+    if (!deletedUser) {
       return res.status(400).json({
         error: "User does not exist",
       });
