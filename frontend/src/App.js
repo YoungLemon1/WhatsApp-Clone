@@ -19,39 +19,39 @@ function App() {
     });
   }, []);
 
-  const createUser = (event) => {
+  async function usernameExists(username) {
+    try {
+      const res = await Axios.get("http://localhost:5000/users");
+      const usersList = res.data;
+      return usersList.some((user) => username === user.username);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+    }
+  }
+
+  const createUser = async (event) => {
     event.preventDefault();
+
     if (!name || !username) {
       alert("Please fill in all required fields.");
       return;
     }
     try {
-      Axios.post("http://localhost:5000/users", {
-        name,
-        username,
-        birthdate,
-        role,
-      })
-        .then((res) => {
-          setUsers([...users, { name, username, birthdate, role }]);
-          alert("user created");
-        })
-        .catch((error) => {
-          if (
-            error.response &&
-            error.response.data &&
-            error.response.data.errors
-          ) {
-            const errorMessages = error.response.data.errors.map(
-              (err) => err.msg
-            );
-            alert(errorMessages.join("\n"));
-          } else {
-            alert("Request failed after post");
-          }
-        });
-    } catch {
-      alert("Request failed");
+      const usernameTaken = await usernameExists(username);
+      if (usernameTaken) {
+        alert(`Username ${username} is already taken.`);
+        return;
+      }
+
+      const user = { name, username, birthdate, role };
+      await Axios.post("http://localhost:5000/users", user);
+
+      setUsers([...users, user]);
+      alert("User created");
+    } catch (error) {
+      console.error("Error creating user:", error);
+      alert("Request failed after post");
     }
   };
 
@@ -62,7 +62,7 @@ function App() {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Age</th>
+              <th>Username</th>
               <th>Birthdate</th>
               <th>Role</th>
             </tr>
