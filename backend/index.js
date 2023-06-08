@@ -47,7 +47,9 @@ app.post(
     // Check if username already exists in the database
     const existingUser = await UserModel.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ message: "Username already exists" });
+      return res
+        .status(400)
+        .json({ message: "Bad request error: Username already exists" });
     }
     try {
       const user = req.body;
@@ -57,11 +59,68 @@ app.post(
       res.json(user);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({
+        error: "Internal server error: failed to save entry to database",
+      });
     }
   }
 );
 
+app.put(
+  "/users/:id",
+  [
+    body("name").notEmpty(),
+    body("username").notEmpty(),
+    body("role").notEmpty(),
+  ],
+  async (req, res) => {
+    const { id } = req.params;
+    const { name, username, birthdate, role } = req.body;
+
+    // Check if username already exists in the database
+    const existingUser = await UserModel.findOne({ _id: id });
+    if (!existingUser) {
+      return res
+        .status(400)
+        .json({ message: "Bad request: user does not exist" });
+    }
+    try {
+      existingUser.name = name;
+      existingUser.username = username;
+      existingUser.birthdate = birthdate;
+      existingUser.role = role;
+
+      await existingUser.save();
+
+      res.json(existingUser);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        error: "Internal server error: failed to update user",
+      });
+    }
+  }
+);
+
+app.delete("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, username, birthdate, role } = req.body;
+  const existingUser = await UserModel.findOne({ _id: id });
+  if (!existingUser) {
+    return res
+      .status(400)
+      .json({ message: "Bad request: user does not exist" });
+  }
+  try {
+    await existingUser.delete();
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Internal server error: failed to delete user",
+    });
+  }
+});
 // API routes
 /*app.use("/api/auth", require("./routes/auth"));
 app.use("/api/users", require("./routes/users"));
