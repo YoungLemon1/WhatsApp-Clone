@@ -27,10 +27,15 @@ mongoose
 app.get("/users", async (req, res) => {
   try {
     const users = await UserModel.find({});
-    res.json(users);
+    res.json({
+      success: true,
+      data: users,
+    });
   } catch (err) {
     console.error(err.stack);
-    res.status(500).json({ error: "Error fetching users" });
+    res.status(500).json({
+      error: "Internal server error: Failure fetching users",
+    });
   }
 });
 
@@ -47,16 +52,18 @@ app.post(
     // Check if username already exists in the database
     const existingUser = await UserModel.findOne({ username });
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Bad request error: Username already exists" });
+      return res.status(400).json({
+        error: "Username already exists",
+      });
     }
     try {
       const user = req.body;
       const newUser = new UserModel(user);
       await newUser.save();
 
-      res.json(user);
+      res.json({
+        success: newUser,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -80,9 +87,9 @@ app.put(
     // Check if username already exists in the database
     const existingUser = await UserModel.findOne({ _id: id });
     if (!existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Bad request: user does not exist" });
+      return res.status(400).json({
+        error: "Bad request: user does not exist",
+      });
     }
     try {
       existingUser.name = name;
@@ -92,7 +99,9 @@ app.put(
 
       await existingUser.save();
 
-      res.json(existingUser);
+      res.json({
+        success: existingUser,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -107,13 +116,15 @@ app.delete("/users/:id", async (req, res) => {
   const { name, username, birthdate, role } = req.body;
   const existingUser = await UserModel.findOne({ _id: id });
   if (!existingUser) {
-    return res
-      .status(400)
-      .json({ message: "Bad request: user does not exist" });
+    return res.status(400).json({
+      error: "Bad request: user does not exist",
+    });
   }
   try {
     await existingUser.delete();
-    res.json({ message: "User deleted successfully" });
+    res.json({
+      success: "User deleted successfully",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -130,12 +141,16 @@ app.use("/api/messages", require("./routes/messages"));
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: "Internal Server Error" });
+  res.status(500).json({
+    error: "Internal Server Error",
+  });
 });
 
 // 404 route
 app.use((req, res) => {
-  res.status(404).json({ message: `Cannot GET / Route not found` });
+  res.status(404).json({
+    error: `Cannot GET / Route not found`,
+  });
 });
 
 app.listen(PORT);
