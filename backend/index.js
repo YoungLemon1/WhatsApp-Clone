@@ -28,7 +28,6 @@ app.get("/users", async (req, res) => {
   try {
     const users = await UserModel.find({});
     res.json({
-      success: true,
       data: users,
     });
   } catch (err) {
@@ -62,7 +61,7 @@ app.post(
       await newUser.save();
 
       res.json({
-        success: newUser,
+        data: newUser,
       });
     } catch (error) {
       console.error(error);
@@ -100,7 +99,7 @@ app.put(
       await existingUser.save();
 
       res.json({
-        success: existingUser,
+        data: existingUser,
       });
     } catch (error) {
       console.error(error);

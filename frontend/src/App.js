@@ -10,9 +10,13 @@ function App() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    Axios.get("http://localhost:5000/users").then((res) => {
-      setUsers(res.data);
-    });
+    Axios.get("http://localhost:5000/users")
+      .then((res) => {
+        setUsers(res.data.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, []);
 
   const addUser = (user) => {
