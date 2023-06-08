@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #182e59;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -37,9 +37,13 @@
   }
 }
 
+#all-users table {
+  width: 100%;
+}
+
 table th,
 td {
-  padding: 3rem;
+  padding: 2rem;
 }
 
 form label {
@@ -51,6 +55,7 @@ form label {
 
 form input {
   margin-top: 0px;
+  width: 180px;
 }
 
 form div {
