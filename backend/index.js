@@ -67,7 +67,7 @@ app.post(
     } catch (error) {
       console.error(error);
       res.status(500).json({
-        error: "Internal server error: failed to save entry to database",
+        error: "Internal server error: failed to create user",
       });
     }
   }
@@ -114,14 +114,13 @@ app.put(
 app.delete("/users/:id", async (req, res) => {
   const { id } = req.params;
   const { name, username, birthdate, role } = req.body;
-  const existingUser = await UserModel.findOne({ _id: id });
-  if (!existingUser) {
-    return res.status(400).json({
-      error: "Bad request: user does not exist",
-    });
-  }
   try {
-    await existingUser.delete();
+    const deletedUser = await UserModel.findByIdAndDelete(id);
+    if (!existingUser) {
+      return res.status(400).json({
+        error: "User does not exist",
+      });
+    }
     res.json({
       success: "User deleted successfully",
     });
