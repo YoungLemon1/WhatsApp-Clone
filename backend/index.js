@@ -24,6 +24,7 @@ mongoose
     console.error("Error connecting to Mongo", err);
   });
 
+//routers
 app.use("/users", userRouter);
 
 // API routes

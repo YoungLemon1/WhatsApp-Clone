@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, validationResult } from "express-validator";
+import { body } from "express-validator";
 import UserModel from "../models/user.js";
 const userRouter = Router();
 
@@ -13,6 +13,21 @@ userRouter.get("/", async (req, res) => {
     console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: Failure fetching users",
+    });
+  }
+});
+
+userRouter.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const users = await UserModel.findById(id);
+    res.status(200).json({
+      data: users,
+    });
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching user",
     });
   }
 });
@@ -35,8 +50,7 @@ userRouter.post(
       });
     }
     try {
-      const user = req.body;
-      const newUser = new UserModel(user);
+      const newUser = new UserModel(req.body);
       await newUser.save();
 
       res.status(201).json({

@@ -13,6 +13,14 @@ const UserSchema = new Schema({
     type: Date,
     required: false,
   },
+  email: {
+    type: String,
+    required: false,
+  },
+  profilePictureURL: {
+    type: String,
+    required: false,
+  },
   role: {
     type: String,
     required: true,
