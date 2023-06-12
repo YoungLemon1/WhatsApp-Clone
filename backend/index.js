@@ -1,5 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import cors from "cors";
 import { configDotenv } from "dotenv";
 import userRouter from "./routes/users.js";
@@ -11,6 +13,14 @@ configDotenv();
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "5000");
+const server = createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
 
 app.use(cors());
 app.use(express.json());
@@ -18,7 +28,6 @@ app.use(express.json());
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log(`Listening on port ${PORT}`);
     console.log(`Connected to MongoDB`);
     console.log(`Connected to database: ${mongoose.connection.name}`);
   })
@@ -31,6 +40,24 @@ app.use("/users", userRouter);
 app.use("/messages", messageRouter);
 app.use("/chatrooms", chatroomRouter);
 
+io.on("connection", (socket) => {
+  console.log(socket.id + " connected");
+
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log(`user ${socket.id} joined room ${data}`);
+  });
+  socket.on("leave_room", (data) => {
+    socket.leave(data);
+    console.log(`user ${socket.id} left room ${data}`);
+  });
+  socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
+  });
+  socket.on("disconnect", () => {
+    console.log(socket.id + " disconnected");
+  });
+});
 // API routes
 /*app.use("/api/auth", require("./routes/auth"));
 app.use("/api/users", require("./routes/users"));
@@ -52,4 +79,6 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT);
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+});
