@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { configDotenv } from "dotenv";
 import userRouter from "./routes/users.js";
+import messageRouter from "./routes/messages.js";
+import chatroomRouter from "./routes/chatrooms.js";
 // ...existing code
 
 configDotenv();
@@ -26,6 +28,8 @@ mongoose
 
 //routers
 app.use("/users", userRouter);
+app.use("/messages", messageRouter);
+app.use("/chatrooms", chatroomRouter);
 
 // API routes
 /*app.use("/api/auth", require("./routes/auth"));
