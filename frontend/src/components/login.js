@@ -35,7 +35,7 @@ function Login({ setUser, setLoggedIn }) {
     }
   }
   function routeToSignup() {
-    navigate("/");
+    navigate("/signup");
   }
   return (
     <div>
@@ -64,7 +64,7 @@ function Login({ setUser, setLoggedIn }) {
             variant="primary"
             onClick={routeToSignup}
           >
-            signup
+            Create account
           </Button>
         </div>
       </form>

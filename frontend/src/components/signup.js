@@ -5,7 +5,7 @@ import { Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DatePicker from "react-datepicker";
 
-function NewUser({ users, addUser }) {
+function Signup({ users, addUser }) {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [birthdate, setBirthdate] = useState();
@@ -74,11 +74,11 @@ function NewUser({ users, addUser }) {
           onChange={handleBirthDateChange}
         ></DatePicker>
         <Button className="submit-btn" type="submit" variant="success">
-          Save
+          Sign Up
         </Button>
       </form>
     </div>
   );
 }
 
-export default NewUser;
+export default Signup;
