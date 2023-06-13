@@ -20,7 +20,12 @@ userRouter.get("/", async (req, res) => {
 userRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const users = await UserModel.findById(id);
+    const user = await UserModel.findById(id);
+    if (user) {
+      return res.status(400).json({
+        error: "username or password are incorrect, please try again",
+      });
+    }
     res.status(200).json({
       data: users,
     });
