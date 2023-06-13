@@ -15,7 +15,7 @@ function App() {
       {!loggedIn ? (
         <Login setUser={setUser} setLoggedIn={setLoggedIn} />
       ) : (
-        <UserPage loggedUser={user} />
+        <UserPage user={user} />
       )}
     </div>
   );
