@@ -6,9 +6,7 @@ const userRouter = Router();
 userRouter.get("/", async (req, res) => {
   try {
     const users = await UserModel.find({});
-    res.status(200).json({
-      data: users,
-    });
+    res.status(200).json(users);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -21,9 +19,7 @@ userRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const user = await UserModel.findById(id);
-    res.status(200).json({
-      data: user,
-    });
+    res.status(200).json(user);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -36,9 +32,7 @@ userRouter.get("/username/:username", async (req, res) => {
   try {
     const { username } = req.params;
     const user = await UserModel.findOne({ username: username });
-    res.status(200).json({
-      data: user,
-    });
+    res.status(200).json(user);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -68,9 +62,7 @@ userRouter.post(
       const newUser = new UserModel(req.body);
       await newUser.save();
 
-      res.status(201).json({
-        data: newUser,
-      });
+      res.status(201).json(newUser);
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -106,9 +98,7 @@ userRouter.put(
 
       await user.save();
 
-      res.status(200).json({
-        data: user,
-      });
+      res.status(200).json(user);
     } catch (error) {
       console.error(error);
       res.status(500).json({

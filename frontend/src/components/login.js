@@ -7,7 +7,7 @@ function Login({ setUser, setLoggedIn }) {
   const [username, setUsername] = useState("");
   async function loginUser() {
     if (!username) {
-      console.log("Empty username");
+      console.log("Error: empty username");
       setUsernameFooter("Please enter your username");
       return;
     }
@@ -16,8 +16,14 @@ function Login({ setUser, setLoggedIn }) {
         `http://localhost:5000/users/username/${username}`
       );
       const user = res.data;
+      console.log(user);
+      if (user === null) {
+        alert("username or password are incorrect, try again");
+        return;
+      }
       setUser(user);
       setLoggedIn(true);
+      setUsernameFooter("");
       console.log(`user ${user.username} logged in successfully`);
     } catch (error) {
       console.error("error fetching user", error);

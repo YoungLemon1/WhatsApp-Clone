@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import "./App.css";
-import io from "socket.io-client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
 import Login from "./components/login";
 import UserPage from "./components/user-page";
-import { Button } from "react-bootstrap";
-import { id } from "date-fns/locale";
 
 function App() {
   const [user, setUser] = useState({});
@@ -16,7 +13,7 @@ function App() {
   return (
     <div className="App">
       {!loggedIn ? (
-        <Login user={setUser} setLoggedIn={setLoggedIn} />
+        <Login setUser={setUser} setLoggedIn={setLoggedIn} />
       ) : (
         <UserPage loggedUser={user} />
       )}
