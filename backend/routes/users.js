@@ -27,7 +27,7 @@ userRouter.get("/:id", async (req, res) => {
       });
     }
     res.status(200).json({
-      data: users,
+      data: user,
     });
   } catch (err) {
     console.error(err.stack);
