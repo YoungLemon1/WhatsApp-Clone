@@ -71,9 +71,3 @@ form input {
 form div {
   height: min-content;
 }
-
-#save-btn {
-  margin: 40px;
-  width: 150px;
-  height: 50px;
-}

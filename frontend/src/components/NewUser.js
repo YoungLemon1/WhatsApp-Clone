@@ -1,6 +1,8 @@
 import React from "react";
 import { useState } from "react";
 import Axios from "axios";
+import { Button, Container, Form } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 import DatePicker from "react-datepicker";
 
 function NewUser({ users, addUser }) {
@@ -47,10 +49,10 @@ function NewUser({ users, addUser }) {
     }
   };
   return (
-    <div>
-      <form onSubmit={createUser}>
+    <Container>
+      <Form onSubmit={createUser}>
         <h3>Create New User</h3>
-        <div>
+        <Container>
           <label>Name</label>
           <input
             required
@@ -58,8 +60,8 @@ function NewUser({ users, addUser }) {
             name="name"
             onChange={(e) => setName(e.target.value)}
           ></input>
-        </div>
-        <div>
+        </Container>
+        <Container>
           <label>Username</label>
           <input
             required
@@ -67,8 +69,8 @@ function NewUser({ users, addUser }) {
             name="username"
             onChange={(e) => setUsername(e.target.value)}
           ></input>
-        </div>
-        <div>
+        </Container>
+        <Container>
           <label>Birthdate (DD/MM/YYYY)</label>
           <DatePicker
             selected={birthdate}
@@ -76,12 +78,12 @@ function NewUser({ users, addUser }) {
             showDayMonthYearPicker
             onChange={handleBirthDateChange}
           ></DatePicker>
-        </div>
-        <button id="save-btn" type="submit">
+        </Container>
+        <Button className="submit-btn" type="submit" variant="success">
           Save
-        </button>
-      </form>
-    </div>
+        </Button>
+      </Form>
+    </Container>
   );
 }
 
