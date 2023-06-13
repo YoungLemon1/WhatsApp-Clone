@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import Axios from "axios";
-import { Button, Container, Form } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DatePicker from "react-datepicker";
 
@@ -49,41 +49,35 @@ function NewUser({ users, addUser }) {
     }
   };
   return (
-    <Container>
-      <Form onSubmit={createUser}>
+    <div>
+      <form id="signup" className="user-form" onSubmit={createUser}>
         <h3>Create New User</h3>
-        <Container>
-          <label>Name</label>
-          <input
-            required
-            id="name"
-            name="name"
-            onChange={(e) => setName(e.target.value)}
-          ></input>
-        </Container>
-        <Container>
-          <label>Username</label>
-          <input
-            required
-            id="username"
-            name="username"
-            onChange={(e) => setUsername(e.target.value)}
-          ></input>
-        </Container>
-        <Container>
-          <label>Birthdate (DD/MM/YYYY)</label>
-          <DatePicker
-            selected={birthdate}
-            dateFormat="dd/MM/yyyy"
-            showDayMonthYearPicker
-            onChange={handleBirthDateChange}
-          ></DatePicker>
-        </Container>
+        <label>Name</label>
+        <input
+          required
+          id="name"
+          name="name"
+          onChange={(e) => setName(e.target.value)}
+        ></input>
+        <label>Username</label>
+        <input
+          required
+          id="username"
+          name="username"
+          onChange={(e) => setUsername(e.target.value)}
+        ></input>
+        <label>Birthdate (DD/MM/YYYY)</label>
+        <DatePicker
+          selected={birthdate}
+          dateFormat="dd/MM/yyyy"
+          showDayMonthYearPicker
+          onChange={handleBirthDateChange}
+        ></DatePicker>
         <Button className="submit-btn" type="submit" variant="success">
           Save
         </Button>
-      </Form>
-    </Container>
+      </form>
+    </div>
   );
 }
 

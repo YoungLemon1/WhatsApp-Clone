@@ -46,11 +46,6 @@ label {
   margin: 0.5rem;
 }
 
-#login button {
-  margin: 2rem;
-  padding: 0.25rem;
-}
-
 #login small {
   display: block;
   padding-left: 5rem;
@@ -67,16 +62,26 @@ td {
   padding: 2rem;
 }
 
-form label {
+.user-form label {
   display: block;
   font-size: medium;
   margin-bottom: 0px;
   padding: 2px;
 }
 
-form input {
+.user-form input {
   margin-top: 0px;
   width: 180px;
+}
+
+.user-form button {
+  display: inline-block;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 form div {
