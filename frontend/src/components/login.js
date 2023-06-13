@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { Button, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-function Login() {
-  const [username, setUsername] = useState("");
-  function login() {}
+import axios from "axios";
+function Login({ socket, username, setUsername, setId }) {
+  const [usernameFooter, setUsernameFooter] = useState();
+  function loginUser() {
+    if (!username) {
+      setUsernameFooter("Please enter your username");
+      return;
+    }
+  }
   return (
     <Container id="login">
       <h1>Chat and Play</h1>
@@ -16,6 +22,7 @@ function Login() {
             setUsername(event.target.value);
           }}
         ></input>
+        <small>{usernameFooter}</small>
       </Container>
       <Container>
         <label id="password">Password</label>
