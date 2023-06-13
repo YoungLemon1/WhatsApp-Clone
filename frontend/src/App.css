@@ -41,6 +41,16 @@
   width: 100%;
 }
 
+#login input,
+label {
+  margin: 0.5rem;
+}
+
+#login button {
+  margin: 2rem;
+  padding: 0.25rem;
+}
+
 table th,
 td {
   padding: 2rem;
