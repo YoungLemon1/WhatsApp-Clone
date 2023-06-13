@@ -35,7 +35,7 @@ userRouter.get("/:id", async (req, res) => {
 userRouter.get("/username/:username", async (req, res) => {
   try {
     const { username } = req.params;
-    const user = await UserModel.findById({ username: username });
+    const user = await UserModel.findOne({ username: username });
     res.status(200).json({
       data: user,
     });
