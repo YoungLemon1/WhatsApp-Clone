@@ -11,22 +11,20 @@ function App() {
   const [user, setUser] = useState({});
   const [loggedIn, setLoggedIn] = useState(false);
 
-  //const socket = io.connect("http://localhost:5000");
+  const homeRoute = () => {
+    return loggedIn ? (
+      <UserPage user={user} />
+    ) : (
+      <Login setUser={setUser} setLoggedIn={setLoggedIn} />
+    );
+  };
+
   return (
     <div className="App">
       <Router>
         <Routes>
-          <Route
-            path="/"
-            element={
-              !loggedIn ? (
-                <Login setUser={setUser} setLoggedIn={setLoggedIn} />
-              ) : (
-                <UserPage user={user} />
-              )
-            }
-          />
-          <Route path="/signup" element={<Signup></Signup>} />
+          <Route path="/" element={homeRoute()} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </Router>
     </div>
