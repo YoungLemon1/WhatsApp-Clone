@@ -51,6 +51,10 @@ label {
   padding: 0.25rem;
 }
 
+#login small {
+  color: red;
+}
+
 table th,
 td {
   padding: 2rem;
