@@ -1,23 +1,29 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Axios from "axios";
 import { Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DatePicker from "react-datepicker";
 
-function Signup({ users, addUser }) {
+function Signup() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [birthdate, setBirthdate] = useState();
   const role = "user";
-
+  const navigate = useNavigate();
   const handleBirthDateChange = (date) => {
     setBirthdate(date);
   };
 
   async function usernameExists(username) {
     try {
-      return users.some((user) => username === user.username);
+      const res = await Axios.get(
+        `http://localhost:5000/users/username/${username}`
+      );
+      const data = res.data;
+      console.log(data);
+      return data !== null;
     } catch (error) {
       console.error("Error fetching users:", error);
       throw error;
@@ -41,11 +47,11 @@ function Signup({ users, addUser }) {
       const user = { name, username, birthdate, role };
       await Axios.post("http://localhost:5000/users", user);
 
-      addUser(user);
       alert("User created");
+      navigate("/");
     } catch (error) {
       console.error("Error creating user:", error);
-      alert("Request failed after post");
+      alert("Request failed");
     }
   };
   return (
