@@ -7,7 +7,6 @@ import { configDotenv } from "dotenv";
 import userRouter from "./routes/users.js";
 import messageRouter from "./routes/messages.js";
 import chatroomRouter from "./routes/chatrooms.js";
-// ...existing code
 
 configDotenv();
 
