@@ -1,13 +1,27 @@
 import React, { useState } from "react";
 import { Button, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import axios from "axios";
-function Login({ socket, username, setUsername, setId }) {
+import Axios from "axios";
+function Login({ setUser, setLoggedIn }) {
   const [usernameFooter, setUsernameFooter] = useState();
-  function loginUser() {
+  const [username, setUsername] = useState("");
+  async function loginUser() {
     if (!username) {
+      console.log("Empty username");
       setUsernameFooter("Please enter your username");
       return;
+    }
+    try {
+      const res = await Axios.get(
+        `http://localhost:5000/users/username/${username}`
+      );
+      const user = res.data;
+      setUser(user);
+      setLoggedIn(true);
+      console.log(`user ${user.username} logged in successfully`);
+    } catch (error) {
+      console.error("error fetching user", error);
+      throw error;
     }
   }
   return (
@@ -28,7 +42,7 @@ function Login({ socket, username, setUsername, setId }) {
         <label id="password">Password</label>
         <input id="password" name="password" disabled></input>
       </Container>
-      <Button id="login" name="login" variant="success">
+      <Button id="login" name="login" variant="success" onClick={loginUser}>
         login
       </Button>
     </Container>

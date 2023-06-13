@@ -32,7 +32,7 @@ userRouter.get("/:id", async (req, res) => {
   }
 });
 
-userRouter.get("/:username", async (req, res) => {
+userRouter.get("/username/:username", async (req, res) => {
   try {
     const { username } = req.params;
     const user = await UserModel.findById({ username: username });

@@ -9,22 +9,16 @@ import { Button } from "react-bootstrap";
 import { id } from "date-fns/locale";
 
 function App() {
-  const [username, setUsername] = useState("");
-  const [id, setId] = useState("");
+  const [user, setUser] = useState({});
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const socket = io.connect("http://localhost:5000");
+  //const socket = io.connect("http://localhost:5000");
   return (
     <div className="App">
       {!loggedIn ? (
-        <Login
-          socket={socket}
-          username={username}
-          setUsername={setUsername}
-          setId={setId}
-        />
+        <Login user={setUser} setLoggedIn={setLoggedIn} />
       ) : (
-        <UserPage loggedUser={id} />
+        <UserPage loggedUser={user} />
       )}
     </div>
   );
