@@ -5,18 +5,18 @@ import Axios from "axios";
 import { Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DatePicker from "react-datepicker";
-
 function Signup() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [birthdate, setBirthdate] = useState();
+  const [email, setEmail] = useState("");
+  const [imageURL, setImageURL] = useState("");
   const role = "user";
   const navigate = useNavigate();
   const handleBirthDateChange = (date) => {
     setBirthdate(date);
   };
-
   async function usernameExists(username) {
     try {
       const res = await Axios.get(
@@ -45,7 +45,15 @@ function Signup() {
         return;
       }
 
-      const user = { name, username, birthdate, role };
+      const user = {
+        name,
+        username,
+        password,
+        birthdate,
+        email,
+        imageURL,
+        role,
+      };
       await Axios.post("http://localhost:5000/users", user);
 
       alert("User created");
@@ -64,21 +72,21 @@ function Signup() {
           required
           id="name"
           name="name"
-          onChange={(e) => setName(e.target.value)}
+          onChange={(event) => setName(event.target.value)}
         ></input>
         <label htmlFor="username">Username</label>
         <input
           required
           id="username"
           name="username"
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(event) => setUsername(event.target.value)}
         ></input>
         <label htmlFor="password">Password</label>
         <input
           required
           id="password"
           name="username"
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(event) => setPassword(event.target.value)}
         ></input>
         <label htmlFor="birthdate">Birthdate (DD/MM/YYYY)</label>
         <DatePicker

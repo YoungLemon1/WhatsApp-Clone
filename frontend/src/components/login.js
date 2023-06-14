@@ -20,14 +20,14 @@ function Login({ setUser, setLoggedIn }) {
       setPasswordFooter("Please enter your password");
       return;
     }
-
     try {
       const res = await Axios.get(
         `http://localhost:5000/users/username/${username}`
       );
       const data = res.data;
       console.log(data);
-      if (data === null || password !== data.password) {
+      if (data === null || !(await comparePasswords(password, data.password))) {
+        console.log(data.password);
         setError("Username or password is incorrect. Please try again.");
         return;
       }
@@ -42,6 +42,21 @@ function Login({ setUser, setLoggedIn }) {
       setError("An error occurred. Please try again later.");
     }
   }
+  async function comparePasswords(password, hashedPassword) {
+    try {
+      const response = await Axios.post(
+        "http://localhost:5000/users/compare-password",
+        { password, hashedPassword }
+      );
+      const result = response.data;
+      console.log("Password comparison result:", result);
+      return result;
+    } catch (error) {
+      console.error("Error comparing passwords", error);
+      return Promise.reject(error);
+    }
+  }
+
   function routeToSignup() {
     navigate("/signup");
   }

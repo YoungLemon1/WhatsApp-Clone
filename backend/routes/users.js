@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { body } from "express-validator";
+import crypto from "crypto";
+import bcrypt, { hash } from "bcrypt";
 import UserModel from "../models/user.js";
+import { log } from "console";
 const userRouter = Router();
 
 userRouter.get("/", async (req, res) => {
@@ -41,72 +44,75 @@ userRouter.get("/username/:username", async (req, res) => {
   }
 });
 
-userRouter.post(
-  "/",
-  [
-    body("name").notEmpty(),
-    body("username").notEmpty(),
-    body("role").notEmpty(),
-  ],
-  async (req, res) => {
-    const { name, username, birthdate, role } = req.body;
-
-    // Check if username already exists in the database
-    const existingUser = await UserModel.findOne({ username: username });
-    if (existingUser) {
-      return res.status(400).json({
-        error: "Username already exists",
-      });
-    }
-    try {
-      const newUser = new UserModel(req.body);
-      await newUser.save();
-
-      res.status(201).json(newUser);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        error: "Internal server error: failed to create user",
-      });
-    }
+userRouter.post("/", async (req, res) => {
+  const requiredFields = ["name", "username", "password"];
+  const { name, username, password, birthdate, email, imageURL, role } =
+    req.body;
+  if (!requiredFields.every((field) => field in req.body)) {
+    res.status(400).json({ error: "Missing required fields" });
+    return;
   }
-);
-
-userRouter.put(
-  "/:id",
-  [
-    body("name").notEmpty(),
-    body("username").notEmpty(),
-    body("role").notEmpty(),
-  ],
-  async (req, res) => {
-    const { id } = req.params;
-    const { name, username, birthdate, role } = req.body;
-
-    // Check if username already exists in the database
-    const user = await UserModel.findOne({ _id: id });
-    if (!user) {
-      return res.status(400).json({
-        error: "Bad request: user does not exist",
-      });
-    }
-    try {
-      user.name = name;
-      user.username = username;
-      user.birthdate = birthdate;
-      user.role = role;
-
-      await user.save();
-
-      res.status(200).json(user);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        error: "Internal server error: failed to update user",
-      });
-    }
+  // Check if username already exists in the database
+  const existingUser = await UserModel.findOne({ username: username });
+  if (existingUser) {
+    return res.status(400).json({
+      error: "Username already exists",
+    });
   }
-);
+  const newUser = new UserModel(req.body);
+  try {
+    const saltRounds = 10;
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log("Hashed password:", hashedPassword);
+    newUser.password = hashedPassword;
+  } catch (error) {
+    res.status(500).json({
+      error: "Internal server error: failed to encrypt user password",
+    });
+  }
+  try {
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Internal server error: failed to create user",
+    });
+  }
+});
+
+userRouter.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const requiredFields = ["name", "username", "password"];
+  const { name, username, password, birthdate, role } = req.body;
+  if (!requiredFields.every((field) => field in req.body)) {
+    res.status(400).json({ error: "Missing required fields" });
+    return;
+  }
+  // Check if username already exists in the database
+  const user = await UserModel.findOne({ _id: id });
+  if (!user) {
+    return res.status(400).json({
+      error: "Bad request: user does not exist",
+    });
+  }
+  try {
+    user.name = name;
+    user.username = username;
+    user.birthdate = birthdate;
+    user.role = role;
+
+    await user.save();
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Internal server error: failed to update user",
+    });
+  }
+});
 
 userRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
@@ -124,6 +130,21 @@ userRouter.delete("/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: "Internal server error: failed to delete user",
+    });
+  }
+});
+
+userRouter.post("/compare-password", async (req, res) => {
+  const { password, hashedPassword } = req.body;
+
+  try {
+    const result = await bcrypt.compare(password, hashedPassword);
+    console.log(result);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Internal server error: Failed to compare passwords",
     });
   }
 });
