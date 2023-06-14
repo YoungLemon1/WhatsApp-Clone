@@ -10,8 +10,8 @@ function Signup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [nameError, setNameError] = useState("");
-  const [usernameError, setUsernameError] = useState();
-  const [passwordError, setPasswordError] = useState();
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [birthdate, setBirthdate] = useState();
   const [email, setEmail] = useState("");
   const [imageURL, setImageURL] = useState("");
@@ -61,6 +61,7 @@ function Signup() {
         setUsernameError(`Username ${username} already exists`);
         return;
       }
+
       alert("User created");
       navigate("/");
     } catch (error) {
@@ -74,9 +75,9 @@ function Signup() {
         <h3>Create New User</h3>
         <label htmlFor="name">Name</label>
         <input
-          required
           id="name"
           name="name"
+          required
           minLength={2}
           onChange={(event) => setName(event.target.value)}
         ></input>
@@ -84,18 +85,18 @@ function Signup() {
         <label htmlFor="username">Username</label>
         <input
           required
+          minLength={2}
           id="username"
           name="username"
-          minLength={2}
           onChange={(event) => setUsername(event.target.value)}
         ></input>
         <small>{usernameError}</small>
         <label htmlFor="password">Password</label>
         <input
           required
+          minLength={6}
           id="password"
           name="password"
-          minLength={6}
           onChange={(event) => {
             const newPassword = event.target.value;
             setPassword(newPassword);
