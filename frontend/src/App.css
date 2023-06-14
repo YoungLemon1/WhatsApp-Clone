@@ -46,14 +46,14 @@ label {
   margin: 0.5rem;
 }
 
-#login small {
-  display: block;
-  color: red;
-}
-
 #error-container {
   background-color: darkred;
   color: rgb(230, 224, 221);
+}
+
+.user-form small {
+  display: block;
+  color: red;
 }
 
 table th,

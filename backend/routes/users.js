@@ -59,6 +59,13 @@ userRouter.post("/", async (req, res) => {
       error: "Username already exists",
     });
   }
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      error:
+        "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number.",
+    });
+  }
   const newUser = new UserModel(req.body);
   try {
     const saltRounds = 10;

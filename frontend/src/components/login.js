@@ -6,18 +6,18 @@ import Axios from "axios";
 function Login({ setUser, setLoggedIn }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [usernameFooter, setUsernameFooter] = useState();
-  const [passwordFooter, setPasswordFooter] = useState();
+  const [usernameError, setUsernameError] = useState();
+  const [passwordError, setPasswordError] = useState();
   const [error, setError] = useState("");
   const navigate = useNavigate();
   async function loginUser() {
     if (!username) {
       console.log("Error: empty username");
-      setUsernameFooter("Please enter your username");
+      setUsernameError("Please enter your username");
       return;
     } else if (!password) {
       console.log("Error: empty password");
-      setPasswordFooter("Please enter your password");
+      setPasswordError("Please enter your password");
       return;
     }
     try {
@@ -33,8 +33,8 @@ function Login({ setUser, setLoggedIn }) {
       }
       await setUser(data);
       setUsername("");
-      setUsernameFooter("");
-      setPasswordFooter("");
+      setUsernameError("");
+      setPasswordError("");
       setLoggedIn(true);
       console.log(`User ${data.username} logged in successfully`);
     } catch (error) {
@@ -71,20 +71,20 @@ function Login({ setUser, setLoggedIn }) {
           name="username"
           onChange={(event) => {
             setUsername(event.target.value);
-            setUsernameFooter("");
+            setUsernameError("");
           }}
         ></input>
-        <small>{usernameFooter}</small>
+        <small>{usernameError}</small>
         <label htmlFor="password">Password</label>
         <input
           id="password"
           name="password"
           onChange={(event) => {
             setPassword(event.target.value);
-            setPasswordFooter("");
+            setPasswordError("");
           }}
         ></input>
-        <small>{passwordFooter}</small>
+        <small>{passwordError}</small>
         <div>
           <Button id="login" name="login" variant="success" onClick={loginUser}>
             login
