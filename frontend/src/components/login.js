@@ -21,16 +21,12 @@ function Login({ setUser, setLoggedIn }) {
       return;
     }
     try {
-      const res = await Axios.get(
-        `http://localhost:5000/users/username/${username}`
-      );
+      const res = await Axios.post("http://localhost:5000/users/auth", {
+        username,
+        password,
+      });
       const data = res.data;
       console.log(data);
-      if (data === null || !(await comparePasswords(password, data.password))) {
-        console.log(data.password);
-        setError("Username or password is incorrect. Please try again.");
-        return;
-      }
       await setUser(data);
       setUsername("");
       setUsernameError("");
@@ -39,21 +35,7 @@ function Login({ setUser, setLoggedIn }) {
       console.log(`User ${data.username} logged in successfully`);
     } catch (error) {
       console.error("Error fetching user", error);
-      setError("An error occurred. Please try again later.");
-    }
-  }
-  async function comparePasswords(password, hashedPassword) {
-    try {
-      const response = await Axios.post(
-        "http://localhost:5000/users/compare-password",
-        { password, hashedPassword }
-      );
-      const result = response.data;
-      console.log("Password comparison result:", result);
-      return result;
-    } catch (error) {
-      console.error("Error comparing passwords", error);
-      return Promise.reject(error);
+      setError("Username or password are incorrect. Please try again.");
     }
   }
 
@@ -69,6 +51,7 @@ function Login({ setUser, setLoggedIn }) {
         <input
           id="username"
           name="username"
+          required
           onChange={(event) => {
             setUsername(event.target.value);
             setUsernameError("");
@@ -79,6 +62,7 @@ function Login({ setUser, setLoggedIn }) {
         <input
           id="password"
           name="password"
+          required
           onChange={(event) => {
             setPassword(event.target.value);
             setPasswordError("");

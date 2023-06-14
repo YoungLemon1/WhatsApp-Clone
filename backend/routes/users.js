@@ -4,6 +4,7 @@ import crypto from "crypto";
 import bcrypt, { hash } from "bcrypt";
 import UserModel from "../models/user.js";
 import { log } from "console";
+
 const userRouter = Router();
 
 userRouter.get("/", async (req, res) => {
@@ -31,10 +32,29 @@ userRouter.get("/:id", async (req, res) => {
   }
 });
 
-userRouter.get("/username/:username", async (req, res) => {
+userRouter.post("/auth", async (req, res) => {
   try {
-    const { username } = req.params;
+    const { username, password } = req.body;
+
+    // Find the user by username
     const user = await UserModel.findOne({ username: username });
+
+    if (!user) {
+      res.status(401).json({
+        error: "Authentication failed: Invalid username or password",
+      });
+      return;
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      res.status(401).json({
+        error: "Authentication failed: Invalid username or password",
+      });
+      return;
+    }
+
     res.status(200).json(user);
   } catch (err) {
     console.error(err.stack);
@@ -55,8 +75,8 @@ userRouter.post("/", async (req, res) => {
   // Check if username already exists in the database
   const existingUser = await UserModel.findOne({ username: username });
   if (existingUser) {
-    return res.status(400).json({
-      error: "Username already exists",
+    return res.status(200).json({
+      message: "Username already exists",
     });
   }
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
@@ -69,7 +89,6 @@ userRouter.post("/", async (req, res) => {
   const newUser = new UserModel(req.body);
   try {
     const saltRounds = 10;
-
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     console.log("Hashed password:", hashedPassword);
     newUser.password = hashedPassword;
@@ -94,6 +113,9 @@ userRouter.put("/:id", async (req, res) => {
   const requiredFields = ["name", "username", "password"];
   const { name, username, password, birthdate, email, imageURL, role } =
     req.body;
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  const matchedPassword = await bcrypt.compare(password, hashedPassword);
   if (!requiredFields.every((field) => field in req.body)) {
     res.status(400).json({ error: "Missing required fields" });
     return;
@@ -108,9 +130,9 @@ userRouter.put("/:id", async (req, res) => {
   try {
     user.name = name;
     user.username = username;
+    user.password = hashedPassword;
     user.birthdate = birthdate;
     user.role = role;
-
     await user.save();
 
     res.status(200).json(user);

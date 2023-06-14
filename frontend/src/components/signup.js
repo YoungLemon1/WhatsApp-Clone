@@ -9,6 +9,7 @@ function Signup() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [nameError, setNameError] = useState("");
   const [usernameError, setUsernameError] = useState();
   const [passwordError, setPasswordError] = useState();
   const [birthdate, setBirthdate] = useState();
@@ -25,34 +26,26 @@ function Signup() {
 
     return passwordRegex.test(password);
   }
-  async function usernameExists(username) {
-    try {
-      const res = await Axios.get(
-        `http://localhost:5000/users/username/${username}`
-      );
-      const data = res.data;
-      console.log(data);
-      return data !== null;
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      throw error;
-    }
-  }
 
   const createUser = async (event) => {
     event.preventDefault();
-
-    if (!name || !username || !password) {
-      alert("Please fill in all required fields.");
+    if (!name) {
+      console.log("Error: empty username");
+      setNameError("Please enter your name");
+      return;
+    } else if (!username) {
+      console.log("Error: empty username");
+      setUsernameError("Please enter your username");
+      return;
+    } else if (!password) {
+      console.log("Error: empty password");
+      setPasswordError("Please enter your password");
+      return;
+    } else if (!validatePassword(password)) {
+      console.error("invalid password");
       return;
     }
     try {
-      const usernameTaken = await usernameExists(username);
-      if (usernameTaken) {
-        alert(`Username ${username} is already taken.`);
-        return;
-      }
-
       const user = {
         name,
         username,
@@ -62,8 +55,12 @@ function Signup() {
         imageURL,
         role,
       };
-      await Axios.post("http://localhost:5000/users", user);
+      const res = await Axios.post("http://localhost:5000/users", user);
 
+      if (res.data.message) {
+        setUsernameError(`Username ${username} already exists`);
+        return;
+      }
       alert("User created");
       navigate("/");
     } catch (error) {
@@ -83,6 +80,7 @@ function Signup() {
           minLength={2}
           onChange={(event) => setName(event.target.value)}
         ></input>
+        <small>{nameError}</small>
         <label htmlFor="username">Username</label>
         <input
           required
@@ -110,7 +108,6 @@ function Signup() {
             }
           }}
         ></input>
-
         <small>{passwordError}</small>
         <label htmlFor="email">Email</label>
         <input
