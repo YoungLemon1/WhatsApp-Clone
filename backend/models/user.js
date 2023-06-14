@@ -9,6 +9,10 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
+  password: {
+    type: String,
+    require: true,
+  },
   birthdate: {
     type: Date,
     required: false,

@@ -1,6 +1,9 @@
 import React from "react";
 import moment from "moment";
-function AllUsers({ users }) {
+import Axios from "axios";
+async function AllUsers() {
+  const res = await Axios.get("http://localhost:5000/users");
+  const users = res.data;
   return (
     <div id="all-users">
       <table>
