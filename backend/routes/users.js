@@ -41,16 +41,16 @@ userRouter.post("/auth", async (req, res) => {
 
     if (!user) {
       res.status(401).json({
-        error: "Authentication failed: Invalid username or password",
+        error: "Authentication failed: Invalid credentials",
       });
       return;
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       res.status(401).json({
-        error: "Authentication failed: Invalid username or password",
+        error: "Authentication failed: Invalid credentials",
       });
       return;
     }
@@ -90,22 +90,14 @@ userRouter.post("/", async (req, res) => {
   try {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    console.log("Hashed password:", hashedPassword);
     newUser.password = hashedPassword;
   } catch (error) {
     res.status(500).json({
       error: "Internal server error: failed to encrypt user password",
     });
   }
-  try {
-    await newUser.save();
-    res.status(201).json(newUser);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "Internal server error: failed to create user",
-    });
-  }
+  await newUser.save();
+  res.status(201).json(newUser);
 });
 
 userRouter.put("/:id", async (req, res) => {
@@ -115,7 +107,6 @@ userRouter.put("/:id", async (req, res) => {
     req.body;
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
-  const matchedPassword = await bcrypt.compare(password, hashedPassword);
   if (!requiredFields.every((field) => field in req.body)) {
     res.status(400).json({ error: "Missing required fields" });
     return;

@@ -62,6 +62,7 @@ function Login({ setUser, setLoggedIn }) {
         <input
           id="password"
           name="password"
+          type="password"
           required
           onChange={(event) => {
             setPassword(event.target.value);

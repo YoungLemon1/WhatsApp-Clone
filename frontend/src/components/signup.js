@@ -97,6 +97,7 @@ function Signup() {
           minLength={6}
           id="password"
           name="password"
+          type="password"
           onChange={(event) => {
             const newPassword = event.target.value;
             setPassword(newPassword);
