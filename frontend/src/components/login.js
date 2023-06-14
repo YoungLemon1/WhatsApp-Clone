@@ -61,7 +61,7 @@ function Login({ setUser, setLoggedIn }) {
     navigate("/signup");
   }
   return (
-    <div>
+    <div className="form-container">
       <form id="login" className="user-form">
         <h1>Chat and Play</h1>
         <Container id="error-container">{error}</Container>
@@ -86,7 +86,7 @@ function Login({ setUser, setLoggedIn }) {
         ></input>
         <small>{passwordError}</small>
         <div>
-          <Button id="login" name="login" variant="success" onClick={loginUser}>
+          <Button className="submit-btn" variant="success" onClick={loginUser}>
             login
           </Button>
           <Button

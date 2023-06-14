@@ -72,7 +72,7 @@ function Signup() {
     }
   };
   return (
-    <div>
+    <div className="form-container">
       <form id="signup" className="user-form" onSubmit={createUser}>
         <h3>Create New User</h3>
         <label htmlFor="name">Name</label>
