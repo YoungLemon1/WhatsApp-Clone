@@ -9,6 +9,7 @@ import DatePicker from "react-datepicker";
 function Signup() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [birthdate, setBirthdate] = useState();
   const role = "user";
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ function Signup() {
   const createUser = async (event) => {
     event.preventDefault();
 
-    if (!name || !username) {
+    if (!name || !username || !password) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -58,22 +59,31 @@ function Signup() {
     <div>
       <form id="signup" className="user-form" onSubmit={createUser}>
         <h3>Create New User</h3>
-        <label>Name</label>
+        <label htmlFor="name">Name</label>
         <input
           required
           id="name"
           name="name"
           onChange={(e) => setName(e.target.value)}
         ></input>
-        <label>Username</label>
+        <label htmlFor="username">Username</label>
         <input
           required
           id="username"
           name="username"
           onChange={(e) => setUsername(e.target.value)}
         ></input>
-        <label>Birthdate (DD/MM/YYYY)</label>
+        <label htmlFor="password">Password</label>
+        <input
+          required
+          id="password"
+          name="username"
+          onChange={(e) => setPassword(e.target.value)}
+        ></input>
+        <label htmlFor="birthdate">Birthdate (DD/MM/YYYY)</label>
         <DatePicker
+          id="birthdate"
+          name="birthdate"
           selected={birthdate}
           dateFormat="dd/MM/yyyy"
           showDayMonthYearPicker

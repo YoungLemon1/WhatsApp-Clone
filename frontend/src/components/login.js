@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Axios from "axios";
 function Login({ setUser, setLoggedIn }) {
-  const [usernameFooter, setUsernameFooter] = useState();
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [usernameFooter, setUsernameFooter] = useState();
+  const [passwordFooter, setPasswordFooter] = useState();
   const [error, setError] = useState("");
   const navigate = useNavigate();
   async function loginUser() {
@@ -13,20 +15,26 @@ function Login({ setUser, setLoggedIn }) {
       console.log("Error: empty username");
       setUsernameFooter("Please enter your username");
       return;
+    } else if (!password) {
+      console.log("Error: empty password");
+      setPasswordFooter("Please enter your password");
+      return;
     }
+
     try {
       const res = await Axios.get(
         `http://localhost:5000/users/username/${username}`
       );
       const data = res.data;
       console.log(data);
-      if (data === null) {
+      if (data === null || password !== data.password) {
         setError("Username or password is incorrect. Please try again.");
         return;
       }
       await setUser(data);
       setUsername("");
       setUsernameFooter("");
+      setPasswordFooter("");
       setLoggedIn(true);
       console.log(`User ${data.username} logged in successfully`);
     } catch (error) {
@@ -53,7 +61,15 @@ function Login({ setUser, setLoggedIn }) {
         ></input>
         <small>{usernameFooter}</small>
         <label htmlFor="password">Password</label>
-        <input id="password" name="password" disabled></input>
+        <input
+          id="password"
+          name="password"
+          onChange={(event) => {
+            setPassword(event.target.value);
+            setPasswordFooter("");
+          }}
+        ></input>
+        <small>{passwordFooter}</small>
         <div>
           <Button id="login" name="login" variant="success" onClick={loginUser}>
             login
