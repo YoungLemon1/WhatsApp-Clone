@@ -88,7 +88,19 @@ function Signup() {
           name="username"
           onChange={(event) => setPassword(event.target.value)}
         ></input>
-        <label htmlFor="birthdate">Birthdate (DD/MM/YYYY)</label>
+        <label htmlFor="email">Email</label>
+        <input
+          id="email"
+          name="email"
+          onChange={(event) => setEmail(event.target.value)}
+        ></input>
+        <label htmlFor="imageURL">Image URl</label>
+        <input
+          id="imageURL"
+          name="imageURL"
+          onChange={(event) => setImageURL(event.target.value)}
+        ></input>
+        <label htmlFor="birthdate">Birthdate</label>
         <DatePicker
           id="birthdate"
           name="birthdate"

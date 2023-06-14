@@ -85,7 +85,8 @@ userRouter.post("/", async (req, res) => {
 userRouter.put("/:id", async (req, res) => {
   const { id } = req.params;
   const requiredFields = ["name", "username", "password"];
-  const { name, username, password, birthdate, role } = req.body;
+  const { name, username, password, birthdate, email, imageURL, role } =
+    req.body;
   if (!requiredFields.every((field) => field in req.body)) {
     res.status(400).json({ error: "Missing required fields" });
     return;

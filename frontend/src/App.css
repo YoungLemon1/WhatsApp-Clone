@@ -64,12 +64,12 @@ td {
 .user-form label {
   display: block;
   font-size: medium;
-  margin-bottom: 0px;
-  padding: 2px;
+  padding: 0.2rem;
 }
 
 .user-form input {
-  margin-top: 0px;
+  margin-top: 0.2rem;
+  margin-bottom: 0.5rem;
   width: 180px;
 }
 
