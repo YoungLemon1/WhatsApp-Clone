@@ -16,17 +16,17 @@ async function AllUsers() {
           </tr>
         </thead>
         <tbody>
-          {users.map((val) => {
+          {users.map((user) => {
             const birthdate =
-              val.birthdate === undefined
+              user.birthdate === undefined
                 ? ""
-                : moment(val.birthdate).format("DD-MM-YYYY");
+                : moment(user.birthdate).format("DD-MM-YYYY");
             return (
-              <tr key={val.username}>
-                <td>{val.name}</td>
-                <td>{val.username}</td>
+              <tr key={user.username}>
+                <td>{user.name}</td>
+                <td>{user.username}</td>
                 <td>{birthdate}</td>
-                <td>{val.role}</td>
+                <td>{user.role}</td>
               </tr>
             );
           })}

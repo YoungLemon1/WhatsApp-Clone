@@ -11,7 +11,7 @@ function UserPage({ user }) {
   return (
     <div>
       <h1>{user.username}</h1>
-      <div id="chat-history">{chats.map()}</div>
+      <div id="chat-history">{chats.map((chat) => {})}</div>
     </div>
   );
 }
