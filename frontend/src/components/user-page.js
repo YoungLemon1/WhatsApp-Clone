@@ -10,7 +10,7 @@ function UserPage({ user }) {
   return (
     <div>
       <h1>{user.username}</h1>
-      <div></div>
+      <div id="chat-history"></div>
     </div>
   );
 }

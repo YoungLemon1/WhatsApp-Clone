@@ -46,7 +46,7 @@ userRouter.post("/auth", async (req, res) => {
       return;
     }
 
-    const passwordMatch = bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       res.status(401).json({
