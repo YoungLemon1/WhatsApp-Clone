@@ -22,7 +22,7 @@ async function AllUsers() {
                 ? ""
                 : moment(user.birthdate).format("DD-MM-YYYY");
             return (
-              <tr key={user.username}>
+              <tr key={user._id}>
                 <td>{user.name}</td>
                 <td>{user.username}</td>
                 <td>{birthdate}</td>

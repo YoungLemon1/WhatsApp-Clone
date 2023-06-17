@@ -11,7 +11,14 @@ function UserPage({ user }) {
   return (
     <div>
       <h1>{user.username}</h1>
-      <div id="chat-history">{chats.map((chat) => {})}</div>
+      <div id="chat-history">
+        {chats.map((chat) => {
+          chat.
+          return <div>
+            {}
+            </div>;
+        })}
+      </div>
     </div>
   );
 }

@@ -144,7 +144,7 @@ userRouter.delete("/:id", async (req, res) => {
         error: "User does not exist",
       });
     }
-    resres.status(200).json({
+    res.status(200).json({
       success: "User deleted successfully",
     });
   } catch (error) {
@@ -155,19 +155,18 @@ userRouter.delete("/:id", async (req, res) => {
   }
 });
 
-userRouter.post("/compare-password", async (req, res) => {
-  const { password, hashedPassword } = req.body;
+userRouter.get("/user_credentials/:username");
+{
+  const { username } = req.params;
+  const user = await UserModel.findOne({ username: username });
 
-  try {
-    const result = await bcrypt.compare(password, hashedPassword);
-    console.log(result);
-    res.status(200).json(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "Internal server error: Failed to compare passwords",
+  if (!user) {
+    res.status(401).json({
+      error: "Authentication failed: Invalid credentials",
     });
+    return;
   }
-});
+  res.status(200).json({ username: user.username, password: user.password });
+}
 
 export default userRouter;
