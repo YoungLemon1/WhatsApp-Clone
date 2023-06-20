@@ -15,9 +15,8 @@ function UserPage({ user }) {
         const res = await Axios.get(
           `http://localhost:5000/chatrooms/user/${user._id}`
         );
-        const json = await res.json();
-        console.log(json);
-        setChatHistory(json);
+        console.log(res.data);
+        setChatHistory(res.data);
       } catch (error) {
         console.error("Failed to fetch users", error);
       }
@@ -65,10 +64,10 @@ function UserPage({ user }) {
       // Handle the error for the group chat search API request
     }
 
-    console.log(userData);
-    console.log(groupChatData);
+    console.log("user data", userData);
+    console.log("group data", groupChatData);
 
-    if (userData) {
+    if (Array.isArray(userData) && userData.length) {
       const newChatroom = {
         id: `${user._id}${userData._id}`,
         isGroupChat: false,
@@ -77,7 +76,7 @@ function UserPage({ user }) {
       };
       setChatHistory([...chatHistory, newChatroom]);
       navigate(`/chatroom/${newChatroom.id}`);
-    } else if (groupChatData) {
+    } else if (Array.isArray(groupChatData) && groupChatData.length) {
       const newChatroom = {
         id: groupChatData._id,
         isGroupChat: true,
