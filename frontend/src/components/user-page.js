@@ -6,6 +6,7 @@ import { Button } from "react-bootstrap";
 function UserPage({ user }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [isSendToUser, setIsSendToUser] = useState(false);
+  const [chatSearch, setChatSearch] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -21,22 +22,22 @@ function UserPage({ user }) {
       }
     }
     fetchData();
-  }, [user]);
+  }, [user._id]);
   /*function dateFormat(date) {
     if (date) {
       return moment(date).format("DD-MM-YYYY");
     } else return "";
   }*/
-  async function getUser(id) {
-    try {
-      const res = await Axios.get(`http://localhost:5000/users/${id}`);
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching user", error);
-    }
-  }
   function SendToUserCkick() {
     setIsSendToUser(!isSendToUser);
+  }
+  async function enterChatRoom() {
+    if (!chatSearch) {
+      return;
+    }
+    const res = await Axios.get(
+      `http://localhost:5000/chatrooms/user/${user._id}/${chatSearch}`
+    );
   }
 
   return (
@@ -44,25 +45,13 @@ function UserPage({ user }) {
       <h1>{user.username}</h1>
       <div id="chat-history">
         {chatHistory.map((chat) => {
-          if (chat.isGroupChat) {
-            return (
-              <div key={chat._id}>
-                {chat.groupChatPicture} {chat.groupChatName}
-              </div>
-            );
-          }
-          const otherUserID = chat.members.find(
-            (memeber) => memeber !== user._id
-          );
-          const otherUser = getUser(otherUserID);
           return (
-            <div key={chat._id}>
+            <div key={chat.id}>
               <img
-                className="user-image"
-                src={otherUser.imageURL}
-                alt={otherUser.username}
+                className="profile-picture"
+                src={chat.imageURL}
+                alt={chat.name}
               ></img>
-              <h6>{otherUser.username}</h6>
             </div>
           );
         })}
@@ -72,8 +61,17 @@ function UserPage({ user }) {
           <div />
         ) : (
           <div>
-            <label htmlFor="send-to">Search user or group</label>
-            <input></input>
+            <label htmlFor="send-to">Chat with user or group</label>
+            <input
+              id="chat-name"
+              onChange={(event) => {
+                setChatSearch(event.target.value);
+              }}
+            ></input>
+            <button className="submit-btn" onClick={enterChatRoom}>
+              {" "}
+              Enter Chat
+            </button>
           </div>
         )}
         <Button id="send-to-user-btn" onClick={SendToUserCkick}>

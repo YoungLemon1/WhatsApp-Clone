@@ -32,15 +32,15 @@ chatRoomRouter.get("/user/:id", async (req, res) => {
       const chatName = isGroupChat
         ? chatroom.groupChatName
         : otherUser.username;
-      const chatPicture = isGroupChat
+      const chatImageURL = isGroupChat
         ? chatroom.groupChatPicture
         : otherUser.imageURL;
 
       return {
         id: chatroom._id,
-        isGroupChat,
-        chatName,
-        chatPicture,
+        isGroupChat: isGroupChat,
+        name: chatName,
+        imageURL: chatImageURL,
       };
     });
 
