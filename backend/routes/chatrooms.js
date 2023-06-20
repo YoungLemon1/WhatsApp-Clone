@@ -66,6 +66,21 @@ chatRoomRouter.get("/:id", async (req, res) => {
   }
 });
 
+chatRoomRouter.get("search/:groupName", async (req, res) => {
+  try {
+    const { groupName } = req.params;
+    const groupChatrooms = await ChatRoomModel.find({
+      groupChatName: groupName,
+    });
+    res.status(200).json(groupChatrooms);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching chatrooms",
+    });
+  }
+});
+
 chatRoomRouter.post("/", async (req, res) => {
   const { name, username, birthdate, role } = req.body;
 
@@ -85,6 +100,19 @@ chatRoomRouter.post("/", async (req, res) => {
     console.error(error);
     res.status(500).json({
       error: "Internal server error: failed to create chatroom",
+    });
+  }
+});
+
+chatRoomRouter.patch("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const chatroom = await ChatRoomModel.findById(id);
+    res.status(200).json(chatroom);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching chatroom",
     });
   }
 });

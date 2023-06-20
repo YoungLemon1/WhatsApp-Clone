@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
 function UserPage({ user }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [isSendToUser, setIsSendToUser] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
     async function fetchData() {
       try {
@@ -35,9 +36,22 @@ function UserPage({ user }) {
     if (!chatSearch) {
       return;
     }
-    const res = await Axios.get(
-      `http://localhost:5000/chatrooms/user/${user._id}/${chatSearch}`
+    const chat = chatHistory.find((c) => c.name === chatSearch);
+    const responseUserExists = await Axios.get(
+      `http://localhost:5000/users/search/${chatSearch}`
     );
+    const responseChatroomExists = await Axios.get(
+      `http://localhost:5000/chatrooms/search/${chatSearch}`
+    );
+    if (!chat) {
+      setChatHistory(...chatHistory, {
+        id: "1111111111111111111",
+        isGroupChat: false,
+        name: chatName,
+        imageURL: chatImageURL,
+      });
+    }
+    navigate(`/chat/${chat.id}`);
   }
 
   return (

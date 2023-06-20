@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Login from "./components/login";
 import UserPage from "./components/user-page";
 import Signup from "./components/signup";
+import Chat from "./components/chat";
 
 function App() {
   const [user, setUser] = useState({});
@@ -25,6 +26,7 @@ function App() {
         <Routes>
           <Route path="/" element={homeRoute()} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/chat/:id" element={<Chat />} />
         </Routes>
       </Router>
     </div>

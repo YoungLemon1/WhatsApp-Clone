@@ -31,6 +31,19 @@ userRouter.get("/:id", async (req, res) => {
   }
 });
 
+userRouter.get("/search/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await UserModel.find({ username: username });
+    res.status(200).json(user);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching user",
+    });
+  }
+});
+
 userRouter.post("/auth", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -109,7 +122,6 @@ userRouter.put("/:id", async (req, res) => {
     res.status(400).json({ error: "Missing required fields" });
     return;
   }
-  // Check if username already exists in the database
   const user = await UserModel.findOne({ _id: id });
   if (!user) {
     return res.status(400).json({
@@ -151,18 +163,6 @@ userRouter.delete("/:id", async (req, res) => {
       error: "Internal server error: failed to delete user",
     });
   }
-});
-
-userRouter.get("/user-credentials/:username", async (req, res) => {
-  const { username } = req.params;
-  const user = await UserModel.findOne({ username: username });
-
-  if (!user) {
-    return res.status(401).json({
-      error: "Authentication failed: Invalid credentials",
-    });
-  }
-  res.status(200).json({ password: user.password });
 });
 
 export default userRouter;
