@@ -34,7 +34,7 @@ userRouter.get("/:id", async (req, res) => {
 userRouter.get("/search/:username", async (req, res) => {
   try {
     const { username } = req.params;
-    const user = await UserModel.find({ username: username });
+    const user = await UserModel.findOne({ username: username });
     res.status(200).json(user);
   } catch (err) {
     console.error(err.stack);

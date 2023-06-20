@@ -67,7 +67,7 @@ function UserPage({ user }) {
     console.log("user data", userData);
     console.log("group data", groupChatData);
 
-    if (Array.isArray(userData) && userData.length) {
+    if (userData) {
       const newChatroom = {
         id: `${user._id}${userData._id}`,
         isGroupChat: false,
@@ -76,7 +76,7 @@ function UserPage({ user }) {
       };
       setChatHistory([...chatHistory, newChatroom]);
       navigate(`/chatroom/${newChatroom.id}`);
-    } else if (Array.isArray(groupChatData) && groupChatData.length) {
+    } else if (groupChatData) {
       const newChatroom = {
         id: groupChatData._id,
         isGroupChat: true,

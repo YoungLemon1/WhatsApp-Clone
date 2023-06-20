@@ -69,7 +69,7 @@ chatRoomRouter.get("/:id", async (req, res) => {
 chatRoomRouter.get("/search/:groupName", async (req, res) => {
   try {
     const { groupName } = req.params;
-    const groupChatrooms = await ChatRoomModel.find({
+    const groupChatrooms = await ChatRoomModel.findOne({
       groupChatName: groupName,
     });
     res.status(200).json(groupChatrooms);
