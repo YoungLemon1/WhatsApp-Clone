@@ -29,7 +29,7 @@ chatRoomRouter.get("/user/:id", async (req, res) => {
       const otherUserId = chatroom.members.find(
         (member) => member.toString() !== id
       );
-      const otherUser = await UserModel.findById(otherUserId);
+      const otherUser = (await UserModel.findById(otherUserId)) ?? undefined;
       const isGroupChat = chatroom.isGroupChat;
       const chatName = isGroupChat
         ? chatroom.groupChatName
