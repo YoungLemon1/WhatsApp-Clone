@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import moment from "moment";
+import { Button } from "react-bootstrap";
 
 function UserPage({ user }) {
   const [chats, setChats] = useState([]);
+  const [isSendToUser, setIsSendToUser] = useState(false);
   useEffect(
     () =>
       async function fetchData() {
@@ -33,8 +35,12 @@ function UserPage({ user }) {
       <h1>{user.username}</h1>
       <div id="chat-history">
         {chats.map((chat) => {
-          if (chat.isGroupchat) {
-            return <div>profile picture {chat.name}</div>;
+          if (chat.isGroupChat) {
+            return (
+              <div>
+                {chat.groupChatPicture} {chat.groupChatName}
+              </div>
+            );
           }
           const otherUserID = chat.members.find(
             (memeber) => memeber !== user._id
@@ -51,6 +57,12 @@ function UserPage({ user }) {
             </div>
           );
         })}
+      </div>
+      <div>
+        {isSendToUser ? "true" : "false"}
+        <Button id="send-to-user-btn" onClick={setIsSendToUser(!isSendToUser)}>
+          {isSendToUser ? "+" : "X"}
+        </Button>
       </div>
     </div>
   );
