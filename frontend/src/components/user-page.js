@@ -37,21 +37,37 @@ function UserPage({ user }) {
       return;
     }
     const chat = chatHistory.find((c) => c.name === chatSearch);
-    const responseUserExists = await Axios.get(
-      `http://localhost:5000/users/search/${chatSearch}`
-    );
-    const responseChatroomExists = await Axios.get(
-      `http://localhost:5000/chatrooms/search/${chatSearch}`
-    );
     if (!chat) {
-      setChatHistory(...chatHistory, {
-        id: "1111111111111111111",
-        isGroupChat: false,
-        name: chatName,
-        imageURL: chatImageURL,
-      });
-    }
-    navigate(`/chat/${chat.id}`);
+      const responseUserSearch = await Axios.get(
+        `http://localhost:5000/users/search/${chatSearch}`
+      );
+      const userData = responseUserSearch.data;
+      if (userData) {
+        const newChatroom = {
+          id: user._id + userData._id,
+          isGroupChat: false,
+          name: userData.username,
+          imageURL: userData.imageURL,
+        };
+        setChatHistory(...chatHistory, newChatroom);
+        navigate(`/chatroom/${newChatroom.id}`);
+      } else {
+        const responseGroupChatSearch = await Axios.get(
+          `http://localhost:5000/chatrooms/search/${chatSearch}`
+        );
+        const groupChatData = responseGroupChatSearch.data;
+        if (groupChatData) {
+          const newChatroom = {
+            id: groupChatData._id,
+            isGroupChat: true,
+            name: groupChatData.groupChatName,
+            imageURL: groupChatData.groupChatPicture,
+          };
+          setChatHistory(...chatHistory, newChatroom);
+          navigate(`/chatroom/${newChatroom.id}`);
+        } else return;
+      }
+    } else navigate(`/chatroom/${chat.id}`);
   }
 
   return (
