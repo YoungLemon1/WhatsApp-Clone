@@ -1,5 +1,6 @@
 import { Router } from "express";
 import ChatRoomModel from "../models/chatroom.js";
+import UserModel from "../models/user.js";
 const chatRoomRouter = Router();
 
 chatRoomRouter.get("/", async (req, res) => {
@@ -19,14 +20,39 @@ chatRoomRouter.get("/", async (req, res) => {
 chatRoomRouter.get("/user/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Fetch the chatrooms where the user is a member
     const chatrooms = await ChatRoomModel.find({ members: { $in: [id] } });
+
+    // Map the chatrooms to the desired format
+    const chatHistory = chatrooms.map(async (chatroom) => {
+      const otherUserId = chatroom.members.find(
+        (member) => member.toString() !== id
+      );
+      const otherUser = await UserModel.findById(otherUserId);
+      const isGroupChat = chatroom.isGroupChat;
+      const chatName = isGroupChat
+        ? chatroom.groupChatName
+        : otherUser.username;
+      const chatPicture = isGroupChat
+        ? chatroom.groupChatPicture
+        : otherUser.imageURL;
+
+      return {
+        id: chatroom._id,
+        isGroupChat,
+        chatName,
+        chatPicture,
+      };
+    });
+
     res.status(200).json({
-      data: chatrooms,
+      data: chatHistory,
     });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: Failure fetching chatroom",
+      error: "Internal server error: Failure fetching chat history",
     });
   }
 });

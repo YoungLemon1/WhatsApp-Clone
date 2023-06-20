@@ -3,8 +3,8 @@ import Axios from "axios";
 import moment from "moment";
 import { Button } from "react-bootstrap";
 
-function UserPage({ user }) {
-  const [chats, setChats] = useState([]);
+async function UserPage({ user }) {
+  const [chatHistory, setChatHistory] = useState([]);
   const [isSendToUser, setIsSendToUser] = useState(false);
   useEffect(
     () =>
@@ -13,7 +13,7 @@ function UserPage({ user }) {
           `http://localhost:5000/chatrooms/user/${user._id}`
         );
         const data = res.data;
-        setChats(data);
+        setChatHistory(data);
       },
     [user._id]
   );
@@ -30,14 +30,18 @@ function UserPage({ user }) {
       console.error("Error fetching user", error);
     }
   }
+  function SendToUserCkick() {
+    setIsSendToUser(!isSendToUser);
+  }
+
   return (
     <div>
       <h1>{user.username}</h1>
       <div id="chat-history">
-        {chats.map((chat) => {
+        {chatHistory.map((chat) => {
           if (chat.isGroupChat) {
             return (
-              <div>
+              <div key={chat._id}>
                 {chat.groupChatPicture} {chat.groupChatName}
               </div>
             );
@@ -47,7 +51,7 @@ function UserPage({ user }) {
           );
           const otherUser = getUser(otherUserID);
           return (
-            <div>
+            <div key={chat._id}>
               <img
                 className="user-image"
                 src={otherUser.imageURL}
@@ -58,9 +62,9 @@ function UserPage({ user }) {
           );
         })}
       </div>
-      <div>
+      <div id="send-message-to-user">
         {isSendToUser ? "true" : "false"}
-        <Button id="send-to-user-btn" onClick={setIsSendToUser(!isSendToUser)}>
+        <Button id="send-to-user-btn" onClick={SendToUserCkick}>
           {isSendToUser ? "+" : "X"}
         </Button>
       </div>
