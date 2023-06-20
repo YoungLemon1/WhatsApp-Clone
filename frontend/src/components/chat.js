@@ -1,7 +1,12 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 
-function Chat({ chat }) {
+function Chat() {
+  const { id } = useParams();
   const [loggedUser, SetLoggedUser] = useState("");
-  return <div>chat</div>;
+  <div>
+    <h1>Chat Room: {id}</h1>
+    {/* Rest of the component */}
+  </div>;
 }
 export default Chat;

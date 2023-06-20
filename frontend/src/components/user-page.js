@@ -37,37 +37,53 @@ function UserPage({ user }) {
       return;
     }
     const chat = chatHistory.find((c) => c.name === chatSearch);
-    if (!chat) {
+    if (chat) {
+      navigate(`/chatroom/${chat.id}`);
+      return;
+    }
+
+    let userData;
+    let groupChatData;
+
+    try {
       const responseUserSearch = await Axios.get(
         `http://localhost:5000/users/search/${chatSearch}`
       );
-      const userData = responseUserSearch.data;
-      if (userData) {
-        const newChatroom = {
-          id: user._id + userData._id,
-          isGroupChat: false,
-          name: userData.username,
-          imageURL: userData.imageURL,
-        };
-        setChatHistory(...chatHistory, newChatroom);
-        navigate(`/chatroom/${newChatroom.id}`);
-      } else {
-        const responseGroupChatSearch = await Axios.get(
-          `http://localhost:5000/chatrooms/search/${chatSearch}`
-        );
-        const groupChatData = responseGroupChatSearch.data;
-        if (groupChatData) {
-          const newChatroom = {
-            id: groupChatData._id,
-            isGroupChat: true,
-            name: groupChatData.groupChatName,
-            imageURL: groupChatData.groupChatPicture,
-          };
-          setChatHistory(...chatHistory, newChatroom);
-          navigate(`/chatroom/${newChatroom.id}`);
-        } else return;
-      }
-    } else navigate(`/chatroom/${chat.id}`);
+      userData = responseUserSearch.data;
+    } catch (error) {
+      console.error(error);
+      // Handle the error for the user search API request
+    }
+
+    try {
+      const responseGroupChatSearch = await Axios.get(
+        `http://localhost:5000/chatrooms/search/${chatSearch}`
+      );
+      groupChatData = responseGroupChatSearch.data;
+    } catch (error) {
+      console.error(error);
+      // Handle the error for the group chat search API request
+    }
+
+    if (userData) {
+      const newChatroom = {
+        id: `${user._id}${userData._id}`,
+        isGroupChat: false,
+        name: userData.username,
+        imageURL: userData.imageURL,
+      };
+      setChatHistory([...chatHistory, newChatroom]);
+      navigate(`/chatroom/${newChatroom.id}`);
+    } else if (groupChatData) {
+      const newChatroom = {
+        id: groupChatData._id,
+        isGroupChat: true,
+        name: groupChatData.groupChatName,
+        imageURL: groupChatData.groupChatPicture,
+      };
+      setChatHistory([...chatHistory, newChatroom]);
+      navigate(`/chatroom/${newChatroom.id}`);
+    }
   }
 
   return (
