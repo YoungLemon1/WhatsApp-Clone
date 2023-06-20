@@ -25,7 +25,7 @@ const UserSchema = new Schema({
     type: String,
     required: false,
   },
-  members: [
+  conatcts: [
     {
       type: Schema.Types.ObjectId,
       ref: "User",
