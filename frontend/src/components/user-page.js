@@ -65,6 +65,9 @@ function UserPage({ user }) {
       // Handle the error for the group chat search API request
     }
 
+    console.log(userData);
+    console.log(groupChatData);
+
     if (userData) {
       const newChatroom = {
         id: `${user._id}${userData._id}`,
