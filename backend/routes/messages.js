@@ -5,10 +5,8 @@ const messageRouter = Router();
 
 messageRouter.get("/", async (req, res) => {
   try {
-    const users = await MessageModel.find({});
-    res.status(200).json({
-      data: users,
-    });
+    const messages = await MessageModel.find({});
+    res.status(200).json(messages);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -21,9 +19,7 @@ messageRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const message = await MessageModel.findById(id);
-    res.status(200).json({
-      data: message,
-    });
+    res.status(200).json(message);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -45,9 +41,7 @@ messageRouter.post("/", [body("text").notEmpty()], async (req, res) => {
     const newMessage = new MessageModel(req.body);
     await newMessage.save();
 
-    res.status(201).json({
-      data: newMessage,
-    });
+    res.status(201).json(newMessage);
   } catch (error) {
     console.error(error);
     res.status(500).json({

@@ -3,7 +3,6 @@ import { body } from "express-validator";
 import crypto from "crypto";
 import bcrypt, { hash } from "bcrypt";
 import UserModel from "../models/user.js";
-import { log } from "console";
 
 const userRouter = Router();
 

@@ -6,9 +6,7 @@ const chatRoomRouter = Router();
 chatRoomRouter.get("/", async (req, res) => {
   try {
     const chatrooms = await ChatRoomModel.find({});
-    res.status(200).json({
-      data: chatrooms,
-    });
+    res.status(200).json(chatrooms);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -46,9 +44,7 @@ chatRoomRouter.get("/user/:id", async (req, res) => {
       };
     });
 
-    res.status(200).json({
-      data: chatHistory,
-    });
+    res.status(200).json(chatHistory);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -61,9 +57,7 @@ chatRoomRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const chatroom = await ChatRoomModel.findById(id);
-    res.status(200).json({
-      data: chatroom,
-    });
+    res.status(200).json(chatroom);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -86,9 +80,7 @@ chatRoomRouter.post("/", async (req, res) => {
     const newChatroom = new ChatRoomModel(req.body);
     await newChatroom.save();
 
-    res.status(201).json({
-      data: newChatroom,
-    });
+    res.status(201).json(newChatroom);
   } catch (error) {
     console.error(error);
     res.status(500).json({
