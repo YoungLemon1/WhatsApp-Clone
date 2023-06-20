@@ -29,6 +29,12 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  members: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 const UserModel = model("User", UserSchema);

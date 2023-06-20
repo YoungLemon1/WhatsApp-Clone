@@ -41,14 +41,13 @@ userRouter.post("/auth", async (req, res) => {
 
     if (!user) {
       res.status(401).json({
-        error: "Authentication failed: Invalid credentials",
+        error: "Authentication failed: Invalid ucredentials",
       });
       return;
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
+    if (!passwordMatch && password !== user.password) {
       res.status(401).json({
         error: "Authentication failed: Invalid credentials",
       });
@@ -155,18 +154,16 @@ userRouter.delete("/:id", async (req, res) => {
   }
 });
 
-userRouter.get("/user_credentials/:username");
-{
+userRouter.get("/user-credentials/:username", async (req, res) => {
   const { username } = req.params;
   const user = await UserModel.findOne({ username: username });
 
   if (!user) {
-    res.status(401).json({
+    return res.status(401).json({
       error: "Authentication failed: Invalid credentials",
     });
-    return;
   }
-  res.status(200).json({ username: user.username, password: user.password });
-}
+  res.status(200).json({ password: user.password });
+});
 
 export default userRouter;

@@ -10,7 +10,7 @@ const MessageSchema = new Schema({
   text: {
     type: String,
   },
-  timestamp: {
+  CreatedAt: {
     type: Date,
   },
   isGroup: {

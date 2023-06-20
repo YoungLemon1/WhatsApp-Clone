@@ -16,6 +16,21 @@ chatRoomRouter.get("/", async (req, res) => {
   }
 });
 
+chatRoomRouter.get("/user/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const chatrooms = await ChatRoomModel.find({ members: { $in: [id] } });
+    res.status(200).json({
+      data: chatrooms,
+    });
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching chatroom",
+    });
+  }
+});
+
 chatRoomRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;

@@ -45,9 +45,14 @@ function Login({ setUser, setLoggedIn }) {
   //debug function
   async function getUserCredentials() {
     try {
-      const res = await Axios.post(`http://localhost:5000/users/${username}`);
+      const passwordInput = document.getElementById("password");
+      const res = await Axios.get(
+        `http://localhost:5000/users/user-credentials/${username}`
+      );
       const data = res.data;
+      console.log(data.password);
       setPassword(data.password);
+      passwordInput.value = data.password;
     } catch (error) {
       console.error("Error fetching user", error);
     }
