@@ -42,21 +42,7 @@ function Login({ setUser, setLoggedIn }) {
   function routeToSignup() {
     navigate("/signup");
   }
-  //debug function
-  async function getUserCredentials() {
-    try {
-      const passwordInput = document.getElementById("password");
-      const res = await Axios.get(
-        `http://localhost:5000/users/user-credentials/${username}`
-      );
-      const data = res.data;
-      console.log(data.password);
-      setPassword(data.password);
-      passwordInput.value = data.password;
-    } catch (error) {
-      console.error("Error fetching user", error);
-    }
-  }
+
   return (
     <div className="form-container">
       <form id="login" className="user-form">
@@ -85,11 +71,6 @@ function Login({ setUser, setLoggedIn }) {
           }}
         ></input>
         <small>{passwordError}</small>
-        <div>
-          <Button variant="warning" onClick={getUserCredentials}>
-            Get user credentials
-          </Button>
-        </div>
         <div>
           <Button className="submit-btn" variant="success" onClick={loginUser}>
             login
