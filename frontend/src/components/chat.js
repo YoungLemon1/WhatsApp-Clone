@@ -22,8 +22,22 @@ function Chat({
       setChatHistory(updatedChatHistory);
     }
   }
-  function sendMessage() {
-    const message = {};
+  async function sendMessage() {
+    const message = {
+      sender: loggedUser._id,
+      text: messageText,
+      createdAt: Date.now(),
+    };
+    try {
+      const res = await Axios.post("http://localhost:5000/messages", message);
+      const data = res.data;
+      console.log("message sent", data);
+      setMessageText("");
+      const textInput = document.getElementById("message-text");
+      textInput.value = "";
+    } catch {
+      console.error("Failed to send message");
+    }
   }
   return (
     <div className="chat">
@@ -41,6 +55,7 @@ function Chat({
       </div>
       <div className="chat-footer">
         <input
+          id="message-text"
           className="message-text-box"
           onChange={(event) => {
             setMessageText(event.target.value);

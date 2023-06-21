@@ -29,7 +29,7 @@ messageRouter.get("/:id", async (req, res) => {
 });
 
 messageRouter.post("/", [body("text").notEmpty()], async (req, res) => {
-  const { sender, recipient, text, timestamp, isGroup } = req.body;
+  const { sender, text, createdAt } = req.body;
 
   // Check if username already exists in the database
   if ({ text } === "") {
