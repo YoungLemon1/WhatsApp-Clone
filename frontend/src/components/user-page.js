@@ -119,7 +119,7 @@ function UserPage({ user }) {
             })}
           </div>
           <div id="send-message-to-user">
-            <label htmlFor="send-to">Chat with user or group</label>
+            <label htmlFor="chat-name">Chat with user or group</label>
             <input
               id="chat-name"
               onChange={(event) => {
