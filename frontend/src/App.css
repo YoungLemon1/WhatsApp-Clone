@@ -33,6 +33,10 @@
   text-align: left;
 }
 
+.App-navbar ul {
+  margin: 0;
+}
+
 .App-navbar ul li {
   list-style: none;
 }
@@ -63,6 +67,58 @@ label {
 #error-container {
   background-color: darkred;
   color: rgb(230, 224, 221);
+}
+.chat .chat-header {
+  background-color: #026783;
+  height: 2.5rem;
+  text-align: left;
+}
+.chat .chat-header * {
+  display: inline-flex;
+}
+
+.chat .chat-header .chat-img {
+  margin: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+
+.chat .chat-header .chat-name {
+  margin: 0.25rem;
+  height: 100%;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+.chat .chat-header .exit-btn {
+  background-color: none;
+  border-radius: 50%;
+  margin-left: 0.5rem;
+  margin-right: 1.5rem;
+}
+.chat .chat-body {
+  height: 100%;
+}
+
+.chat .chat-footer {
+  margin: 0.2rem;
+  margin-top: 70%;
+}
+
+.chat .chat-footer * {
+  margin-top: 0rem;
+  margin-bottom: 0rem;
+  margin-left: 0.2rem;
+  margin-right: 0.2rem;
+}
+.chat .chat-footer .message-text-box {
+  margin-top: 0rem;
+  height: 100%;
+}
+.chat .chat-footer .send-btn {
+  margin-top: 0rem;
+  height: 100%;
 }
 
 .form-container {

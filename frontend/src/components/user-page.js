@@ -102,9 +102,9 @@ function UserPage({ user }) {
 
   return (
     <div>
-      <h1>{user.username}</h1>
       {!isUserInChatroom ? (
         <div>
+          <h1>{user.username}</h1>
           <div id="chat-history">
             {chatHistory.map((chat) => {
               return (
@@ -117,6 +117,24 @@ function UserPage({ user }) {
                 </div>
               );
             })}
+          </div>
+          <div id="send-message-to-user">
+            {!isSendToUser ? (
+              <div />
+            ) : (
+              <div>
+                <label htmlFor="send-to">Chat with user or group</label>
+                <input
+                  id="chat-name"
+                  onChange={(event) => {
+                    setChatSearch(event.target.value);
+                  }}
+                ></input>
+                <button className="submit-btn" onClick={enterChatRoom}>
+                  Enter Chat
+                </button>
+              </div>
+            )}
           </div>
           <div>
             <Button id="send-to-user-btn" onClick={SendToUser}>
@@ -136,24 +154,6 @@ function UserPage({ user }) {
         ></Chat>
       )}
       <div />
-      <div id="send-message-to-user">
-        {!isSendToUser ? (
-          <div />
-        ) : (
-          <div>
-            <label htmlFor="send-to">Chat with user or group</label>
-            <input
-              id="chat-name"
-              onChange={(event) => {
-                setChatSearch(event.target.value);
-              }}
-            ></input>
-            <button className="submit-btn" onClick={enterChatRoom}>
-              Enter Chat
-            </button>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

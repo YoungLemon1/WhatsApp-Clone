@@ -19,23 +19,27 @@ function Chat({
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
       setChatHistory(updatedChatHistory);
     }
-    return;
   }
+  function sendMessage() {}
   return (
-    <div>
-      <div id="chat-header">
-        <button onClick={exitChat}>←</button>
-        <img src={chat.imageURL} alt="chat profile"></img>
-        <h1>{chat.name}</h1>
+    <div className="chat">
+      <div className="chat-header">
+        <button className="exit-btn" onClick={exitChat}>
+          ←
+        </button>
+        <img className="chat-img" src={chat.imageURL} alt="chat profile"></img>
+        <h4 className="chat-name">{chat.name}</h4>
       </div>
-      <div id="chat-content">
+      <div className="chat-body">
         {messages.map((message) => {
           return <div key={message._id}></div>;
         })}
       </div>
-      <div id="chat-footer">
-        <input id="message-text"></input>
-        <Button>Send</Button>
+      <div className="chat-footer">
+        <input className="message-text-box"></input>
+        <button className="send-btn" onClick={sendMessage}>
+          Send
+        </button>
       </div>
     </div>
   );
