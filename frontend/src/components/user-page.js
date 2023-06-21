@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
-import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
-import { useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
 import Chat from "./chat";
 
 function UserPage({ user }) {
   const [chatHistory, setChatHistory] = useState([]);
-  const [isSendToUser, setIsSendToUser] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
   const [isUserInChatroom, setIsUserInChatroom] = useState(false);
   const [currentChat, setCurrentChat] = useState({});
@@ -32,9 +28,6 @@ function UserPage({ user }) {
       return moment(date).format("DD-MM-YYYY");
     } else return "";
   }*/
-  function SendToUser() {
-    setIsSendToUser(!isSendToUser);
-  }
 
   async function enterChatRoom() {
     if (!chatSearch) {
@@ -42,7 +35,6 @@ function UserPage({ user }) {
     }
     const chat = chatHistory.find((c) => c.name === chatSearch);
     if (chat) {
-      setIsSendToUser(false);
       setCurrentChat(chat);
       setIsUserInChatroom(true);
       return;
@@ -83,7 +75,6 @@ function UserPage({ user }) {
         imageURL: userData.imageURL,
       };
       setChatHistory([...chatHistory, newChatroom]);
-      setIsSendToUser(false);
       setCurrentChat(newChatroom);
       setIsUserInChatroom(true);
     } else if (groupChatData) {
@@ -94,7 +85,6 @@ function UserPage({ user }) {
         imageURL: groupChatData.groupChatPicture,
       };
       setChatHistory([...chatHistory, newChatroom]);
-      setIsSendToUser(false);
       setCurrentChat(newChatroom);
       setIsUserInChatroom(true);
     }
