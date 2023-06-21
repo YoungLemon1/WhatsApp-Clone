@@ -28,6 +28,20 @@
   color: #61dafb;
 }
 
+.App-navbar {
+  background-color: #010c22;
+  text-align: left;
+}
+
+.App-navbar ul li {
+  list-style: none;
+}
+
+.App-navbar ul li * {
+  color: #ffffff;
+  text-decoration: none;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
