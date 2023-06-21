@@ -3,6 +3,7 @@ import { Schema, model } from "mongoose";
 const MessageSchema = new Schema({
   sender: {
     type: Schema.Types.ObjectId,
+    ref: "User",
   },
   recipient: {
     type: Schema.Types.ObjectId,
@@ -12,9 +13,6 @@ const MessageSchema = new Schema({
   },
   CreatedAt: {
     type: Date,
-  },
-  isGroup: {
-    type: Boolean,
   },
 });
 

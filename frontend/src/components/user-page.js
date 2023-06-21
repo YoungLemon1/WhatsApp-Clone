@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import moment from "moment";
+import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
@@ -8,6 +9,8 @@ function UserPage({ user }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [isSendToUser, setIsSendToUser] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
+  const [currentChatID, SetCurrentChatID] = useState("");
+  const [showChatroom, SetShowChatroom] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     async function fetchData() {
@@ -28,7 +31,7 @@ function UserPage({ user }) {
       return moment(date).format("DD-MM-YYYY");
     } else return "";
   }*/
-  function SendToUserCkick() {
+  function SendToUser() {
     setIsSendToUser(!isSendToUser);
   }
   async function enterChatRoom() {
@@ -37,7 +40,9 @@ function UserPage({ user }) {
     }
     const chat = chatHistory.find((c) => c.name === chatSearch);
     if (chat) {
-      navigate(`/chatroom/${chat.id}`);
+      setIsSendToUser(false);
+      SetCurrentChatID(chat.id);
+      SetShowChatroom(true);
       return;
     }
 
@@ -68,14 +73,17 @@ function UserPage({ user }) {
     console.log("group data", groupChatData);
 
     if (userData) {
+      const temporaryChatId = uuidv4();
       const newChatroom = {
-        id: `${user._id}${userData._id}`,
+        id: temporaryChatId,
         isGroupChat: false,
         name: userData.username,
         imageURL: userData.imageURL,
       };
       setChatHistory([...chatHistory, newChatroom]);
-      navigate(`/chatroom/${newChatroom.id}`);
+      setIsSendToUser(false);
+      SetCurrentChatID(chat.id);
+      SetShowChatroom(true);
     } else if (groupChatData) {
       const newChatroom = {
         id: groupChatData._id,
@@ -122,7 +130,7 @@ function UserPage({ user }) {
             </button>
           </div>
         )}
-        <Button id="send-to-user-btn" onClick={SendToUserCkick}>
+        <Button id="send-to-user-btn" onClick={SendToUser}>
           {!isSendToUser ? "+" : "X"}
         </Button>
       </div>
