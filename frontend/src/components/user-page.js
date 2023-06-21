@@ -107,7 +107,7 @@ function UserPage({ user }) {
               <img
                 className="profile-picture"
                 src={chat.imageURL}
-                alt={chat.name}
+                alt={`${chat.name} profile`}
               ></img>
             </div>
           );
