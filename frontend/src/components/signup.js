@@ -9,6 +9,7 @@ function Signup() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [nameError, setNameError] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -16,6 +17,7 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [imageURL, setImageURL] = useState("");
   const role = "user";
+
   const navigate = useNavigate();
   const handleBirthDateChange = (date) => {
     setBirthdate(date);
@@ -99,6 +101,7 @@ function Signup() {
           id="password"
           name="password"
           type="password"
+          autoComplete="new-password"
           onChange={(event) => {
             const newPassword = event.target.value;
             setPassword(newPassword);
