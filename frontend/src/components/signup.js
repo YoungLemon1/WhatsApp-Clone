@@ -32,12 +32,15 @@ function Signup() {
   const createUser = async (event) => {
     event.preventDefault();
     if (!username) {
-      console.log("Error: empty username");
+      console.error("Error: empty username");
       setUsernameError("Please enter your username");
       return;
     } else if (!password) {
-      console.log("Error: empty password");
+      console.error("Error: empty password");
       setPasswordError("Please enter your password");
+      return;
+    } else if (password !== passwordConfirmation) {
+      console.error("Error: passwords don't match");
       return;
     } else if (!validatePassword(password)) {
       console.error("invalid password");
@@ -101,27 +104,25 @@ function Signup() {
           }}
         ></input>
         <small>{passwordError}</small>
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password-confirmation">Password confirmation</label>
         <input
           required
           minLength={6}
-          id="password"
-          name="password"
+          id="password-confirmation"
+          name="password-confirmation"
           type="password"
-          autoComplete="new-password"
+          autoComplete="new-password-confirmation"
           onChange={(event) => {
-            const newPassword = event.target.value;
-            setPassword(newPassword);
-            if (!validatePassword(newPassword)) {
-              setPasswordError(
-                "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
-              );
+            const newPasswordConfirmation = event.target.value;
+            setPasswordConfirmation(newPasswordConfirmation);
+            if (password !== passwordConfirmation) {
+              setPasswordConfirmationError("Passwords must match");
             } else {
               setPasswordError("");
             }
           }}
         ></input>
-        <small>{passwordError}</small>
+        <small>{passwordConfirmationError}</small>
         <label htmlFor="email">Email</label>
         <input
           id="email"
