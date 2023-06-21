@@ -118,7 +118,7 @@ function Signup() {
             if (password !== passwordConfirmation) {
               setPasswordConfirmationError("Passwords must match");
             } else {
-              setPasswordError("");
+              setPasswordConfirmationError("");
             }
           }}
         ></input>
