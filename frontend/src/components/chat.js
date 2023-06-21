@@ -22,7 +22,9 @@ function Chat({
       setChatHistory(updatedChatHistory);
     }
   }
-  function sendMessage() {}
+  function sendMessage() {
+    const message = {};
+  }
   return (
     <div className="chat">
       <div className="chat-header">
