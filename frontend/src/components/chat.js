@@ -56,7 +56,7 @@ function Chat({
       <div className="chat-footer">
         <input
           id="message-text"
-          className="message-text-box"
+          className="message-text"
           onChange={(event) => {
             setMessageText(event.target.value);
           }}
