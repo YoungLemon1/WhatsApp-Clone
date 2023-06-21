@@ -6,7 +6,6 @@ import { Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DatePicker from "react-datepicker";
 function Signup() {
-  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -31,11 +30,7 @@ function Signup() {
 
   const createUser = async (event) => {
     event.preventDefault();
-    if (!name) {
-      console.log("Error: empty username");
-      setNameError("Please enter your name");
-      return;
-    } else if (!username) {
+    if (!username) {
       console.log("Error: empty username");
       setUsernameError("Please enter your username");
       return;
@@ -49,7 +44,6 @@ function Signup() {
     }
     try {
       const user = {
-        name,
         username,
         password,
         birthdate,
@@ -76,14 +70,6 @@ function Signup() {
     <div className="form-container">
       <form id="signup" className="user-form" onSubmit={createUser}>
         <h3>Create New User</h3>
-        <label htmlFor="name">Name</label>
-        <input
-          id="name"
-          name="name"
-          required
-          minLength={2}
-          onChange={(event) => setName(event.target.value)}
-        ></input>
         <small>{nameError}</small>
         <label htmlFor="username">Username</label>
         <input

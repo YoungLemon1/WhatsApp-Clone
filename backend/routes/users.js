@@ -76,9 +76,8 @@ userRouter.post("/auth", async (req, res) => {
 });
 
 userRouter.post("/", async (req, res) => {
-  const requiredFields = ["name", "username", "password"];
-  const { name, username, password, birthdate, email, imageURL, role } =
-    req.body;
+  const requiredFields = ["username", "password"];
+  const { username, password, birthdate, email, imageURL, role } = req.body;
   if (!requiredFields.every((field) => field in req.body)) {
     res.status(400).json({ error: "Missing required fields" });
     return;
@@ -129,7 +128,6 @@ userRouter.put("/:id", async (req, res) => {
     });
   }
   try {
-    user.name = name;
     user.username = username;
     user.password = hashedPassword;
     user.birthdate = birthdate;
