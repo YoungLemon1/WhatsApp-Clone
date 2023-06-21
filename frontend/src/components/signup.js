@@ -101,6 +101,11 @@ function Signup() {
             } else {
               setPasswordError("");
             }
+            if (passwordConfirmation && newPassword !== passwordConfirmation) {
+              setPasswordConfirmationError("Passwords must match");
+            } else {
+              setPasswordConfirmationError("");
+            }
           }}
         ></input>
         <small>{passwordError}</small>
@@ -115,7 +120,7 @@ function Signup() {
           onChange={(event) => {
             const newPasswordConfirmation = event.target.value;
             setPasswordConfirmation(newPasswordConfirmation);
-            if (password !== passwordConfirmation) {
+            if (password !== newPasswordConfirmation) {
               setPasswordConfirmationError("Passwords must match");
             } else {
               setPasswordConfirmationError("");
