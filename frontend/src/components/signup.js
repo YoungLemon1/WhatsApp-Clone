@@ -69,6 +69,7 @@ function Signup() {
       alert("Request failed");
     }
   };
+
   return (
     <div className="form-container">
       <form id="signup" className="user-form" onSubmit={createUser}>
