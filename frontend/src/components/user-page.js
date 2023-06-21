@@ -11,7 +11,6 @@ function UserPage({ user }) {
   const [chatSearch, setChatSearch] = useState("");
   const [currentChatID, SetCurrentChatID] = useState("");
   const [showChatroom, SetShowChatroom] = useState(false);
-  const navigate = useNavigate();
   useEffect(() => {
     async function fetchData() {
       try {
@@ -82,7 +81,7 @@ function UserPage({ user }) {
       };
       setChatHistory([...chatHistory, newChatroom]);
       setIsSendToUser(false);
-      SetCurrentChatID(chat.id);
+      SetCurrentChatID(newChatroom.id);
       SetShowChatroom(true);
     } else if (groupChatData) {
       const newChatroom = {
@@ -92,7 +91,9 @@ function UserPage({ user }) {
         imageURL: groupChatData.groupChatPicture,
       };
       setChatHistory([...chatHistory, newChatroom]);
-      navigate(`/chatroom/${newChatroom.id}`);
+      setIsSendToUser(false);
+      SetCurrentChatID(newChatroom.id);
+      SetShowChatroom(true);
     }
   }
 
