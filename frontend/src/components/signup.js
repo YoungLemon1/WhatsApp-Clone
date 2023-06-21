@@ -94,7 +94,7 @@ function Signup() {
           onChange={(event) => {
             const newPassword = event.target.value;
             setPassword(newPassword);
-            if (!validatePassword(newPassword)) {
+            if (newPassword && !validatePassword(newPassword)) {
               setPasswordError(
                 "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
               );
