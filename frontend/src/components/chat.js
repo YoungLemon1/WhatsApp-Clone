@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
-import { useParams } from "react-router-dom";
 
 function Chat({
   chat,

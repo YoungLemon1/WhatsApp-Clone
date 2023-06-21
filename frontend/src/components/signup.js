@@ -9,9 +9,10 @@ function Signup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [nameError, setNameError] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [passwordConfirmationError, setPasswordConfirmationError] =
+    useState("");
   const [birthdate, setBirthdate] = useState();
   const [email, setEmail] = useState("");
   const [imageURL, setImageURL] = useState("");
@@ -70,7 +71,6 @@ function Signup() {
     <div className="form-container">
       <form id="signup" className="user-form" onSubmit={createUser}>
         <h3>Create New User</h3>
-        <small>{nameError}</small>
         <label htmlFor="username">Username</label>
         <input
           required
@@ -80,6 +80,27 @@ function Signup() {
           onChange={(event) => setUsername(event.target.value)}
         ></input>
         <small>{usernameError}</small>
+        <label htmlFor="password">Password</label>
+        <input
+          required
+          minLength={6}
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          onChange={(event) => {
+            const newPassword = event.target.value;
+            setPassword(newPassword);
+            if (!validatePassword(newPassword)) {
+              setPasswordError(
+                "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
+              );
+            } else {
+              setPasswordError("");
+            }
+          }}
+        ></input>
+        <small>{passwordError}</small>
         <label htmlFor="password">Password</label>
         <input
           required
