@@ -11,6 +11,7 @@ function Chat({
   setChatHistory,
 }) {
   const [messages, setMessages] = useState([]);
+  const [messageText, setMessageText] = useState("");
   function exitChat() {
     console.log(isUserInChatroom);
     setCurrentChat({});
@@ -36,7 +37,12 @@ function Chat({
         })}
       </div>
       <div className="chat-footer">
-        <input className="message-text-box"></input>
+        <input
+          className="message-text-box"
+          onChange={(event) => {
+            setMessageText(event.target.value);
+          }}
+        ></input>
         <button className="send-btn" onClick={sendMessage}>
           Send
         </button>
