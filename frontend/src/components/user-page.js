@@ -4,20 +4,22 @@ import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import Chat from "./chat";
 
 function UserPage({ user }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [isSendToUser, setIsSendToUser] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
-  const [currentChatID, SetCurrentChatID] = useState("");
-  const [showChatroom, SetShowChatroom] = useState(false);
+  const [isUserInChatroom, setIsUserInChatroom] = useState(false);
+  const [currentChat, setCurrentChat] = useState({});
+
   useEffect(() => {
     async function fetchData() {
       try {
         const res = await Axios.get(
           `http://localhost:5000/chatrooms/user/${user._id}`
         );
-        console.log(res.data);
+        console.log("data:", res.data);
         setChatHistory(res.data);
       } catch (error) {
         console.error("Failed to fetch users", error);
@@ -33,6 +35,7 @@ function UserPage({ user }) {
   function SendToUser() {
     setIsSendToUser(!isSendToUser);
   }
+
   async function enterChatRoom() {
     if (!chatSearch) {
       return;
@@ -40,8 +43,8 @@ function UserPage({ user }) {
     const chat = chatHistory.find((c) => c.name === chatSearch);
     if (chat) {
       setIsSendToUser(false);
-      SetCurrentChatID(chat.id);
-      SetShowChatroom(true);
+      setCurrentChat(chat);
+      setIsUserInChatroom(true);
       return;
     }
 
@@ -81,8 +84,8 @@ function UserPage({ user }) {
       };
       setChatHistory([...chatHistory, newChatroom]);
       setIsSendToUser(false);
-      SetCurrentChatID(newChatroom.id);
-      SetShowChatroom(true);
+      setCurrentChat(newChatroom);
+      setIsUserInChatroom(true);
     } else if (groupChatData) {
       const newChatroom = {
         id: groupChatData._id,
@@ -92,27 +95,47 @@ function UserPage({ user }) {
       };
       setChatHistory([...chatHistory, newChatroom]);
       setIsSendToUser(false);
-      SetCurrentChatID(newChatroom.id);
-      SetShowChatroom(true);
+      setCurrentChat(newChatroom);
+      setIsUserInChatroom(true);
     }
   }
 
   return (
     <div>
       <h1>{user.username}</h1>
-      <div id="chat-history">
-        {chatHistory.map((chat) => {
-          return (
-            <div key={chat.id}>
-              <img
-                className="profile-picture"
-                src={chat.imageURL}
-                alt={`${chat.name} profile`}
-              ></img>
-            </div>
-          );
-        })}
-      </div>
+      {!isUserInChatroom ? (
+        <div>
+          <div id="chat-history">
+            {chatHistory.map((chat) => {
+              return (
+                <div key={chat.id}>
+                  <img
+                    className="profile-picture"
+                    src={chat.imageURL}
+                    alt={`${chat.name} profile`}
+                  ></img>
+                </div>
+              );
+            })}
+          </div>
+          <div>
+            <Button id="send-to-user-btn" onClick={SendToUser}>
+              {!isSendToUser ? "+" : "X"}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Chat
+          chat={currentChat}
+          setCurrentChat={setCurrentChat}
+          loggedUser={user}
+          isUserInChatroom={isUserInChatroom}
+          setIsUserInChatroom={setIsUserInChatroom}
+          chatHistory={chatHistory}
+          setChatHistory={setChatHistory}
+        ></Chat>
+      )}
+      <div />
       <div id="send-message-to-user">
         {!isSendToUser ? (
           <div />
@@ -126,14 +149,10 @@ function UserPage({ user }) {
               }}
             ></input>
             <button className="submit-btn" onClick={enterChatRoom}>
-              {" "}
               Enter Chat
             </button>
           </div>
         )}
-        <Button id="send-to-user-btn" onClick={SendToUser}>
-          {!isSendToUser ? "+" : "X"}
-        </Button>
       </div>
     </div>
   );
