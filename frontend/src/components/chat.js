@@ -8,12 +8,18 @@ function Chat({
   loggedUser,
   isUserInChatroom,
   setIsUserInChatroom,
+  chatHistory,
+  setChatHistory,
 }) {
   const [messages, setMessages] = useState([]);
   function exitChat() {
     console.log(isUserInChatroom);
     setCurrentChat({});
     setIsUserInChatroom(false);
+    if (messages.length === 0) {
+      const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
+      setChatHistory(updatedChatHistory);
+    }
     return;
   }
   return (
