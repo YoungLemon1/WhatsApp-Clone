@@ -119,27 +119,16 @@ function UserPage({ user }) {
             })}
           </div>
           <div id="send-message-to-user">
-            {!isSendToUser ? (
-              <div />
-            ) : (
-              <div>
-                <label htmlFor="send-to">Chat with user or group</label>
-                <input
-                  id="chat-name"
-                  onChange={(event) => {
-                    setChatSearch(event.target.value);
-                  }}
-                ></input>
-                <button className="submit-btn" onClick={enterChatRoom}>
-                  Enter Chat
-                </button>
-              </div>
-            )}
-          </div>
-          <div>
-            <Button id="send-to-user-btn" onClick={SendToUser}>
-              {!isSendToUser ? "+" : "X"}
-            </Button>
+            <label htmlFor="send-to">Chat with user or group</label>
+            <input
+              id="chat-name"
+              onChange={(event) => {
+                setChatSearch(event.target.value);
+              }}
+            ></input>
+            <button className="submit-btn" onClick={enterChatRoom}>
+              Enter Chat
+            </button>
           </div>
         </div>
       ) : (
