@@ -25,12 +25,6 @@ const ChatRoomSchema = new Schema({
   lastUpdatedAt: {
     type: Date,
   },
-  messages: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "message",
-    },
-  ],
 });
 
 const ChatRoomModel = model("ChatRoom", ChatRoomSchema);
