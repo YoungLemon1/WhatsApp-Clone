@@ -41,8 +41,20 @@ function Chat({
   }
 
   async function sendMessage() {
+    if (messages.length === 0) {
+      try {
+        delete chat.id;
+        const res = await Axios.post("http://localhost:5000/chatrooms", chat);
+        const data = res.data;
+        console.log("chatroom created", data);
+        chat.id = data._id;
+      } catch {
+        console.error("Failed to create chatroom");
+      }
+    }
     const message = {
       sender: loggedUser._id,
+      chatroom: chat.id,
       text: messageText,
       createdAt: Date.now(),
     };
@@ -57,17 +69,6 @@ function Chat({
       textInput.value = "";
     } catch {
       console.error("Failed to send message");
-    }
-    if (messages.length === 0) {
-      try {
-        delete chat.id;
-        const res = await Axios.post("http://localhost:5000/chatrooms", chat);
-        const data = res.data;
-        console.log("chatroom created", data);
-        chat.id = data._id;
-      } catch {
-        console.error("Failed to create chatroom");
-      }
     }
   }
 

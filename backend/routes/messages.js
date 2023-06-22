@@ -31,8 +31,8 @@ messageRouter.get("/:id", async (req, res) => {
 
 messageRouter.get("/chatroom/:id", async (req, res) => {
   try {
-    const { chatID } = req.params;
-    const messages = await MessageModel.find({ chatroom: chatID });
+    const { id } = req.params;
+    const messages = await MessageModel.find({ chatroom: id });
     res.status(200).json(messages);
   } catch (err) {
     console.error(err.stack);
@@ -43,7 +43,7 @@ messageRouter.get("/chatroom/:id", async (req, res) => {
 });
 
 messageRouter.post("/", [body("text").notEmpty()], async (req, res) => {
-  const { sender, text, createdAt } = req.body;
+  const { sender, chatroom, text, createdAt } = req.body;
 
   if (text === "") {
     return res.status(400).json({
@@ -58,7 +58,7 @@ messageRouter.post("/", [body("text").notEmpty()], async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: "Internal server error: failed to create user",
+      error: "Internal server error: failed to create message",
     });
   }
 });
