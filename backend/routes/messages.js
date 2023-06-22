@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import MessageModel from "../models/messages.js";
+import ChatRoomModel from "../models/chatroom.js";
 const messageRouter = Router();
 
 messageRouter.get("/", async (req, res) => {
@@ -20,6 +21,19 @@ messageRouter.get("/:id", async (req, res) => {
     const { id } = req.params;
     const message = await MessageModel.findById(id);
     res.status(200).json(message);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching messages",
+    });
+  }
+});
+
+messageRouter.get("/chatroom/:id", async (req, res) => {
+  try {
+    const { chatID } = req.params;
+    const messages = await MessageModel.find({ chatroom: chatID });
+    res.status(200).json(messages);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
