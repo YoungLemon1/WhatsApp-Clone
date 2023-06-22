@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Axios from "axios";
 
 function Chat({
@@ -12,6 +12,11 @@ function Chat({
 }) {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
+
+  useEffect(() => {
+    const res = Axios.get();
+  }, [messages.length]);
+
   function exitChat() {
     console.log(isUserInChatroom);
     setCurrentChat({});
