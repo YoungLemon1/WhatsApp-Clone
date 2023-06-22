@@ -77,7 +77,7 @@ label {
   display: inline-flex;
 }
 
-.chat .chat-header .chat-img {
+.profile-img {
   margin: 0.25rem;
   width: 2rem;
   height: 2rem;
@@ -99,6 +99,40 @@ label {
 }
 .chat .chat-body {
   height: 100%;
+}
+
+.chat .chat-body .message-container {
+  display: inline-block;
+}
+
+.chat .chat-body .message {
+  display: inline-block;
+  width: max-content;
+  min-width: 2rem;
+  min-height: 1rem;
+  border-radius: 5%;
+  margin: 1.5rem;
+  padding: 0.75rem;
+}
+
+.current-user {
+  float: left;
+}
+
+.chat .chat-body .message.current-user {
+  float: left;
+  background-color: #06702f;
+  text-align: left;
+}
+
+.other-user {
+  float: right;
+}
+
+.chat .chat-body .message.other-user {
+  float: right;
+  background-color: #a3aaacdc;
+  text-align: left;
 }
 
 .chat .chat-footer {
