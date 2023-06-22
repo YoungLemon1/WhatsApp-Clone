@@ -15,6 +15,9 @@ function Chat({
 
   useEffect(() => {
     try {
+      console.log(loggedUser);
+      console.log(chat);
+      console.log(messages);
       const res = Axios.get(
         `http://localhost:5000/messages/chatroom/${chat.id}`
       );
@@ -71,7 +74,17 @@ function Chat({
       <div className="chat-body">
         {messages.map((message) => {
           let sender;
-          return <div key={message._id} className={sender}></div>;
+          return (
+            <div
+              key={message._id}
+              className={`message ${
+                sender === loggedUser._id ? "current-user" : "other-user"
+              }`}
+            >
+              {message.text}
+              {message.createdAt}
+            </div>
+          );
         })}
       </div>
       <div className="chat-footer">
