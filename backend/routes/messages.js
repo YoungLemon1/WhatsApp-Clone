@@ -45,8 +45,7 @@ messageRouter.get("/chatroom/:id", async (req, res) => {
 messageRouter.post("/", [body("text").notEmpty()], async (req, res) => {
   const { sender, text, createdAt } = req.body;
 
-  // Check if username already exists in the database
-  if ({ text } === "") {
+  if (text === "") {
     return res.status(400).json({
       error: "cannot send empty messages",
     });

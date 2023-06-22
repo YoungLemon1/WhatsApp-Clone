@@ -121,6 +121,10 @@ label {
   height: 100%;
 }
 
+.chat .chat-body .message {
+  border-radius: 2%;
+}
+
 .form-container {
   display: flex;
   justify-content: center;

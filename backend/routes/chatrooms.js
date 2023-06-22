@@ -82,11 +82,10 @@ chatRoomRouter.get("/search/:groupName", async (req, res) => {
 });
 
 chatRoomRouter.post("/", async (req, res) => {
-  const { name, username, birthdate, role } = req.body;
+  const { id, chatName, createdAt, isGroupChat, ChatPicture } = req.body;
 
-  // Check if username already exists in the database
-  const existingUser = await ChatRoomModel.findOne({ username });
-  if (existingUser) {
+  const existingChat = await ChatRoomModel.findOne({ username });
+  if (existingChat) {
     return res.status(400).json({
       error: "Chatroom already exists",
     });

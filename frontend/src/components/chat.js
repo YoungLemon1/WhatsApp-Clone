@@ -14,19 +14,17 @@ function Chat({
   const [messageText, setMessageText] = useState("");
 
   useEffect(() => {
+    if (messages.length === 0) return;
     try {
-      console.log(loggedUser);
-      console.log(chat);
-      console.log(messages);
       const res = Axios.get(
         `http://localhost:5000/messages/chatroom/${chat.id}`
       );
       const data = res.data;
-      setMessages(data);
+      console.log(data);
     } catch (error) {
       console.error("Failed to fetch messages", error);
     }
-  }, [chat.id]);
+  }, [chat.id, messages.length]);
 
   function exitChat() {
     console.log(isUserInChatroom);
@@ -42,15 +40,9 @@ function Chat({
     const message = {
       sender: loggedUser._id,
       text: messageText,
-      createdAt: Date.now(),
     };
+    console.log("message payload", message);
     try {
-      if (messages.length === 0) {
-        const res = await Axios.post("http://localhost:5000/chatrooms", chat);
-        const data = res.data;
-        console.log("chatroom created", data);
-        chat.id = data._id;
-      }
       const res = await Axios.post("http://localhost:5000/messages", message);
       const data = res.data;
       console.log("message sent", data);
@@ -61,7 +53,19 @@ function Chat({
     } catch {
       console.error("Failed to send message");
     }
+    if (messages.length === 0) {
+      try {
+        delete chat.id;
+        const res = await Axios.post("http://localhost:5000/chatrooms", chat);
+        const data = res.data;
+        console.log("chatroom created", data);
+        chat.id = data._id;
+      } catch {
+        console.error("Failed to create chatroom");
+      }
+    }
   }
+
   return (
     <div className="chat">
       <div className="chat-header">
@@ -81,7 +85,6 @@ function Chat({
                 sender === loggedUser._id ? "current-user" : "other-user"
               }`}
             >
-              {message.text}
               {message.createdAt}
             </div>
           );
@@ -93,6 +96,9 @@ function Chat({
           className="message-text"
           onChange={(event) => {
             setMessageText(event.target.value);
+          }}
+          onKeyDown={(event) => {
+            event.key === "Enter" && sendMessage();
           }}
         ></input>
         <button className="send-btn" onClick={sendMessage}>
