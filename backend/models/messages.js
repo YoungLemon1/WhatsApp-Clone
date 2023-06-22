@@ -14,6 +14,7 @@ const MessageSchema = new Schema({
   },
   CreatedAt: {
     type: Date,
+    default: Date.now(),
   },
 });
 
