@@ -30,6 +30,17 @@ function Chat({
     fetchMessages();
   }, [chat.id]);
 
+  async function createNonGroupChatroom() {
+    try {
+      const res = await Axios.post("http://localhost:5000/chatrooms", chat);
+      const data = res.data;
+      console.log("chatroom created", data);
+      chat.id = data._id;
+    } catch {
+      console.error("Failed to create chatroom");
+    }
+  }
+
   function exitChat() {
     console.log(isUserInChatroom);
     setCurrentChat({});
@@ -41,16 +52,8 @@ function Chat({
   }
 
   async function sendMessage() {
-    if (messages.length === 0) {
-      try {
-        delete chat.id;
-        const res = await Axios.post("http://localhost:5000/chatrooms", chat);
-        const data = res.data;
-        console.log("chatroom created", data);
-        chat.id = data._id;
-      } catch {
-        console.error("Failed to create chatroom");
-      }
+    if (!chat.isGroupChat && messages.length === 0) {
+      createNonGroupChatroom();
     }
     const message = {
       sender: loggedUser._id,

@@ -8,6 +8,7 @@ function UserPage({ user }) {
   const [chatSearch, setChatSearch] = useState("");
   const [isUserInChatroom, setIsUserInChatroom] = useState(false);
   const [currentChat, setCurrentChat] = useState({});
+  const [searchError, setSearchError] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -70,6 +71,7 @@ function UserPage({ user }) {
       const temporaryChatId = uuidv4();
       const newChatroom = {
         id: temporaryChatId,
+        members: [user._id, userData._id],
         isGroupChat: false,
         name: userData.username,
         imageURL: userData.imageURL,
@@ -80,6 +82,7 @@ function UserPage({ user }) {
     } else if (groupChatData) {
       const newChatroom = {
         id: groupChatData._id,
+        members: groupChatData.members,
         isGroupChat: true,
         name: groupChatData.groupChatName,
         imageURL: groupChatData.groupChatPicture,
@@ -87,7 +90,7 @@ function UserPage({ user }) {
       setChatHistory([...chatHistory, newChatroom]);
       setCurrentChat(newChatroom);
       setIsUserInChatroom(true);
-    }
+    } else setSearchError("No search results found");
   }
 
   return (
@@ -114,11 +117,17 @@ function UserPage({ user }) {
               id="chat-name"
               onChange={(event) => {
                 setChatSearch(event.target.value);
+                setSearchError("");
               }}
             ></input>
-            <button className="submit-btn" onClick={enterChatRoom}>
+            <button
+              className="submit-btn"
+              disabled={chatSearch === ""}
+              onClick={enterChatRoom}
+            >
               Enter Chat
             </button>
+            <div>{searchError}</div>
           </div>
         </div>
       ) : (
