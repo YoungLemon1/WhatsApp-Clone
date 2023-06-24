@@ -55,6 +55,8 @@ function Signup() {
         imageURL,
         role,
       };
+
+      if (imageURL === "") delete user.imageURL;
       const res = await Axios.post("http://localhost:5000/users", user);
 
       if (res.data.message) {

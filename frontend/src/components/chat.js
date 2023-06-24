@@ -34,8 +34,8 @@ function Chat({
     try {
       const res = await Axios.post("http://localhost:5000/chatrooms", chat);
       const data = res.data;
-      console.log("chatroom created", data);
       chat.id = data._id;
+      console.log("chatroom created", data);
     } catch {
       console.error("Failed to create chatroom");
     }
