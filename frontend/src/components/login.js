@@ -28,15 +28,20 @@ function Login({ setUser, setLoggedIn }) {
       const data = res.data;
       console.log(data);
       await setUser(data);
-      setUsername("");
-      setUsernameError("");
-      setPasswordError("");
+      resetFields();
       setLoggedIn(true);
       console.log(`User ${data.username} logged in successfully`);
     } catch (error) {
       console.error("Error fetching user", error);
       setError("Username or password are incorrect. Please try again.");
     }
+  }
+
+  function resetFields() {
+    setUsername("");
+    setUsernameError("");
+    setUsernameError("");
+    setPasswordError("");
   }
 
   function routeToSignup() {

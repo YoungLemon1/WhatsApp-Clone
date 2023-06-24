@@ -14,7 +14,8 @@ function Chat({
   const [messageText, setMessageText] = useState("");
 
   useEffect(() => {
-    const fetchMessages = async () => {
+    if (chat.id.includes("tmp")) return;
+    async function fetchMessages() {
       try {
         const res = await Axios.get(
           `http://localhost:5000/messages/chatroom/${chat.id}`
@@ -25,7 +26,7 @@ function Chat({
       } catch (error) {
         console.error("Failed to fetch messages", error);
       }
-    };
+    }
 
     fetchMessages();
   }, [chat.id]);
