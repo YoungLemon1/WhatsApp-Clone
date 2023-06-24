@@ -1,11 +1,11 @@
 import { Router } from "express";
-import ChatRoomModel from "../models/chatroom.js";
-import UserModel from "../models/user.js";
+import ChatRoom from "../models/chatroom.js";
+import User from "../models/user.js";
 const chatRoomRouter = Router();
 
 chatRoomRouter.get("/", async (req, res) => {
   try {
-    const chatrooms = await ChatRoomModel.find({});
+    const chatrooms = await ChatRoom.find({});
     res.status(200).json(chatrooms);
   } catch (err) {
     console.error(err.stack);
@@ -20,14 +20,14 @@ chatRoomRouter.get("/user/:id", async (req, res) => {
     const { id } = req.params;
 
     // Fetch the chatrooms where the user is a member
-    const chatrooms = await ChatRoomModel.find({ members: { $in: [id] } });
+    const chatrooms = await ChatRoom.find({ members: { $in: [id] } });
 
     // Map the chatrooms to the desired format
     const chatHistory = chatrooms.map(async (chatroom) => {
       const otherUserId = chatroom.members.find(
         (member) => member.toString() !== id
       );
-      const otherUser = (await UserModel.findById(otherUserId)) ?? undefined;
+      const otherUser = (await User.findById(otherUserId)) ?? undefined;
       const isGroupChat = chatroom.isGroupChat;
       const chatName = isGroupChat
         ? chatroom.groupChatName
@@ -56,7 +56,7 @@ chatRoomRouter.get("/user/:id", async (req, res) => {
 chatRoomRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const chatroom = await ChatRoomModel.findById(id);
+    const chatroom = await ChatRoom.findById(id);
     res.status(200).json(chatroom);
   } catch (err) {
     console.error(err.stack);
@@ -69,7 +69,7 @@ chatRoomRouter.get("/:id", async (req, res) => {
 chatRoomRouter.get("/search/:groupName", async (req, res) => {
   try {
     const { groupName } = req.params;
-    const groupChatrooms = await ChatRoomModel.findOne({
+    const groupChatrooms = await ChatRoom.findOne({
       groupChatName: groupName,
     });
     res.status(200).json(groupChatrooms);
@@ -84,14 +84,14 @@ chatRoomRouter.get("/search/:groupName", async (req, res) => {
 chatRoomRouter.post("/", async (req, res) => {
   const { id, chatName, createdAt, isGroupChat, ChatPicture } = req.body;
 
-  const existingChat = await ChatRoomModel.findById(id);
+  const existingChat = await ChatRoom.findById(id);
   if (existingChat) {
     return res.status(400).json({
       error: "Chatroom already exists",
     });
   }
   try {
-    const newChatroom = new ChatRoomModel(req.body);
+    const newChatroom = new ChatRoom(req.body);
     await newChatroom.save();
 
     res.status(201).json(newChatroom);
@@ -106,7 +106,7 @@ chatRoomRouter.post("/", async (req, res) => {
 chatRoomRouter.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const chatroom = await ChatRoomModel.findById(id);
+    const chatroom = await ChatRoom.findById(id);
     res.status(200).json(chatroom);
   } catch (err) {
     console.error(err.stack);
@@ -119,7 +119,7 @@ chatRoomRouter.patch("/:id", async (req, res) => {
 chatRoomRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedChatroom = await ChatRoomModel.findByIdAndDelete(id);
+    const deletedChatroom = await ChatRoom.findByIdAndDelete(id);
     if (!deletedChatroom) {
       return res.status(400).json({
         error: "chatroom does not exist",

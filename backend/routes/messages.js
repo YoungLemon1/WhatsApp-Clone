@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import MessageModel from "../models/messages.js";
-import ChatRoomModel from "../models/chatroom.js";
+import UserMessage from "../models/userMessages.js";
+import ChatRoom from "../models/chatroom.js";
 const messageRouter = Router();
 
 messageRouter.get("/", async (req, res) => {
   try {
-    const messages = await MessageModel.find({});
+    const messages = await UserMessage.find({});
     res.status(200).json(messages);
   } catch (err) {
     console.error(err.stack);
@@ -19,7 +19,7 @@ messageRouter.get("/", async (req, res) => {
 messageRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const message = await MessageModel.findById(id);
+    const message = await UserMessage.findById(id);
     res.status(200).json(message);
   } catch (err) {
     console.error(err.stack);
@@ -32,7 +32,7 @@ messageRouter.get("/:id", async (req, res) => {
 messageRouter.get("/chatroom/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const messages = await MessageModel.find({ chatroom: id });
+    const messages = await UserMessage.find({ chatroom: id });
     res.status(200).json(messages);
   } catch (err) {
     console.error(err.stack);
@@ -51,7 +51,7 @@ messageRouter.post("/", [body("text").notEmpty()], async (req, res) => {
     });
   }
   try {
-    const newMessage = new MessageModel(req.body);
+    const newMessage = new UserMessage(req.body);
     await newMessage.save();
 
     res.status(201).json(newMessage);
@@ -66,7 +66,7 @@ messageRouter.post("/", [body("text").notEmpty()], async (req, res) => {
 messageRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedMessage = await MessageModel.findByIdAndDelete(id);
+    const deletedMessage = await UserMessage.findByIdAndDelete(id);
     if (!deletedMessage) {
       return res.status(400).json({
         error: "message does not exist",

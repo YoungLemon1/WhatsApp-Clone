@@ -14,7 +14,7 @@ function Chat({
   const [messageText, setMessageText] = useState("");
 
   useEffect(() => {
-    if (chat.id.includes("tmp")) return;
+    if (messages.length === 0) return;
     async function fetchMessages() {
       try {
         const res = await Axios.get(
@@ -29,10 +29,11 @@ function Chat({
     }
 
     fetchMessages();
-  }, [chat.id]);
+  }, [chat.id, messages.length]);
 
   async function createNonGroupChatroom() {
     try {
+      delete chat.tmp;
       const res = await Axios.post("http://localhost:5000/chatrooms", chat);
       const data = res.data;
       chat.id = data._id;

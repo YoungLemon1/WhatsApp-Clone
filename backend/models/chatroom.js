@@ -27,6 +27,6 @@ const ChatRoomSchema = new Schema({
   },
 });
 
-const ChatRoomModel = model("ChatRoom", ChatRoomSchema);
+const ChatRoom = model("ChatRoom", ChatRoomSchema);
 
-export default ChatRoomModel;
+export default ChatRoom;

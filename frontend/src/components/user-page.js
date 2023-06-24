@@ -74,7 +74,7 @@ function UserPage({ user, setUser, setLoggedIn }) {
     console.log("group data", groupChatData);
 
     if (userData) {
-      const temporaryChatId = "tmp" + uuidv4();
+      const temporaryChatId = uuidv4();
       const newChatroom = {
         id: temporaryChatId,
         members: [user._id, userData._id],

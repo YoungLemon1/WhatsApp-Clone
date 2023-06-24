@@ -1,16 +1,19 @@
 import { Schema, model } from "mongoose";
 
-const MessageSchema = new Schema({
+const UserMessageSchema = new Schema({
   sender: {
     type: Schema.Types.ObjectId,
     ref: "User",
+    required: true,
   },
-  chatroom: {
+  recipient: {
     type: Schema.Types.ObjectId,
     ref: "Chatroom",
+    required: true,
   },
   text: {
     type: String,
+    required: true,
   },
   createdAt: {
     type: Date,
@@ -18,6 +21,6 @@ const MessageSchema = new Schema({
   },
 });
 
-const MessageModel = model("Message", MessageSchema);
+const UserMessage = model("UserMessage", UserMessageSchema);
 
-export default MessageModel;
+export default UserMessage;
