@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import Chat from "./chat";
+import { Button } from "react-bootstrap";
 
-function UserPage({ user }) {
+function UserPage({ user, setUser, setLoggedIn }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatSearch, setChatSearch] = useState("");
   const [isUserInChatroom, setIsUserInChatroom] = useState(false);
@@ -29,6 +30,11 @@ function UserPage({ user }) {
       return moment(date).format("DD-MM-YYYY");
     } else return "";
   }*/
+
+  function logout() {
+    setUser({});
+    setLoggedIn(false);
+  }
 
   async function enterChatRoom() {
     if (!chatSearch) {
@@ -98,6 +104,7 @@ function UserPage({ user }) {
       {!isUserInChatroom ? (
         <div>
           <h1>{user.username}</h1>
+          <Button onClick={logout}>logout</Button>
           <div id="chat-history">
             {chatHistory.map((chat) => {
               return (

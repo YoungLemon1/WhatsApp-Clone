@@ -15,7 +15,7 @@ function App() {
 
   const homeRoute = () => {
     return loggedIn ? (
-      <UserPage user={user} />
+      <UserPage user={user} setUser={setUser} setLoggedIn={setLoggedIn} />
     ) : (
       <Login setUser={setUser} setLoggedIn={setLoggedIn} />
     );
