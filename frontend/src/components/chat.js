@@ -119,7 +119,11 @@ function Chat({
             event.key === "Enter" && sendMessage();
           }}
         ></input>
-        <button className="send-btn" onClick={sendMessage}>
+        <button
+          className="send-btn"
+          disabled={messageText === ""}
+          onClick={sendMessage}
+        >
           Send
         </button>
       </div>
