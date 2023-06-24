@@ -103,8 +103,8 @@ function UserPage({ user, setUser, setLoggedIn }) {
     <div>
       {!isUserInChatroom ? (
         <div>
-          <h1>{user.username}</h1>
           <Button onClick={logout}>logout</Button>
+          <h1>{user.username}</h1>
           <div id="chat-history">
             {chatHistory.map((chat) => {
               return (
