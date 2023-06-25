@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import customValidator from "./validator/customValidator";
 
 const MessageSchema = new Schema({
   sender: {
@@ -22,14 +23,16 @@ const MessageSchema = new Schema({
     type: Date,
     default: Date.now(),
   },
-  validate: function (message) {
-    if (message.sender === null && message.chatroom === null) {
-      throw new Error("At least one of sender_id or chatroom_id is required");
-    } else if (message.sender !== null && message.chatroom !== null) {
-      throw new Error("Both sender_id and chatroom_id cannot be set");
-    } else if (message.message === "") {
-      throw new Error("Cannot send empty messages");
-    }
+  validate: {
+    validator: customValidator,
+    messages: {
+      "No sender error": "Message must include sender id",
+      "No recipient error":
+        "At least one of recipient id or chatroom id is required",
+      "Conflicting message type error":
+        "Both sender_id and chatroom_id cannot be set",
+      "Empty message error": "Empty messages cannot be sent",
+    },
   },
 });
 
