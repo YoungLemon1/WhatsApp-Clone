@@ -3,7 +3,7 @@ import Axios from "axios";
 import Chat from "./chat";
 import { Button } from "react-bootstrap";
 
-function UserPage({ user, setUser, setLoggedIn }) {
+function UserPage({ loggedUser, setUser, setLoggedIn }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatSearch, setChatSearch] = useState("");
   const [isUserInChatroom, setIsUserInChatroom] = useState(false);
@@ -15,7 +15,7 @@ function UserPage({ user, setUser, setLoggedIn }) {
       let result = [];
       try {
         const res = await Axios.get(
-          `http://localhost:5000/chatrooms/user/${user._id}`
+          `http://localhost:5000/chatrooms/user/${loggedUser._id}`
         );
         result = result.concat(res.data);
         console.log("data:", res.data);
@@ -24,7 +24,7 @@ function UserPage({ user, setUser, setLoggedIn }) {
       }
       try {
         const res = await Axios.get(
-          `http://localhost:5000/messages/user/${user._id}`
+          `http://localhost:5000/messages//user/conversations/${loggedUser._id}`
         );
         result = result.concat(res.data);
         console.log("data:", res.data);
@@ -38,7 +38,7 @@ function UserPage({ user, setUser, setLoggedIn }) {
       setChatHistory(result);
     }
     fetchData();
-  }, [user._id]);
+  }, [loggedUser._id]);
   /*function dateFormat(date) {
     if (date) {
       return moment(date).format("DD-MM-YYYY");
@@ -90,7 +90,7 @@ function UserPage({ user, setUser, setLoggedIn }) {
       const temporaryChatId = "111111111111111111111111";
       const chatroom = {
         id: temporaryChatId,
-        members: [user._id, userData._id],
+        members: [loggedUser._id, userData._id],
         isGroupChat: false,
         name: userData.username,
         imageURL: userData.imageURL,
@@ -119,7 +119,7 @@ function UserPage({ user, setUser, setLoggedIn }) {
       {!isUserInChatroom ? (
         <div>
           <Button onClick={logout}>logout</Button>
-          <h1>{user.username}</h1>
+          <h1>{loggedUser.username}</h1>
           <div id="chat-history">
             {chatHistory.map((chat) => {
               return (
@@ -156,7 +156,7 @@ function UserPage({ user, setUser, setLoggedIn }) {
         <Chat
           chat={currentChat}
           setCurrentChat={setCurrentChat}
-          loggedUser={user}
+          loggedUser={loggedUser}
           isUserInChatroom={isUserInChatroom}
           setIsUserInChatroom={setIsUserInChatroom}
           chatHistory={chatHistory}

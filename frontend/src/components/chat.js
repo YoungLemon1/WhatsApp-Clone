@@ -30,18 +30,6 @@ function Chat({
     fetchMessages();
   }, [chat.id, messages.length]);
 
-  async function createNonGroupChatroom() {
-    try {
-      delete chat.tmp;
-      const res = await Axios.post("http://localhost:5000/chatrooms", chat);
-      const data = res.data;
-      chat.id = data._id;
-      console.log("chatroom created", data);
-    } catch {
-      console.error("Failed to create chatroom");
-    }
-  }
-
   function exitChat() {
     console.log(isUserInChatroom);
     setCurrentChat({});
