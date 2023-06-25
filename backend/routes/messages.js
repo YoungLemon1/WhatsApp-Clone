@@ -42,12 +42,31 @@ messageRouter.get("/chatroom/:id", async (req, res) => {
 });
 
 messageRouter.post("/", [body("message").notEmpty()], async (req, res) => {
-  const { sender, chatroom, message, createdAt } = req.body;
-  const errors = Message.schema.validate(message);
-  if (errors) {
-    res.status(400).json({ error: "Invalid message schema", data: errors });
-    throw new Error(errors.map((error) => error.message).join(", "));
+  const { sender, recipient, chatroom, message, createdAt } = req.body;
+  if (!sender) {
+    res.status(400).json({ error: "No sender" });
+    return;
   }
+  if (!recipient && !chatroom) {
+    res.status(400).json({
+      error:
+        "Message target undefined: message must include recipient or chatroom id",
+    });
+    return;
+  }
+  if (recipient && chatroom) {
+    res.status(400).json({
+      error:
+        "Duplicate message type: Message cannot be sent to a user and a group at the same time",
+    });
+    return;
+  }
+  if (!message || message === "") {
+    res.status(400).json({
+      error: "Cannot send empty messages",
+    });
+  }
+
   try {
     const newMessage = new Message(req.body);
     await newMessage.save();
