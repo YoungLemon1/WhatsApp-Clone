@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
-import { v4 as uuidv4 } from "uuid";
 import Chat from "./chat";
 import { Button } from "react-bootstrap";
 
@@ -31,16 +30,12 @@ function UserPage({ user, setUser, setLoggedIn }) {
     } else return "";
   }*/
 
-  function userInConversation() {
-    return currentChat !== null || currentChat !== undefined;
-  }
-
   function logout() {
     setUser({});
     setLoggedIn(false);
   }
 
-  async function enterChatRoom() {
+  async function tryEnterChatroom() {
     if (!chatSearch) {
       return;
     }
@@ -77,34 +72,36 @@ function UserPage({ user, setUser, setLoggedIn }) {
     console.log("group data", groupChatData);
 
     if (userData) {
-      const temporaryChatId = uuidv4();
-      const newChatroom = {
+      const temporaryChatId = "111111111111111111111111";
+      const chatroom = {
         id: temporaryChatId,
         members: [user._id, userData._id],
         isGroupChat: false,
         name: userData.username,
         imageURL: userData.imageURL,
       };
-      setChatHistory([...chatHistory, newChatroom]);
-      setCurrentChat(newChatroom);
-      setIsUserInChatroom(true);
+      enterChatroom(chatroom);
     } else if (groupChatData) {
-      const newChatroom = {
+      const chatroom = {
         id: groupChatData._id,
         members: groupChatData.members,
         isGroupChat: true,
         name: groupChatData.groupChatName,
         imageURL: groupChatData.groupChatPicture,
       };
-      setChatHistory([...chatHistory, newChatroom]);
-      setCurrentChat(newChatroom);
-      setIsUserInChatroom(true);
+      enterChatroom(chatroom);
     } else setSearchError("No search results found");
+  }
+
+  function enterChatroom(chatroom) {
+    setChatHistory([...chatHistory, chatroom]);
+    setCurrentChat(chatroom);
+    setIsUserInChatroom(true);
   }
 
   return (
     <div>
-      {!userInConversation() ? (
+      {!isUserInChatroom ? (
         <div>
           <Button onClick={logout}>logout</Button>
           <h1>{user.username}</h1>
@@ -133,7 +130,7 @@ function UserPage({ user, setUser, setLoggedIn }) {
             <button
               className="submit-btn"
               disabled={chatSearch === ""}
-              onClick={enterChatRoom}
+              onClick={tryEnterChatroom}
             >
               Enter Chat
             </button>

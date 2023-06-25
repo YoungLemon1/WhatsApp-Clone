@@ -14,7 +14,6 @@ function Chat({
   const [messageText, setMessageText] = useState("");
 
   useEffect(() => {
-    if (messages.length === 0) return;
     async function fetchMessages() {
       try {
         const res = await Axios.get(
@@ -54,9 +53,6 @@ function Chat({
   }
 
   async function sendMessage() {
-    if (!chat.isGroupChat && messages.length === 0) {
-      createNonGroupChatroom();
-    }
     const message = {
       sender: loggedUser._id,
       chatroom: chat.id,
