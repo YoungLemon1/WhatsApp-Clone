@@ -96,6 +96,40 @@ messageRouter.get("/user/conversations/:userID", async (req, res) => {
   }
 });
 
+messageRouter.get("/user/conversation/:otherUserID", async (req, res) => {
+  try {
+    const { otherUserID } = req.params;
+    const userID = req.user.id; // Assuming the user ID is available in req.user
+
+    // Fetch the conversation between the logged-in user and the other user
+    const conversation = await Message.find({
+      $or: [
+        { sender: userID, recipient: otherUserID, chatroom: null },
+        { sender: otherUserID, recipient: userID, chatroom: null },
+      ],
+    }).sort({ createdAt: 1 });
+
+    // Retrieve the user objects for the logged-in user and the other user
+    const [loggedInUser, otherUser] = await Promise.all([
+      User.findById(userID),
+      User.findById(otherUserID),
+    ]);
+
+    const conversationWithUsers = {
+      loggedInUser,
+      otherUser,
+      messages: conversation,
+    };
+
+    res.status(200).json(conversationWithUsers);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching conversation",
+    });
+  }
+});
+
 messageRouter.post("/", [body("message").notEmpty()], async (req, res) => {
   const { sender, recipient, chatroom, message, createdAt } = req.body;
   if (!sender) {
