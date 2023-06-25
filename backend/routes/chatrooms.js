@@ -15,32 +15,21 @@ chatRoomRouter.get("/", async (req, res) => {
   }
 });
 
-chatRoomRouter.get("/user/:id", async (req, res) => {
+chatRoomRouter.get("/user/:userID", async (req, res) => {
   try {
-    const { id } = req.params;
+    const { userID } = req.params;
 
     // Fetch the chatrooms where the user is a member
-    const chatrooms = await ChatRoom.find({ members: { $in: [id] } });
+    const chatrooms = await ChatRoom.find({ members: { $in: [userID] } });
 
     // Map the chatrooms to the desired format
     const chatHistory = chatrooms.map(async (chatroom) => {
-      const otherUserId = chatroom.members.find(
-        (member) => member.toString() !== id
-      );
-      const otherUser = (await User.findById(otherUserId)) ?? undefined;
-      const isGroupChat = chatroom.isGroupChat;
-      const chatName = isGroupChat
-        ? chatroom.groupChatName
-        : otherUser.username;
-      const chatImageURL = isGroupChat
-        ? chatroom.groupChatPicture
-        : otherUser.imageURL;
-
       return {
         id: chatroom._id,
-        isGroupChat: isGroupChat,
-        name: chatName,
-        imageURL: chatImageURL,
+        name: chatroom.name,
+        members: chatroom.members,
+        imageURL: chat.imageURL,
+        lastMessage: chat.lastMessage,
       };
     });
 
