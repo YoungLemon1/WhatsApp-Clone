@@ -28,8 +28,8 @@ chatRoomRouter.get("/user/:userID", async (req, res) => {
         id: chatroom._id,
         name: chatroom.name,
         members: chatroom.members,
-        imageURL: chat.imageURL,
-        lastMessage: chat.lastMessage,
+        imageURL: chatroom.imageURL,
+        lastMessage: chatroom.lastMessage,
       };
     });
 

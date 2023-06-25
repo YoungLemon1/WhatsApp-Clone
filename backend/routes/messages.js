@@ -52,38 +52,39 @@ messageRouter.get("/user/:userID", async (req, res) => {
       ),
     ];
 
-    // An array of array of messages between the user and another user sorted in acsending order
+    // An array of conversations array, made of messages between the user and another user sorted in acsending order
     const conversations = otherUsers.map((otherUser) => {
-      userMessages
-        .map((message) => {
-          if (message.sender === otherUser || message.recipient === otherUser)
-            return message;
-        })
+      return userMessages
+        .filter(
+          (message) =>
+            message.sender === otherUser || message.recipient === otherUser
+        )
         .sort(function (a, b) {
           return new Date(b.createdAt) - new Date(a.createdAt);
         });
     });
 
-    const chatHistory = conversations.map((conversation) => {
-      const lastMessage = conversation.at(-1);
-      const otherUserID =
-        lastMessage.sender !== userID
-          ? lastMessage.sender
-          : lastMessage.recipient;
-      const otherUser = User.findById(otherUserID);
-      return {
-        id: otherUserID,
-        name: otherUser.username,
-        imageURL: otherUser.imageURL,
-        lastMessage: lastMessage._id,
-      };
-    });
-
+    const chatHistory = await Promise.all(
+      conversations.map((conversation) => {
+        const lastMessage = conversation[conversation.length - 1];
+        const otherUserID =
+          lastMessage.sender !== userID
+            ? lastMessage.sender
+            : lastMessage.recipient;
+        const otherUser = User.findById(otherUserID);
+        return {
+          id: otherUserID,
+          name: otherUser.username,
+          imageURL: otherUser.imageURL,
+          lastMessage: lastMessage._id,
+        };
+      })
+    );
     res.status(200).json(chatHistory);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: Failure fetching chat history",
+      error: "Internal server error: Failure fetching user chat history",
     });
   }
 });
