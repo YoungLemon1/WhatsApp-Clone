@@ -31,6 +31,10 @@ function UserPage({ user, setUser, setLoggedIn }) {
     } else return "";
   }*/
 
+  function userInConversation() {
+    return currentChat !== null || currentChat !== undefined;
+  }
+
   function logout() {
     setUser({});
     setLoggedIn(false);
@@ -43,7 +47,6 @@ function UserPage({ user, setUser, setLoggedIn }) {
     const chat = chatHistory.find((c) => c.name === chatSearch);
     if (chat) {
       setCurrentChat(chat);
-      setIsUserInChatroom(true);
       return;
     }
 
@@ -101,7 +104,7 @@ function UserPage({ user, setUser, setLoggedIn }) {
 
   return (
     <div>
-      {!isUserInChatroom ? (
+      {!userInConversation() ? (
         <div>
           <Button onClick={logout}>logout</Button>
           <h1>{user.username}</h1>

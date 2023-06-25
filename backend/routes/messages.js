@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import UserMessage from "../models/userMessages.js";
-import ChatRoom from "../models/chatroom.js";
+import Message from "../models/message.js";
 const messageRouter = Router();
 
 messageRouter.get("/", async (req, res) => {
@@ -42,16 +41,15 @@ messageRouter.get("/chatroom/:id", async (req, res) => {
   }
 });
 
-messageRouter.post("/", [body("text").notEmpty()], async (req, res) => {
-  const { sender, chatroom, text, createdAt } = req.body;
-
-  if (text === "") {
-    return res.status(400).json({
-      error: "cannot send empty messages",
-    });
+messageRouter.post("/", [body("message").notEmpty()], async (req, res) => {
+  const { sender, chatroom, message, createdAt } = req.body;
+  const errors = Message.schema.validate(message);
+  if (errors) {
+    res.status(400).json({ error: "Invalid message schema", data: errors });
+    throw new Error(errors.map((error) => error.message).join(", "));
   }
   try {
-    const newMessage = new UserMessage(req.body);
+    const newMessage = new Message(req.body);
     await newMessage.save();
 
     res.status(201).json(newMessage);
