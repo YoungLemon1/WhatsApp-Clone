@@ -66,13 +66,13 @@ chatRoomRouter.get("/:id", async (req, res) => {
   }
 });
 
-chatRoomRouter.get("/search/:groupName", async (req, res) => {
+chatRoomRouter.get("/search/:chatroomName", async (req, res) => {
   try {
-    const { groupName } = req.params;
-    const groupChatrooms = await ChatRoom.findOne({
-      groupChatName: groupName,
+    const { chatroomName } = req.params;
+    const chatrooms = await ChatRoom.find({
+      name: chatroomName,
     });
-    res.status(200).json(groupChatrooms);
+    res.status(200).json(chatrooms);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
