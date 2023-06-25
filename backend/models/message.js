@@ -27,6 +27,8 @@ const MessageSchema = new Schema({
       throw new Error("At least one of sender_id or chatroom_id is required");
     } else if (message.sender !== null && message.chatroom !== null) {
       throw new Error("Both sender_id and chatroom_id cannot be set");
+    } else if (message.message === "") {
+      throw new Error("Cannot send empty messages");
     }
   },
 });
