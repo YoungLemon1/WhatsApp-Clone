@@ -29,7 +29,7 @@ messageRouter.get("/:id", async (req, res) => {
   }
 });
 
-messageRouter.get("/user/:userID", async (req, res) => {
+messageRouter.get("/user/conversations/:userID", async (req, res) => {
   try {
     const { userID } = req.params;
 
@@ -42,7 +42,7 @@ messageRouter.get("/user/:userID", async (req, res) => {
     });
 
     // Map the chatrooms to the desired format
-    const otherUsers = [
+    const otherUsersIDs = [
       ...new Set(
         userMessages.map((message) => {
           const otherUserID =
@@ -53,7 +53,7 @@ messageRouter.get("/user/:userID", async (req, res) => {
     ];
 
     // An array of conversations array, made of messages between the user and another user sorted in acsending order
-    const conversations = otherUsers.map((otherUser) => {
+    const conversations = otherUsersIDs.map((otherUser) => {
       return userMessages
         .filter(
           (message) =>
@@ -64,22 +64,29 @@ messageRouter.get("/user/:userID", async (req, res) => {
         });
     });
 
-    const chatHistory = await Promise.all(
-      conversations.map((conversation) => {
-        const lastMessage = conversation[conversation.length - 1];
-        const otherUserID =
-          lastMessage.sender !== userID
-            ? lastMessage.sender
-            : lastMessage.recipient;
-        const otherUser = User.findById(otherUserID);
-        return {
-          id: otherUserID,
-          name: otherUser.username,
-          imageURL: otherUser.imageURL,
-          lastMessage: lastMessage._id,
-        };
-      })
-    );
+    const otherUsers = await User.find({ _id: { $in: otherUsersIDs } });
+
+    // Create a user map for quick access
+    const userMap = otherUsers.reduce((map, user) => {
+      map[user._id] = user;
+      return map;
+    }, {});
+
+    // Modify the chatHistory mapping to use the userMap
+    const chatHistory = conversations.map((conversation) => {
+      const lastMessage = conversation[conversation.length - 1];
+      const otherUserID =
+        lastMessage.sender !== userID
+          ? lastMessage.sender
+          : lastMessage.recipient;
+      const otherUser = userMap[otherUserID];
+      return {
+        id: otherUserID,
+        name: otherUser.username,
+        imageURL: otherUser.imageURL,
+        lastMessage: lastMessage._id,
+      };
+    });
     res.status(200).json(chatHistory);
   } catch (err) {
     console.error(err.stack);
