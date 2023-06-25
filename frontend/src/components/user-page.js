@@ -12,15 +12,30 @@ function UserPage({ user, setUser, setLoggedIn }) {
 
   useEffect(() => {
     async function fetchData() {
+      let result = [];
       try {
         const res = await Axios.get(
           `http://localhost:5000/chatrooms/user/${user._id}`
         );
+        result = result.concat(res.data);
         console.log("data:", res.data);
-        setChatHistory(res.data);
       } catch (error) {
-        console.error("Failed to fetch users", error);
+        console.error("Failed to fetch chatroom messaging history", error);
       }
+      try {
+        const res = await Axios.get(
+          `http://localhost:5000/messages/user/${user._id}`
+        );
+        result = result.concat(res.data);
+        console.log("data:", res.data);
+      } catch (error) {
+        console.error(
+          "Failed to fetch one on one user messaging history",
+          error
+        );
+      }
+      result.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
+      setChatHistory(result);
     }
     fetchData();
   }, [user._id]);
