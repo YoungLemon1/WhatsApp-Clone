@@ -7,14 +7,10 @@ const ChatRoomSchema = new Schema({
       ref: "User",
     },
   ],
-  isGroupChat: {
-    type: Boolean,
-    default: false,
-  },
-  groupChatName: {
+  name: {
     type: String,
   },
-  groupChatPicture: {
+  imageURL: {
     type: String,
     default:
       "https://cdn6.aptoide.com/imgs/1/2/2/1221bc0bdd2354b42b293317ff2adbcf_icon.png",
