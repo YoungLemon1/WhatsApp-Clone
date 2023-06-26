@@ -7,7 +7,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   const userId = loggedUser._id;
   const [chatHistory, setChatHistory] = useState([]);
   const [chatSearch, setChatSearch] = useState("");
-  const [isUserInChatroom, setIsUserInChatroom] = useState(false);
+  const [isUserInChat, setIsUserInChat] = useState(false);
   const [currentChat, setCurrentChat] = useState({});
   const [searchError, setSearchError] = useState("");
   useEffect(() => {
@@ -53,20 +53,20 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
     let groupChatData;
 
     try {
-      const responseUserSearch = await Axios.get(
+      const resUserSearch = await Axios.get(
         `http://localhost:5000/users/search/${chatSearch}`
       );
-      userData = responseUserSearch.data;
+      userData = resUserSearch.data;
     } catch (error) {
       console.error("user search error", error);
       // Handle the error for the user search API request
     }
 
     try {
-      const responseGroupChatSearch = await Axios.get(
+      const resGroupChatSearch = await Axios.get(
         `http://localhost:5000/chatrooms/search/${chatSearch}`
       );
-      groupChatData = responseGroupChatSearch.data;
+      groupChatData = resGroupChatSearch.data;
     } catch (error) {
       console.error("chatroom search error", error);
       // Handle the error for the group chat search API request
@@ -98,12 +98,12 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   function enterChat(chat) {
     setChatHistory([...chatHistory, chat]);
     setCurrentChat(chat);
-    setIsUserInChatroom(true);
+    setIsUserInChat(true);
   }
 
   return (
     <div id="user-page">
-      {!isUserInChatroom ? (
+      {!isUserInChat ? (
         <div>
           <Button onClick={logout}>logout</Button>
           <h1>{loggedUser.username}</h1>
@@ -145,8 +145,8 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
           chat={currentChat}
           setCurrentChat={setCurrentChat}
           loggedUser={loggedUser}
-          isUserInChatroom={isUserInChatroom}
-          setIsUserInChatroom={setIsUserInChatroom}
+          isUserInChatroom={isUserInChat}
+          setIsUserInChatroom={setIsUserInChat}
           chatHistory={chatHistory}
           setChatHistory={setChatHistory}
         ></Chat>
