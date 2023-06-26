@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import Chat from "./chat";
 import { Button } from "react-bootstrap";
+import ChatRoom from "../../../backend/models/chatroom";
 
 function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   const userId = loggedUser._id;
@@ -58,7 +59,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
       );
       userData = responseUserSearch.data;
     } catch (error) {
-      console.error(error);
+      console.error("user search error", error);
       // Handle the error for the user search API request
     }
 
@@ -68,7 +69,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
       );
       groupChatData = responseGroupChatSearch.data;
     } catch (error) {
-      console.error(error);
+      console.error("chatroom search error", error);
       // Handle the error for the group chat search API request
     }
 
