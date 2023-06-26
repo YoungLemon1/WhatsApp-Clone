@@ -63,6 +63,7 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
     }, {});
 
     console.log("other users", otherUsersIDs);
+
     // An array of last messages between the user and another user
     const conversationLastMessages = otherUsersIDs.map((otherUser) => {
       const conversation = userMessages.filter(
