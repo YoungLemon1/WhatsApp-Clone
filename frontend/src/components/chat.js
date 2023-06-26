@@ -36,7 +36,7 @@ function Chat({
     }
 
     fetchMessages();
-  }, []);
+  }, [chat.id, loggedUser._id, chat.isGroupChat]);
 
   function exitChat() {
     console.log(isUserInChatroom);
