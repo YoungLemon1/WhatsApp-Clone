@@ -30,7 +30,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         console.log("data:", res.data);
       } catch (error) {
         console.error(
-          "Failed to fetch one on one user messaging history",
+          "Failed to fetch one on one user one-on-one messaging history",
           error
         );
       }

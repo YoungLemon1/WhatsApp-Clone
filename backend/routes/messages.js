@@ -2,6 +2,7 @@ import { Router } from "express";
 import { body } from "express-validator";
 import Message from "../models/message.js";
 import User from "../models/user.js";
+import Chatroom from "../models/chatroom.js";
 const messageRouter = Router();
 
 messageRouter.get("/", async (req, res) => {
@@ -41,6 +42,8 @@ messageRouter.get("/conversations/:userID", async (req, res) => {
       ],
     });
 
+    const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
+
     // Map the chatrooms to the desired format
     const otherUsersIDs = [
       ...new Set(
@@ -51,6 +54,8 @@ messageRouter.get("/conversations/:userID", async (req, res) => {
         })
       ),
     ];
+
+    const otherUsers = await User.find({ _id: { $in: otherUsersIDs } });
 
     // An array of conversations array, made of messages between the user and another user sorted in acsending order
     const conversations = otherUsersIDs.map((otherUser) => {
@@ -64,7 +69,19 @@ messageRouter.get("/conversations/:userID", async (req, res) => {
         });
     });
 
-    const otherUsers = await User.find({ _id: { $in: otherUsersIDs } });
+    const chatroomLastMessages = await Message.find({
+      [userChatrooms]: { $in: lastMessage },
+    });
+
+    const lastMessages = conversations
+      .map((conversation) => {
+        const lastMessage = conversation[conversation.length - 1];
+        return lastMessage;
+      })
+      .concat(chatroomLastMessages)
+      .sort(function (a, b) {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
 
     // Create a user map for quick access
     const userMap = otherUsers.reduce((map, user) => {
