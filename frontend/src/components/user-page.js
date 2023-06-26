@@ -35,6 +35,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   }*/
 
   function logout() {
+    console.log(`${loggedUser.username} logged out successefully`);
     setLoggedUser({});
     setLoggedIn(false);
   }
