@@ -65,6 +65,8 @@ label {
 }
 
 #logout {
+  background-color: darkred;
+  border: none;
   margin: 0.5rem;
 }
 
@@ -88,6 +90,7 @@ label {
   height: 2rem;
   border-radius: 50%;
 }
+
 .chat .chat-header {
   background-color: #026783;
   height: max-content;
@@ -113,7 +116,9 @@ label {
 
 .chat .chat-body {
   min-height: 30rem;
-  max-width: 35rem;
+  width: 100%;
+  padding-left: 5rem;
+  padding-right: 5rem;
 }
 
 .chat .chat-body .message-container {
@@ -129,13 +134,16 @@ label {
 .chat .chat-body .message-container .message {
   display: block;
   flex-wrap: wrap;
-  min-height: 1rem;
-  min-width: 4rem;
-  max-width: 6rem;
-  border-radius: 5%;
+  min-height: 1.5rem;
+  min-width: 6rem;
+  max-width: 12rem;
+  border-radius: 12rem 12rem 12rem 12rem;
   margin: 0.5rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  word-wrap: break-word;
 }
 
 .chat .chat-body .message p {
