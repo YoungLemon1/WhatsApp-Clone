@@ -118,8 +118,8 @@ function Chat({
                     : "other-user"
                 }`}
               >
-                <div>{message.message}</div>
-                <div>{dateFormat(message.createdAt)}</div>
+                <p>{message.message}</p>
+                <small>{dateFormat(message.createdAt)}</small>
               </div>
             </div>
           );

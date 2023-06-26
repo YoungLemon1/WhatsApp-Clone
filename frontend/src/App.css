@@ -106,27 +106,42 @@ label {
   margin-left: 0.5rem;
   margin-right: 1.5rem;
 }
+
 .chat .chat-body {
   min-height: 30rem;
 }
 
-.chat .chat-body .message {
+.chat .chat-body .message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.chat .chat-body .message-container .message {
   display: block;
   min-height: 1rem;
-  width: 4rem;
+  min-width: 4rem;
   border-radius: 5%;
-  margin: 1.5rem;
-  padding: 0.75rem;
+  margin: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.chat .chat-body .message p {
+  margin: 0rem;
 }
 
 .chat .chat-body .message.current-user {
-  justify-content: flex-start;
-  align-self: start;
+  align-self: flex-start;
   background-color: #06702f;
 }
 
 .chat .chat-body .message.other-user {
-  justify-content: flex-end;
+  align-self: flex-end;
   background-color: #a3aaacdc;
 }
 
@@ -139,14 +154,6 @@ label {
   margin-bottom: 0rem;
   margin-left: 0.2rem;
   margin-right: 0.2rem;
-}
-.chat .chat-footer .message-text {
-  margin-top: 0rem;
-  height: 100%;
-}
-.chat .chat-footer .send-btn {
-  margin-top: 0rem;
-  height: 100%;
 }
 
 .form-container {
