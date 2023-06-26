@@ -15,33 +15,6 @@ chatRoomRouter.get("/", async (req, res) => {
   }
 });
 
-chatRoomRouter.get("/user/:userID", async (req, res) => {
-  try {
-    const { userID } = req.params;
-
-    // Fetch the chatrooms where the user is a member
-    const chatrooms = await ChatRoom.find({ members: { $in: [userID] } });
-
-    // Map the chatrooms to the desired format
-    const chatHistory = chatrooms.map(async (chatroom) => {
-      return {
-        id: chatroom._id,
-        name: chatroom.name,
-        members: chatroom.members,
-        imageURL: chatroom.imageURL,
-        lastMessage: chatroom.lastMessage,
-      };
-    });
-
-    res.status(200).json(chatHistory);
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: Failure fetching chat history",
-    });
-  }
-});
-
 chatRoomRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
