@@ -26,11 +26,11 @@ function Login({ setLoggedUser, setLoggedIn }) {
         password,
       });
       const data = res.data;
-      console.log(data);
       await setLoggedUser(data);
       resetFields();
       setLoggedIn(true);
       console.log(`User ${data.username} logged in successfully`);
+      console.log(data);
     } catch (error) {
       console.error("Error fetching user", error);
       setError("Username or password are incorrect. Please try again.");
@@ -40,7 +40,7 @@ function Login({ setLoggedUser, setLoggedIn }) {
   function resetFields() {
     setUsername("");
     setUsernameError("");
-    setUsernameError("");
+    setPassword("");
     setPasswordError("");
   }
 
