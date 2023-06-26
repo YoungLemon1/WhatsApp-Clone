@@ -15,7 +15,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
       let result = [];
       try {
         const res = await Axios.get(
-          `http://localhost:5000/chatHistory/${userId}`
+          `http://localhost:5000/messages/chatHistory/${userId}`
         );
         const data = res.data;
         setChatHistory(data);
