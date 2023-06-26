@@ -170,12 +170,14 @@ messageRouter.get("/conversation/:chatroomID", async (req, res) => {
   try {
     const { chatroomID } = req.params;
 
-    // Fetch the conversation between the logged-in user and the other user
+    // Fetch the conversation inside the chatroom
     const conversation = await Message.find({
       chatroom: chatroomID,
-    }).sort((a, b) => a.createdAt - b.createdAt);
+    });
 
-    // Retrieve the user objects for the logged-in user and the other user
+    if (conversation.length > 1) {
+      conversation = conversation.sort((a, b) => a.createdAt - b.createdAt);
+    }
 
     res.status(200).json(conversation);
   } catch (err) {
