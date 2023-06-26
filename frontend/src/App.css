@@ -118,7 +118,7 @@ label {
 }
 
 #user-page #chat-history .chat-history-item:hover {
-  background-color: lightskyblue;
+  background-color: rgba(147, 148, 150, 0.212);
   cursor: pointer;
 }
 
