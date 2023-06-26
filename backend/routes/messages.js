@@ -69,7 +69,6 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
     });
 
     const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
-
     const chatroomLastMessages = await Message.find({
       _id: {
         $in: userChatrooms
@@ -93,7 +92,7 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
       const lastMessageID = lastMessage._id;
       const messageContent = lastMessage.message;
       const createdAt = lastMessage.createdAt;
-      const isGroupChat = lastMessage.chatroom !== null;
+      const isGroupChat = lastMessage.chatroom != null;
       if (!isGroupChat) {
         const otherUserID =
           lastMessage.sender !== userID
@@ -116,6 +115,7 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
         const chatroom = chatroomsMap[chatroomID];
         return {
           id: chatroomID,
+          members: chatroom.members,
           name: chatroom.name,
           imageURL: chatroom.imageURL,
           isGroupChat: isGroupChat,
