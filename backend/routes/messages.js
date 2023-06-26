@@ -41,14 +41,16 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
         { recipient: userID, chatroom: null },
       ],
     });
-
+    console.log(userID);
+    console.log("user messages", userMessages);
     // Map the chatrooms to the desired format
     const otherUsersIDs = [
       ...new Set(
         userMessages.map((message) => {
-          const otherUserID =
-            message.sender !== userID ? message.sender : message.recipient;
-          return otherUserID;
+          const otherUserID = message.sender.equals(userID)
+            ? message.recipient
+            : message.sender;
+          return otherUserID.toString();
         })
       ),
     ];
@@ -60,20 +62,33 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
       return map;
     }, {});
 
-    // An array of conversations array, made of messages between the user and another user
-    const conversations = otherUsersIDs.map((otherUser) => {
-      const conversation = userMessages.filter((message) =>
-        [message.sender, message.recipient].includes(otherUser)
+    console.log("other users", otherUsersIDs);
+    // An array of last messages between the user and another user
+    const conversationLastMessages = otherUsersIDs.map((otherUser) => {
+      const conversation = userMessages.filter(
+        (message) =>
+          message.recipient.equals(otherUser) ||
+          message.sender.equals(otherUser)
       );
-      return conversation[conversation.length - 1];
+      console.log("conversation", conversation);
+      const lastMessage = conversation.reduce((latest, message) => {
+        console.log("message", message);
+        if (!latest || message.createdAt > latest.createdAt) {
+          return message;
+        }
+        return latest;
+      }, null);
+      return lastMessage;
     });
+
+    console.log("Last convo messages", conversationLastMessages);
 
     const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
     const chatroomLastMessages = await Message.find({
       _id: {
         $in: userChatrooms
-          .filter((chatroom) => chatroom.lastMessage !== null)
-          .map((chatroom) => chatroom.lastMessage),
+          .map((chatroom) => chatroom.lastMessage)
+          .filter((lastMessage) => lastMessage !== undefined),
       },
     });
 
@@ -82,10 +97,13 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
       return map;
     }, {});
 
+    console.log("chatrooms map", chatroomsMap);
+
     //All last messages in user to user conversation or in chatroom sorted in descending order
-    const lastMessages = [...conversations, ...chatroomLastMessages].sort(
-      (a, b) => b.createdAt - a.createdAt
-    );
+    const lastMessages = [
+      ...conversationLastMessages,
+      ...chatroomLastMessages,
+    ].sort((a, b) => b.createdAt - a.createdAt);
 
     // Modify the chatHistory mapping to use the userMap
     const chatHistory = lastMessages.map((lastMessage) => {
@@ -94,6 +112,7 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
       const messageContent = lastMessage.message;
       const createdAt = lastMessage.createdAt;
       const isGroupChat = lastMessage.chatroom != null;
+      console.log("message", lastMessage);
       if (!isGroupChat) {
         const otherUserID = lastMessage.sender.equals(userID)
           ? lastMessage.recipient
@@ -101,14 +120,14 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
         const otherUser = otherUsersMap[otherUserID];
         return {
           id: otherUserID,
-          name: otherUser?.username ?? "",
-          imageURL: otherUser?.imageURL ?? "",
+          name: otherUsersMap[otherUserID].username,
+          imageURL: otherUsersMap[otherUserID].imageURL,
           isGroupChat: isGroupChat,
           lastMessage: {
             id: messageID,
             sender: sender,
             message: messageContent,
-            createdAt: createdAt,
+            createdAt: lastMessage.createdAt,
           },
         };
       } else {
