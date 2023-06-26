@@ -78,8 +78,6 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
       return lastMessage;
     });
 
-    console.log("Last convo messages", conversationLastMessages);
-
     const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
     const chatroomLastMessages = await Message.find({
       _id: {
@@ -94,8 +92,6 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
       return map;
     }, {});
 
-    console.log("chatrooms map", chatroomsMap);
-
     //All last messages in user to user conversation or in chatroom sorted in descending order
     const lastMessages = [
       ...conversationLastMessages,
@@ -109,7 +105,7 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
       const messageContent = lastMessage.message;
       const createdAt = lastMessage.createdAt;
       const isGroupChat = lastMessage.chatroom != null;
-      console.log("message", lastMessage);
+
       if (!isGroupChat) {
         const otherUserID = lastMessage.sender.equals(userID)
           ? lastMessage.recipient
@@ -168,8 +164,6 @@ messageRouter.get("/conversation/:userID/:otherUserID", async (req, res) => {
     if (conversation.length > 1) {
       conversation = conversation.sort((a, b) => a.createdAt - b.createdAt);
     }
-
-    console.log(conversation);
 
     // Retrieve the user objects for the logged-in user and the other user
 
