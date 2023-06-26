@@ -12,7 +12,6 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   const [searchError, setSearchError] = useState("");
   useEffect(() => {
     async function fetchData() {
-      let result = [];
       try {
         const res = await Axios.get(
           `http://localhost:5000/messages/chat-history/${loggedUser._id}`
@@ -23,8 +22,6 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
       } catch (error) {
         console.error("Failed to fetch user chat history", error);
       }
-      result.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
-      setChatHistory(result);
     }
     fetchData();
   }, [loggedUser._id]);
