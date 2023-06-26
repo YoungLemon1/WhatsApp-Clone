@@ -56,7 +56,6 @@ function Chat({
   }
 
   async function sendMessage() {
-    console.log(isGroupChat.current);
     const message = {
       sender: userID.current,
       message: messageContent,
@@ -70,7 +69,8 @@ function Chat({
       const data = res.data;
       console.log("message created", data);
       emptyMessage();
-      setMessages([...messages, message]);
+      await setMessages([...messages, message]);
+      console.log(messages);
     } catch {
       console.error("Failed to send message");
     }
@@ -91,7 +91,6 @@ function Chat({
       </div>
       <div className="chat-body">
         {messages.map((message) => {
-          console.log(message.createdAt);
           return (
             <div className="message-container" key={message._id}>
               <div
