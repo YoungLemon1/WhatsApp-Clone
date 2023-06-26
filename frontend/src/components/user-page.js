@@ -44,7 +44,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
     }
     const chat = chatHistory.find((c) => c.name === chatSearch);
     if (chat) {
-      setCurrentChat(chat);
+      enterChat(chat);
       return;
     }
 
