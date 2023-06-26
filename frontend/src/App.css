@@ -71,6 +71,7 @@ label {
 #logout {
   background-color: darkred;
   border: none;
+  margin-top: 0.4rem;
   margin-right: 1.5rem;
   float: right;
 }
@@ -107,7 +108,13 @@ label {
 }
 
 #user-page #chat-history .chat-history-item {
-  padding: 0.2rem;
+  padding-right: 0.2rem;
+  padding-left: 0.2rem;
+}
+
+#user-page #chat-history .chat-history-item hr {
+  margin: 0;
+  padding: 0;
 }
 
 #user-page #chat-history .chat-history-item:hover {
