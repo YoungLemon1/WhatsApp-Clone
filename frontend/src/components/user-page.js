@@ -19,7 +19,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         );
         const data = res.data;
         setChatHistory(data);
-        console.log("data:", data);
+        console.log("successfully fetched user chat history", data);
       } catch (error) {
         console.error("Failed to fetch user chat history", error);
       }
