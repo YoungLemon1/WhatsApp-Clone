@@ -156,7 +156,8 @@ messageRouter.get("/conversation/:userID/:otherUserID", async (req, res) => {
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: Failure fetching conversation",
+      error:
+        "Internal server error: Failure fetching user-to-user conversation",
     });
   }
 });
@@ -176,7 +177,7 @@ messageRouter.get("/conversation/:chatroomID", async (req, res) => {
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: Failure fetching conversation",
+      error: "Internal server error: Failure fetching chatroom conversation",
     });
   }
 });
