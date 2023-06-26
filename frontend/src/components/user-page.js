@@ -134,7 +134,11 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
               const sender =
                 chat.lastMessage.sender === loggedUser._id ? "You: " : "";
               return (
-                <div className="chat-history-item" key={chat.id}>
+                <div
+                  className="chat-history-item"
+                  key={chat.id}
+                  onClick={() => enterChat(chat)}
+                >
                   <div id="conversation-details">
                     <img
                       className="profile-img"
