@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import moment from "moment";
 import Axios from "axios";
 
 function Chat({
@@ -55,6 +56,12 @@ function Chat({
     textInput.value = "";
   }
 
+  function dateFormat(date) {
+    if (date) {
+      return moment(date).format("HH:MM");
+    } else return "";
+  }
+
   async function sendMessage() {
     const message = {
       sender: userID.current,
@@ -62,6 +69,7 @@ function Chat({
       ...(isGroupChat.current
         ? { chatroom: chatID.current }
         : { recipient: chatID.current }),
+      createdAt: Date.now(),
     };
     console.log("message payload", message);
     try {
@@ -102,7 +110,7 @@ function Chat({
                 }`}
               >
                 <div>{message.message}</div>
-                <div>{message.createdAt}</div>
+                <div>{dateFormat(message.createdAt)}</div>
               </div>
             </div>
           );

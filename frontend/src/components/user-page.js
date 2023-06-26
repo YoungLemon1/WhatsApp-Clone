@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import Chat from "./chat";
+import moment from "moment";
 import { Button } from "react-bootstrap";
 
 function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
@@ -28,11 +29,12 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
     }
     fetchData();
   }, [userId]);
-  /*function dateFormat(date) {
+
+  function dateFormat(date) {
     if (date) {
-      return moment(date).format("DD-MM-YYYY");
+      return moment(date).format("HH:MM");
     } else return "";
-  }*/
+  }
 
   function logout() {
     console.log(`${loggedUser.username} logged out successefully`);
@@ -112,11 +114,18 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
             {chatHistory.map((chat) => {
               return (
                 <div className="chat-history-item" key={chat.id}>
-                  <img
-                    className="profile-img"
-                    src={chat.imageURL}
-                    alt={`${chat.name} profile`}
-                  ></img>
+                  <div id="conversation-details">
+                    <img
+                      className="profile-img"
+                      src={chat.imageURL}
+                      alt={`${chat.name} profile`}
+                    ></img>
+                    <h4>{chat.name}</h4>
+                  </div>
+                  <div id="last-message">
+                    <p>{chat.lastMessage.message}</p>
+                    <small>{dateFormat(chat.lastMessage.createdAt)}</small>
+                  </div>
                   <hr></hr>
                 </div>
               );
