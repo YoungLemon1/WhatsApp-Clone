@@ -138,7 +138,7 @@ messageRouter.get("/conversation/:userID/:otherUserID", async (req, res) => {
         { sender: userID, recipient: otherUserID, chatroom: null },
         { sender: otherUserID, recipient: userID, chatroom: null },
       ],
-    }).sort({ createdAt: 1 });
+    }).sort((a, b) => a.createdAt - b.createdAt);
 
     // Retrieve the user objects for the logged-in user and the other user
 
@@ -159,7 +159,7 @@ messageRouter.get("/conversation/:chatroomID", async (req, res) => {
     // Fetch the conversation between the logged-in user and the other user
     const conversation = await Message.find({
       chatroom: chatroomID,
-    }).sort({ createdAt: 1 });
+    }).sort((a, b) => a.createdAt - b.createdAt);
 
     // Retrieve the user objects for the logged-in user and the other user
 
