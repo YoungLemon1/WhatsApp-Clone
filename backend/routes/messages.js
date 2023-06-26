@@ -30,7 +30,7 @@ messageRouter.get("/:id", async (req, res) => {
   }
 });
 
-messageRouter.get("/conversations/:userID", async (req, res) => {
+messageRouter.get("/chatHistory/:userID", async (req, res) => {
   try {
     const { userID } = req.params;
 

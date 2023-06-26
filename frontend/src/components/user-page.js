@@ -17,16 +17,6 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         const res = await Axios.get(
           `http://localhost:5000/chatrooms/user/${loggedUser._id}`
         );
-        result = result.concat(res.data);
-        console.log("data:", res.data);
-      } catch (error) {
-        console.error("Failed to fetch chatroom messaging history", error);
-      }
-      try {
-        const res = await Axios.get(
-          `http://localhost:5000/messages/conversations/${loggedUser._id}`
-        );
-        result = result.concat(res.data);
         console.log("data:", res.data);
       } catch (error) {
         console.error(
