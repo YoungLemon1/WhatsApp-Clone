@@ -146,7 +146,11 @@ messageRouter.get("/conversation/:userID/:otherUserID", async (req, res) => {
         { sender: userID, recipient: otherUserID, chatroom: null },
         { sender: otherUserID, recipient: userID, chatroom: null },
       ],
-    }).sort((a, b) => a.createdAt - b.createdAt);
+    });
+
+    if (conversation.length > 1) {
+      conversation = conversation.sort((a, b) => a.createdAt - b.createdAt);
+    }
 
     console.log(conversation);
 
