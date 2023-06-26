@@ -64,6 +64,10 @@ label {
   margin: 0.5rem;
 }
 
+#logout {
+  margin: 0.5rem;
+}
+
 #error-container {
   background-color: darkred;
   color: rgb(230, 224, 221);
@@ -86,11 +90,11 @@ label {
 }
 .chat .chat-header {
   background-color: #026783;
-  height: 2.5rem;
+  height: max-content;
   text-align: left;
 }
 .chat .chat-header * {
-  display: inline-flex;
+  display: inline;
 }
 
 .chat .chat-header .chat-name {
@@ -109,6 +113,7 @@ label {
 
 .chat .chat-body {
   min-height: 30rem;
+  max-width: 35rem;
 }
 
 .chat .chat-body .message-container {
@@ -123,8 +128,10 @@ label {
 
 .chat .chat-body .message-container .message {
   display: block;
+  flex-wrap: wrap;
   min-height: 1rem;
   min-width: 4rem;
+  max-width: 6rem;
   border-radius: 5%;
   margin: 0.5rem;
   padding-left: 0.5rem;

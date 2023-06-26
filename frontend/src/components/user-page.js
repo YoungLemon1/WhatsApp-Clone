@@ -105,10 +105,12 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
     <div id="user-page">
       {!isUserInChat ? (
         <div>
-          <Button onClick={logout}>logout</Button>
+          <Button id="logout" onClick={logout}>
+            logout
+          </Button>
           <h1>{loggedUser.username}</h1>
           <div id="send-message-to-user">
-            <label htmlFor="chat-search-bar">Chat with user or group</label>
+            <label htmlFor="chat-search-bar">Chat with a user or a group</label>
             <input
               id="chat-search-bar"
               onChange={(event) => {
