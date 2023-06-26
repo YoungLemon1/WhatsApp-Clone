@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Axios from "axios";
 
 function Chat({
@@ -11,13 +11,21 @@ function Chat({
   setChatHistory,
 }) {
   const [messages, setMessages] = useState([]);
-  const [messageText, setMessageText] = useState("");
+  const [messageContent, setMessageContent] = useState("");
+
+  const userID = useRef(null);
+  const chatID = useRef(null);
+  const isGroupChat = useRef(null);
 
   useEffect(() => {
+    userID.current = loggedUser._id;
+    chatID.current = chat.id;
+    isGroupChat.current = chat.isGroupChat;
+    const reqParams = isGroupChat ? `${userID}/${chatID}` : chatID;
     async function fetchMessages() {
       try {
         const res = await Axios.get(
-          `http://localhost:5000/messages/chatroom/${chat.id}`
+          `http://localhost:5000/messages/conversation/${reqParams}`
         );
         const data = res.data;
         console.log(data);
@@ -28,7 +36,7 @@ function Chat({
     }
 
     fetchMessages();
-  }, [chat.id, messages.length]);
+  }, []);
 
   function exitChat() {
     console.log(isUserInChatroom);
@@ -40,22 +48,25 @@ function Chat({
     }
   }
 
+  function emptyMessage() {
+    setMessageContent("");
+    const textInput = document.getElementById("message-text");
+    textInput.value = "";
+  }
+
   async function sendMessage() {
     const message = {
-      sender: loggedUser._id,
-      chatroom: chat.id,
-      text: messageText,
-      createdAt: Date.now(),
+      sender: userID,
+      message: messageContent,
+      ...(isGroupChat ? { chatroom: chatID } : { recipient: chatID }),
     };
     console.log("message payload", message);
+    emptyMessage();
     try {
       const res = await Axios.post("http://localhost:5000/messages", message);
       const data = res.data;
       console.log("message created", data);
       setMessages([...messages, message]);
-      setMessageText("");
-      const textInput = document.getElementById("message-text");
-      textInput.value = "";
     } catch {
       console.error("Failed to send message");
     }
@@ -99,7 +110,7 @@ function Chat({
           id="message-text"
           className="message-text"
           onChange={(event) => {
-            setMessageText(event.target.value);
+            setMessageContent(event.target.value);
           }}
           onKeyDown={(event) => {
             event.key === "Enter" && sendMessage();
@@ -107,7 +118,7 @@ function Chat({
         ></input>
         <button
           className="send-btn"
-          disabled={messageText === ""}
+          disabled={messageContent === ""}
           onClick={sendMessage}
         >
           Send
