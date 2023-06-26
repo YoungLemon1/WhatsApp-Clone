@@ -21,10 +21,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         setChatHistory(data);
         console.log("data:", data);
       } catch (error) {
-        console.error(
-          "Failed to fetch one on one user one-on-one messaging history",
-          error
-        );
+        console.error("Failed to fetch user chat history", error);
       }
       result.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
       setChatHistory(result);
