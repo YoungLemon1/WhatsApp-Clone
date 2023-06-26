@@ -3,7 +3,7 @@ import { Button, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Axios from "axios";
-function Login({ setUser, setLoggedIn }) {
+function Login({ setLoggedUser, setLoggedIn }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState();
@@ -27,7 +27,7 @@ function Login({ setUser, setLoggedIn }) {
       });
       const data = res.data;
       console.log(data);
-      await setUser(data);
+      await setLoggedUser(data);
       resetFields();
       setLoggedIn(true);
       console.log(`User ${data.username} logged in successfully`);

@@ -3,7 +3,7 @@ import Axios from "axios";
 import Chat from "./chat";
 import { Button } from "react-bootstrap";
 
-function UserPage({ loggedUser, setUser, setLoggedIn }) {
+function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatSearch, setChatSearch] = useState("");
   const [isUserInChatroom, setIsUserInChatroom] = useState(false);
@@ -24,7 +24,7 @@ function UserPage({ loggedUser, setUser, setLoggedIn }) {
       }
       try {
         const res = await Axios.get(
-          `http://localhost:5000/messages//user/conversations/${loggedUser._id}`
+          `http://localhost:5000/messages/conversations/${loggedUser._id}`
         );
         result = result.concat(res.data);
         console.log("data:", res.data);
@@ -46,7 +46,7 @@ function UserPage({ loggedUser, setUser, setLoggedIn }) {
   }*/
 
   function logout() {
-    setUser({});
+    setLoggedUser({});
     setLoggedIn(false);
   }
 
