@@ -61,11 +61,11 @@ function Chat({
       ...(isGroupChat ? { chatroom: chatID } : { recipient: chatID }),
     };
     console.log("message payload", message);
-    emptyMessage();
     try {
       const res = await Axios.post("http://localhost:5000/messages", message);
       const data = res.data;
       console.log("message created", data);
+      emptyMessage();
       setMessages([...messages, message]);
     } catch {
       console.error("Failed to send message");
