@@ -108,8 +108,10 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
           <Button id="logout" onClick={logout}>
             logout
           </Button>
-          <h1>{loggedUser.username}</h1>
-          <div id="send-message-to-user">
+          <div id="loged-user-username">
+            <h1>{loggedUser.username}</h1>
+          </div>
+          <div id="chat-search">
             <label htmlFor="chat-search-bar">Chat with a user or a group</label>
             <input
               id="chat-search-bar"

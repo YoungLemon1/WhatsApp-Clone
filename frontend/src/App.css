@@ -59,6 +59,10 @@
   width: 100%;
 }
 
+#loged-user-username {
+  display: block;
+}
+
 #login input,
 label {
   margin: 0.5rem;
@@ -67,7 +71,12 @@ label {
 #logout {
   background-color: darkred;
   border: none;
-  margin: 0.5rem;
+  margin-right: 1.5rem;
+  float: right;
+}
+
+#loged-user-username {
+  float: none;
 }
 
 #error-container {
@@ -75,9 +84,26 @@ label {
   color: rgb(230, 224, 221);
 }
 
-#user-page #chat-history {
-  display: inline-block;
+#conversation-details {
+  display: inline-flex;
   width: 100%;
+}
+
+#conversation-details * {
+  display: inline-flex;
+  margin: 0.4rem;
+}
+
+#last-message {
+  display: flex;
+  justify-items: flex-start;
+}
+
+#last-message * {
+  align-self: flex-start;
+  margin: 0.4rem;
+  font-size: small;
+  vertical-align: middle;
 }
 
 #user-page #chat-history .chat-history-item {
