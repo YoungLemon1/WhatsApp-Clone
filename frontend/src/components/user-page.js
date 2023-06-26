@@ -87,30 +87,26 @@ function UserPage({ loggedUser, setUser, setLoggedIn }) {
     console.log("group data", groupChatData);
 
     if (userData) {
-      const temporaryChatId = "111111111111111111111111";
-      const chatroom = {
-        id: temporaryChatId,
-        members: [loggedUser._id, userData._id],
-        isGroupChat: false,
+      const userChat = {
+        id: userData._id,
         name: userData.username,
         imageURL: userData.imageURL,
       };
-      enterChatroom(chatroom);
+      enterChat(userChat);
     } else if (groupChatData) {
       const chatroom = {
         id: groupChatData._id,
         members: groupChatData.members,
-        isGroupChat: true,
         name: groupChatData.groupChatName,
         imageURL: groupChatData.groupChatPicture,
       };
-      enterChatroom(chatroom);
+      enterChat(chatroom);
     } else setSearchError("No search results found");
   }
 
-  function enterChatroom(chatroom) {
-    setChatHistory([...chatHistory, chatroom]);
-    setCurrentChat(chatroom);
+  function enterChat(chat) {
+    setChatHistory([...chatHistory, chat]);
+    setCurrentChat(chat);
     setIsUserInChatroom(true);
   }
 
