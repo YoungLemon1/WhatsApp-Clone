@@ -89,23 +89,24 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
 
     // Modify the chatHistory mapping to use the userMap
     const chatHistory = lastMessages.map((lastMessage) => {
-      const lastMessageID = lastMessage._id;
+      const messageID = lastMessage._id;
+      const sender = lastMessage.sender;
       const messageContent = lastMessage.message;
       const createdAt = lastMessage.createdAt;
       const isGroupChat = lastMessage.chatroom != null;
       if (!isGroupChat) {
-        const otherUserID =
-          lastMessage.sender !== userID
-            ? lastMessage.sender
-            : lastMessage.recipient;
+        const otherUserID = lastMessage.sender.equals(userID)
+          ? lastMessage.recipient
+          : lastMessage.sender;
         const otherUser = otherUsersMap[otherUserID];
         return {
           id: otherUserID,
-          name: otherUser.username,
-          imageURL: otherUser.imageURL,
+          name: otherUser?.username ?? "",
+          imageURL: otherUser?.imageURL ?? "",
           isGroupChat: isGroupChat,
           lastMessage: {
-            id: lastMessageID,
+            id: messageID,
+            sender: sender,
             message: messageContent,
             createdAt: createdAt,
           },
@@ -120,7 +121,7 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
           imageURL: chatroom.imageURL,
           isGroupChat: isGroupChat,
           lastMessage: {
-            id: lastMessageID,
+            id: messageID,
             message: messageContent,
             createdAt: createdAt,
           },

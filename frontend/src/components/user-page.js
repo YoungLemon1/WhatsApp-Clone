@@ -106,6 +106,24 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         <div>
           <Button onClick={logout}>logout</Button>
           <h1>{loggedUser.username}</h1>
+          <div id="send-message-to-user">
+            <label htmlFor="chat-search-bar">Chat with user or group</label>
+            <input
+              id="chat-search-bar"
+              onChange={(event) => {
+                setChatSearch(event.target.value);
+                setSearchError("");
+              }}
+            ></input>
+            <button
+              className="submit-btn"
+              disabled={chatSearch === ""}
+              onClick={tryEnterChatroom}
+            >
+              Enter Chat
+            </button>
+            <div>{searchError}</div>
+          </div>
           <div id="chat-history">
             {chatHistory.map((chat) => {
               return (
@@ -126,24 +144,6 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
                 </div>
               );
             })}
-          </div>
-          <div id="send-message-to-user">
-            <label htmlFor="chat-search-bar">Chat with user or group</label>
-            <input
-              id="chat-search-bar"
-              onChange={(event) => {
-                setChatSearch(event.target.value);
-                setSearchError("");
-              }}
-            ></input>
-            <button
-              className="submit-btn"
-              disabled={chatSearch === ""}
-              onClick={tryEnterChatroom}
-            >
-              Enter Chat
-            </button>
-            <div>{searchError}</div>
           </div>
         </div>
       ) : (
