@@ -81,6 +81,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         imageURL: userData.imageURL,
         isGroupChat: false,
       };
+      setChatHistory([...chatHistory, chat]);
       enterChat(userChat);
     } else if (groupChatData) {
       const chatroom = {
@@ -90,12 +91,12 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         imageURL: groupChatData.groupChatPicture,
         isGroupChat: true,
       };
+      setChatHistory([...chatHistory, chat]);
       enterChat(chatroom);
     } else setSearchError("No search results found");
   }
 
   function enterChat(chat) {
-    setChatHistory([...chatHistory, chat]);
     setCurrentChat(chat);
     setIsUserInChat(true);
   }
@@ -126,6 +127,8 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
           </div>
           <div id="chat-history">
             {chatHistory.map((chat) => {
+              const sender =
+                chat.lastMessage.sender === loggedUser._id ? "You: " : "";
               return (
                 <div className="chat-history-item" key={chat.id}>
                   <div id="conversation-details">
@@ -137,7 +140,10 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
                     <h4>{chat.name}</h4>
                   </div>
                   <div id="last-message">
-                    <p>{chat.lastMessage.message}</p>
+                    <p>
+                      {sender}
+                      {chat.lastMessage.message}
+                    </p>
                     <small>{dateFormat(chat.lastMessage.createdAt)}</small>
                   </div>
                   <hr></hr>

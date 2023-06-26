@@ -44,7 +44,7 @@ function Chat({
   function exitChat() {
     setCurrentChat({});
     setIsUserInChatroom(false);
-    if (messages.length === 0) {
+    if (!isGroupChat.current && messages.length === 0) {
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
       setChatHistory(updatedChatHistory);
     }
