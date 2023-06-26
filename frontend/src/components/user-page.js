@@ -4,20 +4,22 @@ import Chat from "./chat";
 import { Button } from "react-bootstrap";
 
 function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
+  const userId = loggedUser._id;
   const [chatHistory, setChatHistory] = useState([]);
   const [chatSearch, setChatSearch] = useState("");
   const [isUserInChatroom, setIsUserInChatroom] = useState(false);
   const [currentChat, setCurrentChat] = useState({});
   const [searchError, setSearchError] = useState("");
-
   useEffect(() => {
     async function fetchData() {
       let result = [];
       try {
         const res = await Axios.get(
-          `http://localhost:5000/chatrooms/user/${loggedUser._id}`
+          `http://localhost:5000/chatHistory/${userId}`
         );
-        console.log("data:", res.data);
+        const data = res.data;
+        setChatHistory(data);
+        console.log("data:", data);
       } catch (error) {
         console.error(
           "Failed to fetch one on one user one-on-one messaging history",
@@ -28,7 +30,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
       setChatHistory(result);
     }
     fetchData();
-  }, [loggedUser._id]);
+  }, [userId]);
   /*function dateFormat(date) {
     if (date) {
       return moment(date).format("DD-MM-YYYY");
