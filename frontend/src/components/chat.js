@@ -5,7 +5,6 @@ function Chat({
   chat,
   setCurrentChat,
   loggedUser,
-  isUserInChatroom,
   setIsUserInChatroom,
   chatHistory,
   setChatHistory,
@@ -21,7 +20,10 @@ function Chat({
     userID.current = loggedUser._id;
     chatID.current = chat.id;
     isGroupChat.current = chat.isGroupChat;
-    const reqParams = isGroupChat ? `${userID}/${chatID}` : chatID;
+    console.log(loggedUser._id, chat.id, chat.isGroupChat);
+    const reqParams = chat.isGroupChat
+      ? `${loggedUser._id}/${chat.id}`
+      : chat.id;
     async function fetchMessages() {
       try {
         const res = await Axios.get(
@@ -39,7 +41,6 @@ function Chat({
   }, [chat.id, loggedUser._id, chat.isGroupChat]);
 
   function exitChat() {
-    console.log(isUserInChatroom);
     setCurrentChat({});
     setIsUserInChatroom(false);
     if (messages.length === 0) {

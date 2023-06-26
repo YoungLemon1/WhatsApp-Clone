@@ -103,6 +103,7 @@ messageRouter.get("/chatHistory/:userID", async (req, res) => {
           id: otherUserID,
           name: otherUser.username,
           imageURL: otherUser.imageURL,
+          isGroupChat: false,
           lastMessage: {
             id: lastMessageID,
             message: messageContent,
@@ -116,6 +117,7 @@ messageRouter.get("/chatHistory/:userID", async (req, res) => {
           id: chatroomID,
           name: chatroom.name,
           imageURL: chatroom.imageURL,
+          isGroupChat: true,
           lastMessage: {
             id: lastMessageID,
             message: messageContent,

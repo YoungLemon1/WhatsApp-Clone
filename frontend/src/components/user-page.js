@@ -81,7 +81,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         id: userData._id,
         name: userData.username,
         imageURL: userData.imageURL,
-        isGroupchat: false,
+        isGroupChat: false,
       };
       enterChat(userChat);
     } else if (groupChatData) {
@@ -90,7 +90,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         members: groupChatData.members,
         name: groupChatData.groupChatName,
         imageURL: groupChatData.groupChatPicture,
-        isGroupchat: true,
+        isGroupChat: true,
       };
       enterChat(chatroom);
     } else setSearchError("No search results found");
