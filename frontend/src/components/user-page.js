@@ -81,7 +81,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         imageURL: userData.imageURL,
         isGroupChat: false,
       };
-      setChatHistory([...chatHistory, chat]);
+      setChatHistory([...chatHistory, userData]);
       enterChat(userChat);
     } else if (groupChatData) {
       const chatroom = {
@@ -91,7 +91,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         imageURL: groupChatData.groupChatPicture,
         isGroupChat: true,
       };
-      setChatHistory([...chatHistory, chat]);
+      setChatHistory([...chatHistory, groupChatData]);
       enterChat(chatroom);
     } else setSearchError("No search results found");
   }

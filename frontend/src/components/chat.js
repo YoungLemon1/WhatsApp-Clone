@@ -45,6 +45,7 @@ function Chat({
     setCurrentChat({});
     setIsUserInChatroom(false);
     if (!isGroupChat.current && messages.length === 0) {
+      console.log(chatHistory);
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
       setChatHistory(updatedChatHistory);
     }
@@ -77,7 +78,14 @@ function Chat({
       const data = res.data;
       console.log("message created", data);
       emptyMessage();
-      await setMessages([...messages, message]);
+      setMessages([...messages, data]);
+      chat.lastMessage = {
+        id: data._id.toString(),
+        sender: data.sender.toString(),
+        message: data.message,
+        createdAt: data.createdAt,
+      };
+      console.log(chat.lastMessage);
       console.log(messages);
     } catch {
       console.error("Failed to send message");
