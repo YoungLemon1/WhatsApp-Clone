@@ -44,6 +44,10 @@ messageRouter.get("/conversations/:userID", async (req, res) => {
 
     const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
 
+    const chatroomLastMessages = await Message.find({
+      _id: { $in: userChatrooms.map((chatroom) => chatroom.lastMessage) },
+    });
+
     // Map the chatrooms to the desired format
     const otherUsersIDs = [
       ...new Set(
@@ -57,6 +61,21 @@ messageRouter.get("/conversations/:userID", async (req, res) => {
 
     const otherUsers = await User.find({ _id: { $in: otherUsersIDs } });
 
+    const messagesMap = userMessages.reduce((map, message) => {
+      map[message._id] = message;
+      return map;
+    }, {});
+
+    const otherUsersMap = otherUsers.reduce((map, user) => {
+      map[user._id] = user;
+      return map;
+    }, {});
+
+    const chatroomsMap = userChatrooms.reduce((map, chatroom) => {
+      map[chatroom._id] = chatroom;
+      return map;
+    }, {});
+
     // An array of conversations array, made of messages between the user and another user sorted in acsending order
     const conversations = otherUsersIDs.map((otherUser) => {
       return userMessages
@@ -69,40 +88,45 @@ messageRouter.get("/conversations/:userID", async (req, res) => {
         });
     });
 
-    const chatroomLastMessages = await Message.find({
-      [userChatrooms]: { $in: lastMessage },
-    });
-
     const lastMessages = conversations
       .map((conversation) => {
         const lastMessage = conversation[conversation.length - 1];
         return lastMessage;
       })
       .concat(chatroomLastMessages)
-      .sort(function (a, b) {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      });
-
-    // Create a user map for quick access
-    const userMap = otherUsers.reduce((map, user) => {
-      map[user._id] = user;
-      return map;
-    }, {});
+      .sort({ createdAt: -1 });
 
     // Modify the chatHistory mapping to use the userMap
-    const chatHistory = conversations.map((conversation) => {
-      const lastMessage = conversation[conversation.length - 1];
-      const otherUserID =
-        lastMessage.sender !== userID
-          ? lastMessage.sender
-          : lastMessage.recipient;
-      const otherUser = userMap[otherUserID];
-      return {
-        id: otherUserID,
-        name: otherUser.username,
-        imageURL: otherUser.imageURL,
-        lastMessage: lastMessage._id,
-      };
+    const chatHistory = lastMessages.map((lastMessage) => {
+      const lastMessageID = lastMessage._id;
+      if (lastMessage.chatroom === null) {
+        const otherUserID =
+          lastMessage.sender !== userID
+            ? lastMessage.sender
+            : lastMessage.recipient;
+        const otherUser = otherUsersMap[otherUserID];
+        return {
+          id: otherUserID,
+          name: otherUser.username,
+          imageURL: otherUser.imageURL,
+          lastMessage: {
+            id: lastMessageID,
+            message: messagesMap[lastMessageID],
+          },
+        };
+      } else {
+        const chatroomID = lastMessage.chatroom;
+        const chatroom = chatroomsMap[chatroomID];
+        return {
+          id: chatroomID,
+          name: chatroom.name,
+          imageURL: chatroom.imageURL,
+          lastMessage: {
+            id: lastMessageID,
+            message: messagesMap[lastMessageID],
+          },
+        };
+      }
     });
     res.status(200).json(chatHistory);
   } catch (err) {
