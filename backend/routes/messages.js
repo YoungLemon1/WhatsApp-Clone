@@ -41,8 +41,6 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
         { recipient: userID, chatroom: null },
       ],
     });
-    console.log(userID);
-    console.log("user messages", userMessages);
     // Map the chatrooms to the desired format
     const otherUsersIDs = [
       ...new Set(
