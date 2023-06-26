@@ -98,7 +98,7 @@ function Chat({
                     : "other-user"
                 }`}
               >
-                <div>{message.text}</div>
+                <div>{message.message}</div>
                 <div>{message.createdAt}</div>
               </div>
             </div>
