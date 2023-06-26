@@ -7,7 +7,7 @@ const messageRouter = Router();
 
 messageRouter.get("/", async (req, res) => {
   try {
-    const messages = await UserMessage.find({});
+    const messages = await Message.find({});
     res.status(200).json(messages);
   } catch (err) {
     console.error(err.stack);
@@ -20,7 +20,7 @@ messageRouter.get("/", async (req, res) => {
 messageRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const message = await UserMessage.findById(id);
+    const message = await Message.findById(id);
     res.status(200).json(message);
   } catch (err) {
     console.error(err.stack);
@@ -208,8 +208,8 @@ messageRouter.post("/", [body("message").notEmpty()], async (req, res) => {
     await newMessage.save();
 
     res.status(201).json(newMessage);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: failed to create message",
     });
@@ -228,8 +228,8 @@ messageRouter.delete("/:id", async (req, res) => {
     resres.status(200).json({
       success: "message deleted successfully",
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: failed to delete message",
     });

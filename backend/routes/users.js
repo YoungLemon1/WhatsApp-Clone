@@ -101,7 +101,8 @@ userRouter.post("/", async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     newUser.password = hashedPassword;
-  } catch (error) {
+  } catch (err) {
+    console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: failed to encrypt user password",
     });
@@ -135,8 +136,8 @@ userRouter.put("/:id", async (req, res) => {
     await user.save();
 
     res.status(200).json(user);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: failed to update user",
     });
@@ -155,8 +156,8 @@ userRouter.delete("/:id", async (req, res) => {
     res.status(200).json({
       success: "User deleted successfully",
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: failed to delete user",
     });

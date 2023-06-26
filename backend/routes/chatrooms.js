@@ -57,8 +57,8 @@ chatRoomRouter.post("/", async (req, res) => {
     await newChatroom.save();
 
     res.status(201).json(newChatroom);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: failed to create chatroom",
     });
@@ -90,8 +90,8 @@ chatRoomRouter.delete("/:id", async (req, res) => {
     res.status(200).json({
       success: "chatroom deleted successfully",
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: failed to delete chatroom",
     });
