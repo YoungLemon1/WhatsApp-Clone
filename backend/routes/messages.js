@@ -71,9 +71,7 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
           message.recipient.equals(otherUser) ||
           message.sender.equals(otherUser)
       );
-      console.log("conversation", conversation);
       const lastMessage = conversation.reduce((latest, message) => {
-        console.log("message", message);
         if (!latest || message.createdAt > latest.createdAt) {
           return message;
         }
@@ -162,7 +160,7 @@ messageRouter.get("/conversation/:userID/:otherUserID", async (req, res) => {
     const { userID, otherUserID } = req.params;
 
     // Fetch the conversation between the logged-in user and the other user
-    const conversation = await Message.find({
+    let conversation = await Message.find({
       $or: [
         { sender: userID, recipient: otherUserID, chatroom: null },
         { sender: otherUserID, recipient: userID, chatroom: null },
@@ -192,7 +190,7 @@ messageRouter.get("/conversation/:chatroomID", async (req, res) => {
     const { chatroomID } = req.params;
 
     // Fetch the conversation inside the chatroom
-    const conversation = await Message.find({
+    let conversation = await Message.find({
       chatroom: chatroomID,
     });
 
