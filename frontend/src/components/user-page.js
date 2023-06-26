@@ -110,7 +110,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
           <div id="chat-history">
             {chatHistory.map((chat) => {
               return (
-                <div key={chat.id}>
+                <div className="chat-history-item" key={chat.id}>
                   <img
                     className="profile-img"
                     src={chat.imageURL}
