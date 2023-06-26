@@ -119,6 +119,9 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
                 setChatSearch(event.target.value);
                 setSearchError("");
               }}
+              onKeyDown={(event) => {
+                event.key === "Enter" && tryEnterChatroom();
+              }}
             ></input>
             <button
               className="submit-btn"
