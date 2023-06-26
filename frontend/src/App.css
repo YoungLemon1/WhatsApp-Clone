@@ -75,7 +75,7 @@ label {
   float: right;
 }
 
-#loged-user-username {
+#logged-user-username {
   float: none;
 }
 
@@ -107,7 +107,12 @@ label {
 }
 
 #user-page #chat-history .chat-history-item {
-  margin: 1rem;
+  padding: 0.2rem;
+}
+
+#user-page #chat-history .chat-history-item:hover {
+  background-color: lightskyblue;
+  cursor: pointer;
 }
 
 .profile-img {
