@@ -120,6 +120,7 @@ function Chat({
         <input
           id="message-text"
           className="message-text"
+          placeholder="Send a message"
           onChange={(event) => {
             setMessageContent(event.target.value);
           }}
