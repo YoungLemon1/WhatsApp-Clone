@@ -194,17 +194,10 @@ messageRouter.post("/", [body("message").notEmpty()], async (req, res) => {
     res.status(400).json({ error: "No sender" });
     return;
   }
-  if (!recipient && !chatroom) {
+  if ((recipient && chatroom) || (!recipient && !chatroom)) {
     res.status(400).json({
       error:
-        "Message target undefined: message must include recipient or chatroom id",
-    });
-    return;
-  }
-  if (recipient && chatroom) {
-    res.status(400).json({
-      error:
-        "Duplicate message type: Message cannot be sent to a user and a group at the same time",
+        "Message target undefined: message must include either recipient or chatroom id",
     });
     return;
   }

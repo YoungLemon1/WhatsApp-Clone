@@ -20,7 +20,7 @@ function Chat({
     userID.current = loggedUser._id;
     chatID.current = chat.id;
     isGroupChat.current = chat.isGroupChat;
-    console.log(loggedUser._id, chat.id, chat.isGroupChat);
+    console.log(userID.current, chatID.current, isGroupChat.current);
     const reqParams = chat.isGroupChat
       ? chat.id
       : `${loggedUser._id}/${chat.id}`;
@@ -57,9 +57,11 @@ function Chat({
 
   async function sendMessage() {
     const message = {
-      sender: userID,
+      sender: userID.current,
       message: messageContent,
-      ...(isGroupChat ? { chatroom: chatID } : { recipient: chatID }),
+      ...(!isGroupChat
+        ? { chatroom: chatID.current }
+        : { recipient: chatID.current }),
     };
     console.log("message payload", message);
     try {
