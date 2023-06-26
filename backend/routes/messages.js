@@ -141,18 +141,8 @@ messageRouter.get("/conversation/:userID/:otherUserID", async (req, res) => {
     }).sort({ createdAt: 1 });
 
     // Retrieve the user objects for the logged-in user and the other user
-    const [loggedInUser, otherUser] = await Promise.all([
-      User.findById(userID),
-      User.findById(otherUserID),
-    ]);
 
-    const conversationWithUsers = {
-      loggedInUser,
-      otherUser,
-      messages: conversation,
-    };
-
-    res.status(200).json(conversationWithUsers);
+    res.status(200).json(conversation);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -173,7 +163,7 @@ messageRouter.get("/conversation/:chatroomID", async (req, res) => {
 
     // Retrieve the user objects for the logged-in user and the other user
 
-    res.status(200).json({ messages: conversation });
+    res.status(200).json(conversation);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
