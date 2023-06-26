@@ -56,10 +56,11 @@ function Chat({
   }
 
   async function sendMessage() {
+    console.log(isGroupChat.current);
     const message = {
       sender: userID.current,
       message: messageContent,
-      ...(!isGroupChat
+      ...(isGroupChat.current
         ? { chatroom: chatID.current }
         : { recipient: chatID.current }),
     };
