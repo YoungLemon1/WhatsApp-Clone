@@ -49,7 +49,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
     }
 
     let userData;
-    let groupChatData;
+    let chatroomData;
 
     try {
       const resUserSearch = await Axios.get(
@@ -65,14 +65,14 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
       const resGroupChatSearch = await Axios.get(
         `http://localhost:5000/chatrooms/search/${chatSearch}`
       );
-      groupChatData = resGroupChatSearch.data;
+      chatroomData = resGroupChatSearch.data;
     } catch (error) {
       console.error("chatroom search error", error);
       // Handle the error for the group chat search API request
     }
 
     console.log("user data", userData);
-    console.log("group data", groupChatData);
+    console.log("group data", chatroomData);
 
     if (userData) {
       const userChat = {
@@ -81,17 +81,17 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         imageURL: userData.imageURL,
         isGroupChat: false,
       };
-      setChatHistory([...chatHistory, userData]);
+      setChatHistory([...chatHistory, userChat]);
       enterChat(userChat);
-    } else if (groupChatData) {
+    } else if (chatroomData) {
       const chatroom = {
-        id: groupChatData._id,
-        members: groupChatData.members,
-        name: groupChatData.groupChatName,
-        imageURL: groupChatData.groupChatPicture,
+        id: chatroomData._id,
+        members: chatroomData.members,
+        name: chatroomData.groupChatName,
+        imageURL: chatroomData.groupChatPicture,
         isGroupChat: true,
       };
-      setChatHistory([...chatHistory, groupChatData]);
+      setChatHistory([...chatHistory, chatroom]);
       enterChat(chatroom);
     } else setSearchError("No search results found");
   }

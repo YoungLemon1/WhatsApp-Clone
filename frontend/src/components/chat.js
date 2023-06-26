@@ -45,9 +45,10 @@ function Chat({
     setCurrentChat({});
     setIsUserInChatroom(false);
     if (!isGroupChat.current && messages.length === 0) {
-      console.log(chatHistory);
+      console.log("chat history", chatHistory);
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
       setChatHistory(updatedChatHistory);
+      console.log("chat history", updatedChatHistory);
     }
   }
 
