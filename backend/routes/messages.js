@@ -93,7 +93,8 @@ messageRouter.get("/chatHistory/:userID", async (req, res) => {
       const lastMessageID = lastMessage._id;
       const messageContent = lastMessage.message;
       const createdAt = lastMessage.createdAt;
-      if (lastMessage.chatroom === null) {
+      const isGroupChat = lastMessage.chatroom !== null;
+      if (!isGroupChat) {
         const otherUserID =
           lastMessage.sender !== userID
             ? lastMessage.sender
@@ -103,7 +104,7 @@ messageRouter.get("/chatHistory/:userID", async (req, res) => {
           id: otherUserID,
           name: otherUser.username,
           imageURL: otherUser.imageURL,
-          isGroupChat: false,
+          isGroupChat: isGroupChat,
           lastMessage: {
             id: lastMessageID,
             message: messageContent,
@@ -117,7 +118,7 @@ messageRouter.get("/chatHistory/:userID", async (req, res) => {
           id: chatroomID,
           name: chatroom.name,
           imageURL: chatroom.imageURL,
-          isGroupChat: true,
+          isGroupChat: isGroupChat,
           lastMessage: {
             id: lastMessageID,
             message: messageContent,
@@ -146,6 +147,8 @@ messageRouter.get("/conversation/:userID/:otherUserID", async (req, res) => {
         { sender: otherUserID, recipient: userID, chatroom: null },
       ],
     }).sort((a, b) => a.createdAt - b.createdAt);
+
+    console.log(conversation);
 
     // Retrieve the user objects for the logged-in user and the other user
 
