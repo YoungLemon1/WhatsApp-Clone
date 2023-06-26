@@ -172,10 +172,11 @@ label {
 .chat .chat-body .message-container .message {
   display: block;
   flex-wrap: wrap;
+  text-align: left;
   min-height: 1.5rem;
   min-width: 6rem;
   max-width: 12rem;
-  border-radius: 12rem 12rem 12rem 12rem;
+  border-radius: 5%;
   margin: 0.5rem;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
