@@ -71,14 +71,14 @@ messageRouter.get("/chatHistory/:userID", async (req, res) => {
       return map;
     }, {});
 
-    // An array of conversations array, made of messages between the user and another user sorted in acsending order
+    // An array of conversations array, made of messages between the user and another user
     const conversations = otherUsersIDs.map((otherUser) => {
       const conversation = userMessages.filter((message) =>
         [message.sender, message.recipient].includes(otherUser)
       );
       return conversation[conversation.length - 1];
     });
-
+    //All last messages in user to user conversation or in chatroom sorted in descending order
     const lastMessages = [...conversations, ...chatroomLastMessages].sort(
       (a, b) => b.createdAt - a.createdAt
     );
