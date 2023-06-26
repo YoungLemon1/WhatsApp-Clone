@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import Chat from "./chat";
 import { Button } from "react-bootstrap";
-import ChatRoom from "../../../backend/models/chatroom";
 
 function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   const userId = loggedUser._id;
