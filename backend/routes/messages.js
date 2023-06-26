@@ -60,17 +60,6 @@ messageRouter.get("/chatHistory/:userID", async (req, res) => {
       return map;
     }, {});
 
-    const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
-
-    const chatroomLastMessages = await Message.find({
-      _id: { $in: userChatrooms.map((chatroom) => chatroom.lastMessage) },
-    });
-
-    const chatroomsMap = userChatrooms.reduce((map, chatroom) => {
-      map[chatroom._id] = chatroom;
-      return map;
-    }, {});
-
     // An array of conversations array, made of messages between the user and another user
     const conversations = otherUsersIDs.map((otherUser) => {
       const conversation = userMessages.filter((message) =>
@@ -78,6 +67,22 @@ messageRouter.get("/chatHistory/:userID", async (req, res) => {
       );
       return conversation[conversation.length - 1];
     });
+
+    const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
+
+    const chatroomLastMessages = await Message.find({
+      _id: {
+        $in: userChatrooms
+          .filter((chatroom) => chatroom.lastMessage !== null)
+          .map((chatroom) => chatroom.lastMessage),
+      },
+    });
+
+    const chatroomsMap = userChatrooms.reduce((map, chatroom) => {
+      map[chatroom._id] = chatroom;
+      return map;
+    }, {});
+
     //All last messages in user to user conversation or in chatroom sorted in descending order
     const lastMessages = [...conversations, ...chatroomLastMessages].sort(
       (a, b) => b.createdAt - a.createdAt
