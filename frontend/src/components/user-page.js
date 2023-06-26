@@ -102,7 +102,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   }
 
   return (
-    <div>
+    <div id="user-page">
       {!isUserInChatroom ? (
         <div>
           <Button onClick={logout}>logout</Button>
@@ -116,14 +116,15 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
                     src={chat.imageURL}
                     alt={`${chat.name} profile`}
                   ></img>
+                  <hr></hr>
                 </div>
               );
             })}
           </div>
           <div id="send-message-to-user">
-            <label htmlFor="chat-name">Chat with user or group</label>
+            <label htmlFor="chat-search-bar">Chat with user or group</label>
             <input
-              id="chat-name"
+              id="chat-search-bar"
               onChange={(event) => {
                 setChatSearch(event.target.value);
                 setSearchError("");

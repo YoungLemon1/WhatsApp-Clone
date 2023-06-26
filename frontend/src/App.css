@@ -68,13 +68,14 @@ label {
   background-color: darkred;
   color: rgb(230, 224, 221);
 }
-.chat .chat-header {
-  background-color: #026783;
-  height: 2.5rem;
-  text-align: left;
+
+#user-page #chat-history {
+  display: inline-block;
+  width: 100%;
 }
-.chat .chat-header * {
-  display: inline-flex;
+
+#user-page #chat-history .chat-history-item {
+  margin: 1rem;
 }
 
 .profile-img {
@@ -82,6 +83,14 @@ label {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
+}
+.chat .chat-header {
+  background-color: #026783;
+  height: 2.5rem;
+  text-align: left;
+}
+.chat .chat-header * {
+  display: inline-flex;
 }
 
 .chat .chat-header .chat-name {
