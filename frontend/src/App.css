@@ -100,16 +100,16 @@ label {
   justify-items: flex-start;
 }
 
-#last-message * {
+#last-message:not(small) * {
   align-self: flex-start;
-  margin: 0.4rem;
+  margin: 0.2rem;
   font-size: small;
   vertical-align: middle;
 }
 
 #user-page #chat-history .chat-history-item {
-  padding-right: 0.2rem;
-  padding-left: 0.2rem;
+  padding-right: 0.4rem;
+  padding-left: 0.4rem;
 }
 
 #user-page #chat-history .chat-history-item hr {
@@ -123,7 +123,7 @@ label {
 }
 
 .profile-img {
-  margin: 0.25rem;
+  margin: 0.5rem;
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
@@ -153,7 +153,7 @@ label {
 }
 
 .chat-window .chat-body {
-  height: 30rem;
+  height: 45rem;
   overflow: auto;
   width: 100%;
   padding-left: 5rem;
@@ -181,13 +181,9 @@ label {
   margin: 0.5rem;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
   word-wrap: break-word;
-}
-
-.chat-window .chat-body .message p {
-  margin: 0rem;
 }
 
 .chat-window .chat-body .message.current-user {
