@@ -14,7 +14,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
     async function fetchData() {
       try {
         const res = await Axios.get(
-          `http://localhost:5000/messages/chat-history/${loggedUser._id}`
+          `http://localhost:5000/messages/last-messages?userID=${loggedUser._id}`
         );
         const data = res.data;
         setChatHistory(data);

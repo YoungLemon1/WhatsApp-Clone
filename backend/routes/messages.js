@@ -7,6 +7,56 @@ const messageRouter = Router();
 
 messageRouter.get("/", async (req, res) => {
   try {
+    const { userID, otherUserID } = req.query;
+
+    // Fetch the conversation between the logged-in user and the other user
+    let conversation = await Message.find({
+      $or: [
+        { sender: userID, recipient: otherUserID, chatroom: null },
+        { sender: otherUserID, recipient: userID, chatroom: null },
+      ],
+    });
+
+    if (conversation.length > 1) {
+      conversation = conversation.sort((a, b) => a.createdAt - b.createdAt);
+    }
+
+    // Retrieve the user objects for the logged-in user and the other user
+
+    res.status(200).json(conversation);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error:
+        "Internal server error: Failure fetching user-to-user conversation",
+    });
+  }
+});
+
+messageRouter.get("/", async (req, res) => {
+  try {
+    const { chatroomID } = req.query;
+
+    // Fetch the conversation inside the chatroom
+    let conversation = await Message.find({
+      chatroom: chatroomID,
+    });
+
+    if (conversation.length > 1) {
+      conversation = conversation.sort((a, b) => a.createdAt - b.createdAt);
+    }
+
+    res.status(200).json(conversation);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching chatroom conversation",
+    });
+  }
+});
+
+messageRouter.get("/", async (req, res) => {
+  try {
     const messages = await Message.find({});
     res.status(200).json(messages);
   } catch (err) {
@@ -17,22 +67,10 @@ messageRouter.get("/", async (req, res) => {
   }
 });
 
-messageRouter.get("/:id", async (req, res) => {
+messageRouter.get("/last-messages", async (req, res) => {
   try {
-    const { id } = req.params;
-    const message = await Message.findById(id);
-    res.status(200).json(message);
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: Failure fetching messages",
-    });
-  }
-});
-
-messageRouter.get("/chat-history/:userID", async (req, res) => {
-  try {
-    const { userID } = req.params;
+    const { userID } = req.query;
+    console.log(userID);
 
     // Fetch the chatrooms where the user is a member
     const userMessages = await Message.find({
@@ -149,52 +187,15 @@ messageRouter.get("/chat-history/:userID", async (req, res) => {
   }
 });
 
-messageRouter.get("/conversation/:userID/:otherUserID", async (req, res) => {
+messageRouter.get("/:id", async (req, res) => {
   try {
-    const { userID, otherUserID } = req.params;
-
-    // Fetch the conversation between the logged-in user and the other user
-    let conversation = await Message.find({
-      $or: [
-        { sender: userID, recipient: otherUserID, chatroom: null },
-        { sender: otherUserID, recipient: userID, chatroom: null },
-      ],
-    });
-
-    if (conversation.length > 1) {
-      conversation = conversation.sort((a, b) => a.createdAt - b.createdAt);
-    }
-
-    // Retrieve the user objects for the logged-in user and the other user
-
-    res.status(200).json(conversation);
+    const { id } = req.params;
+    const message = await Message.findById(id);
+    res.status(200).json(message);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error:
-        "Internal server error: Failure fetching user-to-user conversation",
-    });
-  }
-});
-
-messageRouter.get("/conversation/:chatroomID", async (req, res) => {
-  try {
-    const { chatroomID } = req.params;
-
-    // Fetch the conversation inside the chatroom
-    let conversation = await Message.find({
-      chatroom: chatroomID,
-    });
-
-    if (conversation.length > 1) {
-      conversation = conversation.sort((a, b) => a.createdAt - b.createdAt);
-    }
-
-    res.status(200).json(conversation);
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: Failure fetching chatroom conversation",
+      error: "Internal server error: Failure fetching messages",
     });
   }
 });

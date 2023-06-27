@@ -24,13 +24,13 @@ function Chat({
     chatID.current = chat.id;
     isGroupChat.current = chat.isGroupChat;
     console.log(userID.current, chatID.current, isGroupChat.current);
-    const reqParams = chat.isGroupChat
-      ? chat.id
-      : `${loggedUser._id}/${chat.id}`;
+    const queryParams = chat.isGroupChat
+      ? `chatroomID=${chat.id}`
+      : `userID=${loggedUser._id}&otherUserID=${chat.id}`;
     async function fetchMessages() {
       try {
         const res = await Axios.get(
-          `http://localhost:5000/messages/conversation/${reqParams}`
+          `http://localhost:5000/messages?${queryParams}`
         );
         const data = res.data;
         console.log(data);
