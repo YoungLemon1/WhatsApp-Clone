@@ -10,6 +10,7 @@ function Chat({
   setIsUserInChatroom,
   chatHistory,
   setChatHistory,
+  dateFormat,
 }) {
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
@@ -57,12 +58,6 @@ function Chat({
     setMessageContent("");
     const textInput = document.getElementById("message-text");
     textInput.value = "";
-  }
-
-  function dateFormat(date) {
-    if (date) {
-      return moment(date).format("HH:MM");
-    } else return "";
   }
 
   async function sendMessage() {
