@@ -153,7 +153,8 @@ label {
 }
 
 .chat-window .chat-body {
-  min-height: 30rem;
+  height: 30rem;
+  overflow: auto;
   width: 100%;
   padding-left: 5rem;
   padding-right: 5rem;
