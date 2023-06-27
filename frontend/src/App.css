@@ -103,7 +103,7 @@ label {
 }
 
 #conversation-details * {
-  display: inline-flex;
+  display: inline;
   margin: 0.4rem;
 }
 
@@ -187,8 +187,8 @@ label {
   flex-wrap: wrap;
   text-align: left;
   min-height: 1.5rem;
-  min-width: 5rem;
-  max-width: 12rem;
+  width: max-content;
+  max-width: 20vw;
   border-radius: 5%;
   margin: 0.5rem;
   padding-left: 0.5rem;

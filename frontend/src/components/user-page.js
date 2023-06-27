@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import Chat from "./chat";
-import "moment-timezone";
+import moment from "moment";
 import { Button } from "react-bootstrap";
 
 function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
@@ -28,15 +28,8 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
 
   function dateFormat(date) {
     if (date) {
-      const localDate = new Date(date);
-      const localTimeString = localDate.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      return localTimeString;
-    } else {
-      return "";
-    }
+      return moment(date).format("HH:mm");
+    } else return "";
   }
 
   function logout() {
