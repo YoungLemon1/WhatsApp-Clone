@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import moment from "moment";
 import Axios from "axios";
+import moment from "moment";
+import ScrollableFeed from "react-scrollable-feed";
 
 function Chat({
   chat,
@@ -94,7 +95,7 @@ function Chat({
   }
 
   return (
-    <div className="chat">
+    <div className="chat-window">
       <div className="chat-header">
         <button className="exit-btn" onClick={exitChat}>
           ←
@@ -107,23 +108,25 @@ function Chat({
         <h4 className="chat-name">{chat.name}</h4>
       </div>
       <div className="chat-body">
-        {messages.map((message) => {
-          return (
-            <div className="message-container" key={message._id}>
-              <div
-                key={message._id}
-                className={`message ${
-                  message.sender === loggedUser._id
-                    ? "current-user"
-                    : "other-user"
-                }`}
-              >
-                <p>{message.message}</p>
-                <small>{dateFormat(message.createdAt)}</small>
+        <ScrollableFeed>
+          {messages.map((message) => {
+            return (
+              <div className="message-container" key={message._id}>
+                <div
+                  key={message._id}
+                  className={`message ${
+                    message.sender === loggedUser._id
+                      ? "current-user"
+                      : "other-user"
+                  }`}
+                >
+                  <p>{message.message}</p>
+                  <small>{dateFormat(message.createdAt)}</small>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </ScrollableFeed>
       </div>
       <div className="chat-footer">
         <input

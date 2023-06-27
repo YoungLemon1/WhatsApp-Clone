@@ -129,37 +129,37 @@ label {
   border-radius: 50%;
 }
 
-.chat .chat-header {
+.chat-window .chat-header {
   background-color: #026783;
   height: max-content;
   text-align: left;
 }
-.chat .chat-header * {
+.chat-window .chat-header * {
   display: inline;
 }
 
-.chat .chat-header .chat-name {
+.chat-window .chat-header .chat-name {
   margin: 0.25rem;
   height: 100%;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
-.chat .chat-header .exit-btn {
+.chat-window .chat-header .exit-btn {
   background-color: none;
   border-radius: 50%;
   margin-left: 0.5rem;
   margin-right: 1.5rem;
 }
 
-.chat .chat-body {
+.chat-window .chat-body {
   min-height: 30rem;
   width: 100%;
   padding-left: 5rem;
   padding-right: 5rem;
 }
 
-.chat .chat-body .message-container {
+.chat-window .chat-body .message-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -169,7 +169,7 @@ label {
   padding-bottom: 0.5rem;
 }
 
-.chat .chat-body .message-container .message {
+.chat-window .chat-body .message-container .message {
   display: block;
   flex-wrap: wrap;
   text-align: left;
@@ -185,25 +185,25 @@ label {
   word-wrap: break-word;
 }
 
-.chat .chat-body .message p {
+.chat-window .chat-body .message p {
   margin: 0rem;
 }
 
-.chat .chat-body .message.current-user {
+.chat-window .chat-body .message.current-user {
   align-self: flex-start;
   background-color: #06702f;
 }
 
-.chat .chat-body .message.other-user {
+.chat-window .chat-body .message.other-user {
   align-self: flex-end;
   background-color: #a3aaacdc;
 }
 
-.chat .chat-footer {
+.chat-window .chat-footer {
   margin: 0.5rem;
 }
 
-.chat .chat-footer * {
+.chat-window .chat-footer * {
   margin-top: 0rem;
   margin-bottom: 0rem;
   margin-left: 0.2rem;
