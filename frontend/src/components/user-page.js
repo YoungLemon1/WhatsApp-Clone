@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import Chat from "./chat";
-import moment from "moment";
 import "moment-timezone";
 import { Button } from "react-bootstrap";
 
