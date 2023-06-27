@@ -105,9 +105,11 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
     <div id="user-page">
       {!isUserInChat ? (
         <div>
-          <Button id="logout" onClick={logout}>
-            logout
-          </Button>
+          <div id="logout-container">
+            <Button id="logout" onClick={logout}>
+              logout
+            </Button>
+          </div>
           <div id="loged-user-username">
             <h1>{loggedUser.username}</h1>
           </div>
