@@ -1,15 +1,25 @@
 import React, { useState } from "react";
 import { Button, Container } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import Axios from "axios";
-function Login({ user, setUser }) {
+import Signup from "./signup";
+function Login({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState();
   const [passwordError, setPasswordError] = useState();
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [showSignupModal, setShowSignupModal] = useState(false);
+
+  const openModal = () => {
+    setShowSignupModal(true);
+  };
+
+  const closeModal = () => {
+    setShowSignupModal(false);
+  };
+
   async function loginUser() {
     if (!username) {
       console.log("Error: empty username");
@@ -41,10 +51,6 @@ function Login({ user, setUser }) {
     setUsernameError("");
     setPassword("");
     setPasswordError("");
-  }
-
-  function routeToSignup() {
-    navigate("/signup");
   }
 
   return (
@@ -83,10 +89,12 @@ function Login({ user, setUser }) {
             id="signup"
             name="signup"
             variant="primary"
-            onClick={routeToSignup}
+            onClick={openModal}
           >
             Create account
           </Button>
+
+          {showSignupModal && <Signup closeModal={closeModal}></Signup>}
         </div>
       </form>
     </div>

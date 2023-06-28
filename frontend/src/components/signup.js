@@ -1,11 +1,10 @@
 import React from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Axios from "axios";
 import { Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DatePicker from "react-datepicker";
-function Signup() {
+function Signup({ closeModal }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -17,8 +16,6 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [imageURL, setImageURL] = useState("");
   const role = "user";
-
-  const navigate = useNavigate();
   const handleBirthDateChange = (date) => {
     setBirthdate(date);
   };
@@ -65,7 +62,7 @@ function Signup() {
       }
 
       alert("User created");
-      navigate("/");
+      closeModal();
     } catch (error) {
       console.error("Error creating user:", error);
       alert("Request failed");
@@ -75,6 +72,9 @@ function Signup() {
   return (
     <div className="form-container">
       <form id="signup" className="user-form" onSubmit={createUser}>
+        <button className="close-button" onClick={closeModal}>
+          X
+        </button>
         <h3>Create New User</h3>
         <label htmlFor="username">Username</label>
         <input
