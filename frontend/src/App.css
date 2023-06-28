@@ -168,8 +168,8 @@ label {
 }
 
 #error-container {
-  background-color: darkred;
-  color: rgb(230, 224, 221);
+  text-align: center;
+  color: red;
 }
 
 #chat-search {
