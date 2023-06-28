@@ -65,6 +65,7 @@
   align-items: center;
   justify-content: center;
   margin: auto; /* Add this line */
+  border-radius: 10px;
   width: 50vh;
   height: 100vh; /* Add this line */
 }
