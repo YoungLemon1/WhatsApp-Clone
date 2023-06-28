@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import Axios from "axios";
-import moment from "moment";
 import ScrollableFeed from "react-scrollable-feed";
 
 function Chat({

@@ -153,7 +153,6 @@ messageRouter.get("/last-messages", async (req, res) => {
           id: otherUserID,
           name: otherUsersMap[otherUserID].username,
           imageURL: otherUsersMap[otherUserID].imageURL,
-          isGroupChat: isGroupChat,
           lastMessage: {
             id: messageID,
             sender: sender,
@@ -166,12 +165,11 @@ messageRouter.get("/last-messages", async (req, res) => {
         const chatroom = chatroomsMap[chatroomID];
         return {
           id: chatroomID,
-          members: chatroom.members,
           name: chatroom.name,
           imageURL: chatroom.imageURL,
-          isGroupChat: isGroupChat,
           lastMessage: {
             id: messageID,
+            sender: sender,
             message: messageContent,
             createdAt: createdAt,
           },
