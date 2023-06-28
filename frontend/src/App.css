@@ -113,6 +113,10 @@
   height: max-content;
 }
 
+.user-form .date-picker {
+  width: 13rem;
+}
+
 .login-container {
   position: relative;
 }

@@ -148,6 +148,7 @@ function Signup({ closeModal }) {
         <DatePicker
           id="birthdate"
           name="birthdate"
+          className="date-picker"
           selected={birthdate}
           dateFormat="dd/MM/yyyy"
           onChange={handleBirthDateChange}
