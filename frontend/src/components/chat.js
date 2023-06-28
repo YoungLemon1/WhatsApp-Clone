@@ -88,6 +88,7 @@ function Chat({
     }
   }
 
+  console.log(chat);
   return (
     <div className="chat-window">
       <div className="chat-header">
