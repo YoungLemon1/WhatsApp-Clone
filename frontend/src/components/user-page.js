@@ -97,7 +97,6 @@ function UserPage({ user, setUser }) {
           </div>
           <div id="loged-user-username"></div>
           <div id="chat-search">
-            <label htmlFor="chat-search-bar">Chat with a user or a group</label>
             <input
               id="chat-search-bar"
               onChange={(event) => {
@@ -107,6 +106,7 @@ function UserPage({ user, setUser }) {
               onKeyDown={(event) => {
                 event.key === "Enter" && tryEnterChatroom();
               }}
+              placeholder="Chat with a user or a group"
             ></input>
             <button
               className="submit-btn"
