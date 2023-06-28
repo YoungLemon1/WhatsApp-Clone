@@ -54,7 +54,7 @@ function Login({ setUser }) {
   }
 
   return (
-    <div className="form-container">
+    <div className="form-container login-container">
       <form id="login" className="user-form">
         <h1>Chat and Play</h1>
         <Container id="error-container">{error}</Container>
@@ -96,6 +96,7 @@ function Login({ setUser }) {
         </div>
       </form>
       {showSignupModal && <Signup closeModal={closeModal}></Signup>}
+      {showSignupModal && <div className="overlay" onClick={closeModal}></div>}
     </div>
   );
 }

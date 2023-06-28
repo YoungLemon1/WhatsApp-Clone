@@ -24,7 +24,6 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={homeRoute()} />
-          <Route path="/signup" element={<Signup />} />
           <Route path="/chat/:id" element={<Chat />} />
         </Routes>
       </Router>

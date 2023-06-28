@@ -71,7 +71,7 @@ function Signup({ closeModal }) {
 
   return (
     <div className="form-container">
-      <form id="signup" className="user-form" onSubmit={createUser}>
+      <form id="signup-modal" className="user-form" onSubmit={createUser}>
         <button className="close-button" onClick={closeModal}>
           X
         </button>
