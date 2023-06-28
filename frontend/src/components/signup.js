@@ -2,8 +2,8 @@ import React from "react";
 import { useState } from "react";
 import Axios from "axios";
 import { Button } from "react-bootstrap";
+import { DatePicker } from "@mui/x-date-pickers";
 import "bootstrap/dist/css/bootstrap.min.css";
-import DatePicker from "react-datepicker";
 function Signup({ closeModal }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -150,7 +150,6 @@ function Signup({ closeModal }) {
           name="birthdate"
           selected={birthdate}
           dateFormat="dd/MM/yyyy"
-          showDayMonthYearPicker
           onChange={handleBirthDateChange}
         ></DatePicker>
         <Button className="submit-btn" type="submit" variant="success">
