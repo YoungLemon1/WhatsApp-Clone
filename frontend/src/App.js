@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
-import { Link } from "react-router-dom";
 import Login from "./components/login";
 import UserPage from "./components/user-page";
 import Signup from "./components/signup";
