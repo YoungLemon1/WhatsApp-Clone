@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { body } from "express-validator";
 import Message from "../models/message.js";
 import User from "../models/user.js";
 import Chatroom from "../models/chatroom.js";
@@ -198,7 +197,7 @@ messageRouter.get("/:id", async (req, res) => {
   }
 });
 
-messageRouter.post("/", [body("message").notEmpty()], async (req, res) => {
+messageRouter.post("/", async (req, res) => {
   const { sender, recipient, chatroom, message, createdAt } = req.body;
   if (!sender) {
     res.status(400).json({ error: "No sender" });
