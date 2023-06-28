@@ -11,21 +11,6 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   const [isUserInChat, setIsUserInChat] = useState(false);
   const [currentChat, setCurrentChat] = useState({});
   const [searchError, setSearchError] = useState("");
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await Axios.get(
-          `http://localhost:5000/messages/last-messages?userID=${loggedUser._id}`
-        );
-        const data = res.data;
-        setChatHistory(data);
-        console.log("successfully fetched user chat history", data);
-      } catch (error) {
-        console.error("Failed to fetch user chat history", error);
-      }
-    }
-    fetchData();
-  }, [loggedUser._id]);
 
   function dateFormat(date) {
     if (date) {
