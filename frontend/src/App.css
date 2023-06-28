@@ -59,8 +59,60 @@
   }
 }
 
-#all-users table {
-  width: 100%;
+.user-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto; /* Add this line */
+  width: 50vh;
+  height: 100vh; /* Add this line */
+}
+
+.user-form small {
+  display: block;
+  color: red;
+}
+
+.user-form label {
+  display: block;
+  font-size: medium;
+  padding: 0.2rem;
+}
+
+.user-form input {
+  margin-top: 0.2rem;
+  margin-bottom: 0.5rem;
+  width: 180px;
+}
+
+.user-form button {
+  display: inline-block;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+#signup.user-form {
+}
+
+.user-form .close-button {
+  margin: 0;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  border-radius: 50%;
+  border-color: inherit;
+  align-self: flex-start;
+  background-color: inherit;
+}
+
+.user-form .close-button:hover {
+  background-color: #a3aaacb0;
+}
+
+.user-form form div {
+  height: max-content;
 }
 
 #loged-user-username {
@@ -78,7 +130,7 @@ label {
   align-items: flex-start;
 }
 
-#logout {
+#logout-container #logout {
   display: block;
   background-color: darkred;
   border: none;
@@ -221,46 +273,4 @@ label {
   margin-bottom: 0rem;
   margin-left: 0.2rem;
   margin-right: 0.2rem;
-}
-
-.form-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  text-align: center;
-}
-
-.user-form small {
-  display: block;
-  color: red;
-}
-
-table th,
-td {
-  padding: 2rem;
-}
-
-.user-form label {
-  display: block;
-  font-size: medium;
-  padding: 0.2rem;
-}
-
-.user-form input {
-  margin-top: 0.2rem;
-  margin-bottom: 0.5rem;
-  width: 180px;
-}
-
-.user-form button {
-  display: inline-block;
-  margin-top: 2.5rem;
-  margin-bottom: 2.5rem;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-}
-
-form div {
-  height: max-content;
 }

@@ -23,13 +23,6 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <nav className="App-navbar">
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-          </ul>
-        </nav>
         <Routes>
           <Route path="/" element={homeRoute()} />
           <Route path="/signup" element={<Signup />} />

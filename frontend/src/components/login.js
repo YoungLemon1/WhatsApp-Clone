@@ -93,10 +93,9 @@ function Login({ setUser }) {
           >
             Create account
           </Button>
-
-          {showSignupModal && <Signup closeModal={closeModal}></Signup>}
         </div>
       </form>
+      {showSignupModal && <Signup closeModal={closeModal}></Signup>}
     </div>
   );
 }
