@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Axios from "axios";
 import Chat from "./chat";
 import moment from "moment";
 import { Button } from "react-bootstrap";
 import ChatHistory from "./chatHistory";
 
-function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
+function UserPage({ user, setUser }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatSearch, setChatSearch] = useState("");
   const [isUserInChat, setIsUserInChat] = useState(false);
@@ -19,9 +19,8 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   }
 
   function logout() {
-    console.log(`${loggedUser.username} logged out successefully`);
-    setLoggedUser({});
-    setLoggedIn(false);
+    console.log(`${user.username} logged out successefully`);
+    setUser(null);
   }
 
   async function tryEnterChatroom() {
@@ -97,7 +96,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
             </Button>
           </div>
           <div id="loged-user-username">
-            <h1>{loggedUser.username}</h1>
+            <h1>{user.username}</h1>
           </div>
           <div id="chat-search">
             <label htmlFor="chat-search-bar">Chat with a user or a group</label>
@@ -121,7 +120,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
             <div>{searchError}</div>
           </div>
           <ChatHistory
-            loggedUserID={loggedUser._id}
+            loggedUserID={user._id}
             dateFormat={dateFormat}
             enterChat={enterChat}
           ></ChatHistory>
@@ -130,7 +129,7 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
         <Chat
           chat={currentChat}
           setCurrentChat={setCurrentChat}
-          loggedUser={loggedUser}
+          loggedUser={user}
           isUserInChatroom={isUserInChat}
           setIsUserInChatroom={setIsUserInChat}
           chatHistory={chatHistory}

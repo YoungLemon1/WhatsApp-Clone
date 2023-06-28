@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
+import ScrollableFeed from "react-scrollable-feed";
 
 function ChatHistory({ loggedUserID, dateFormat, enterChat }) {
   const [userInteractions, setUserInteractions] = useState([]);
@@ -20,33 +21,36 @@ function ChatHistory({ loggedUserID, dateFormat, enterChat }) {
   }, [loggedUserID]);
   return (
     <div id="chat-history">
-      {userInteractions.map((chat) => {
-        const sender = chat.lastMessage.sender === loggedUserID ? "You: " : "";
-        return (
-          <div
-            className="chat-history-item"
-            key={chat.id}
-            onClick={() => enterChat(chat)}
-          >
-            <div id="conversation-details">
-              <img
-                className="profile-img"
-                src={chat.imageURL}
-                alt={`${chat.name} profile`}
-              ></img>
-              <h4>{chat.name}</h4>
+      <ScrollableFeed>
+        {userInteractions.map((chat) => {
+          const sender =
+            chat.lastMessage.sender === loggedUserID ? "You: " : "";
+          return (
+            <div
+              className="chat-history-item"
+              key={chat.id}
+              onClick={() => enterChat(chat)}
+            >
+              <div id="conversation-details">
+                <img
+                  className="profile-img"
+                  src={chat.imageURL}
+                  alt={`${chat.name} profile`}
+                ></img>
+                <h4>{chat.name}</h4>
+              </div>
+              <div id="last-message">
+                <p>
+                  {sender}
+                  {chat.lastMessage.message}
+                </p>
+                <small>{dateFormat(chat.lastMessage.createdAt)}</small>
+              </div>
+              <hr></hr>
             </div>
-            <div id="last-message">
-              <p>
-                {sender}
-                {chat.lastMessage.message}
-              </p>
-              <small>{dateFormat(chat.lastMessage.createdAt)}</small>
-            </div>
-            <hr></hr>
-          </div>
-        );
-      })}
+          );
+        })}
+      </ScrollableFeed>
     </div>
   );
 }

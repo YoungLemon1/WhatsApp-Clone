@@ -10,18 +10,13 @@ import Signup from "./components/signup";
 import Chat from "./components/chat";
 
 function App() {
-  const [loggedUser, setLoggedUser] = useState({});
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
 
   const homeRoute = () => {
-    return loggedIn ? (
-      <UserPage
-        loggedUser={loggedUser}
-        setLoggedUser={setLoggedUser}
-        setLoggedIn={setLoggedIn}
-      />
+    return user ? (
+      <UserPage user={user} setUser={setUser} />
     ) : (
-      <Login setLoggedUser={setLoggedUser} setLoggedIn={setLoggedIn} />
+      <Login setUser={setUser} />
     );
   };
 
