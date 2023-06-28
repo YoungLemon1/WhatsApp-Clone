@@ -3,6 +3,7 @@ import Axios from "axios";
 import Chat from "./chat";
 import moment from "moment";
 import { Button } from "react-bootstrap";
+import ChatHistory from "./chatHistory";
 
 function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
   const [chatHistory, setChatHistory] = useState([]);
@@ -134,36 +135,11 @@ function UserPage({ loggedUser, setLoggedUser, setLoggedIn }) {
             </button>
             <div>{searchError}</div>
           </div>
-          <div id="chat-history">
-            {chatHistory.map((chat) => {
-              const sender =
-                chat.lastMessage.sender === loggedUser._id ? "You: " : "";
-              return (
-                <div
-                  className="chat-history-item"
-                  key={chat.id}
-                  onClick={() => enterChat(chat)}
-                >
-                  <div id="conversation-details">
-                    <img
-                      className="profile-img"
-                      src={chat.imageURL}
-                      alt={`${chat.name} profile`}
-                    ></img>
-                    <h4>{chat.name}</h4>
-                  </div>
-                  <div id="last-message">
-                    <p>
-                      {sender}
-                      {chat.lastMessage.message}
-                    </p>
-                    <small>{dateFormat(chat.lastMessage.createdAt)}</small>
-                  </div>
-                  <hr></hr>
-                </div>
-              );
-            })}
-          </div>
+          <ChatHistory
+            loggedUserID={loggedUser._id}
+            dateFormat={dateFormat}
+            enterChat={enterChat}
+          ></ChatHistory>
         </div>
       ) : (
         <Chat
