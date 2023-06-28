@@ -155,7 +155,7 @@ label {
 
 #logout-container #logout {
   display: block;
-  background-color: darkred;
+  background-color: rgba(163, 163, 163, 0.205);
   border: none;
   margin-top: 0.4rem;
   margin-right: 1.5rem;
