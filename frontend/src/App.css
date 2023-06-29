@@ -81,10 +81,13 @@
   padding: 0.2rem;
 }
 
-.user-form input {
+.user-form input:not(.date-picker *) {
   margin-top: 0.2rem;
   margin-bottom: 0.5rem;
-  width: 180px;
+  width: 12rem;
+  border: darkgray solid 1px;
+  border-radius: 5px;
+  padding: 0.25rem;
 }
 
 .user-form button {
