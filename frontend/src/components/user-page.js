@@ -8,8 +8,7 @@ import ChatHistory from "./chatHistory";
 function UserPage({ user, setUser }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const [isUserInChat, setIsUserInChat] = useState(false);
-  const [currentChat, setCurrentChat] = useState({});
+  const [currentChat, setCurrentChat] = useState(null);
   const [searchError, setSearchError] = useState("");
 
   function dateFormat(date) {
@@ -83,12 +82,11 @@ function UserPage({ user, setUser }) {
 
   function enterChat(chat) {
     setCurrentChat(chat);
-    setIsUserInChat(true);
   }
 
   return (
     <div id="user-page">
-      {!isUserInChat ? (
+      {!currentChat ? (
         <div>
           <div id="logout-container">
             <Button id="logout" onClick={logout}>
@@ -128,10 +126,9 @@ function UserPage({ user, setUser }) {
           chat={currentChat}
           setCurrentChat={setCurrentChat}
           loggedUser={user}
-          isUserInChatroom={isUserInChat}
-          setIsUserInChatroom={setIsUserInChat}
           chatHistory={chatHistory}
           setChatHistory={setChatHistory}
+          setSearchText={setSearchText}
           dateFormat={dateFormat}
         ></Chat>
       )}

@@ -6,9 +6,9 @@ function Chat({
   chat,
   setCurrentChat,
   loggedUser,
-  setIsUserInChatroom,
   chatHistory,
   setChatHistory,
+  setSearchText,
   dateFormat,
 }) {
   const [messages, setMessages] = useState([]);
@@ -16,7 +16,7 @@ function Chat({
 
   const userID = useRef(null);
   const chatID = useRef(null);
-  const isGroupChat = useRef(null);
+  const isGroupChat = useRef(false);
 
   useEffect(() => {
     userID.current = loggedUser._id;
@@ -43,8 +43,8 @@ function Chat({
   }, [chat.id, loggedUser._id, chat.isGroupChat]);
 
   function exitChat() {
-    setCurrentChat({});
-    setIsUserInChatroom(false);
+    setCurrentChat(null);
+    setSearchText("");
     if (!isGroupChat.current && messages.length === 0) {
       console.log("chat history", chatHistory);
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
@@ -81,6 +81,12 @@ function Chat({
         message: data.message,
         createdAt: data.createdAt,
       };
+      /*
+      if(isGroupChat.current)
+      {
+         const res = await Axios.patch("http://localhost:5000/chatrooms", message.chatroom);
+      }
+      */
       console.log(chat.lastMessage);
       console.log(messages);
     } catch {
