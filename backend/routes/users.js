@@ -5,6 +5,15 @@ import UserModel from "../models/user.js";
 
 const userRouter = Router();
 
+// Validation middleware
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+};
+
 userRouter.get("/", async (req, res) => {
   try {
     const { username } = req.query;
@@ -47,48 +56,55 @@ userRouter.get("/:id", async (req, res) => {
   }
 });
 
-userRouter.post("/auth", async (req, res) => {
-  try {
-    const { username, password } = req.body;
+// auth user validation rules
+const authUserValidationRules = [
+  body("username")
+    .notEmpty()
+    .withMessage("Username is required")
+    .trim()
+    .escape(),
+  body("password").notEmpty().withMessage("Password is required").trim(),
+  // Add more validation rules as needed
+];
 
-    // Find the user by username
-    const user = await UserModel.findOne({ username: username });
+userRouter.post(
+  "/auth",
+  authUserValidationRules,
+  validate,
+  async (req, res) => {
+    try {
+      const { username, password } = req.body;
 
-    if (!user) {
-      res.status(401).json({
-        error: "Authentication failed: Invalid ucredentials",
+      // Find the user by username
+      const user = await UserModel.findOne({ username: username });
+
+      if (!user) {
+        res.status(401).json({
+          error: "Authentication failed: Invalid ucredentials",
+        });
+        return;
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        res.status(401).json({
+          error: "Authentication failed: Invalid credentials",
+        });
+        return;
+      }
+
+      res.status(200).json(user);
+    } catch (err) {
+      console.error(err.stack);
+      res.status(500).json({
+        error: "Internal server error: Failure fetching user",
       });
-      return;
     }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      res.status(401).json({
-        error: "Authentication failed: Invalid credentials",
-      });
-      return;
-    }
-
-    res.status(200).json(user);
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: Failure fetching user",
-    });
   }
-});
+);
 
-// Validation middleware
-const validate = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-};
-
-// Validation rules
-const validationRules = [
+// create user validation rules
+const createUserValidationRules = [
   body("username")
     .notEmpty()
     .withMessage("Username is required")
@@ -106,7 +122,7 @@ const validationRules = [
   // Add more validation rules as needed
 ];
 
-userRouter.post("/", validationRules, validate, async (req, res) => {
+userRouter.post("/", createUserValidationRules, validate, async (req, res) => {
   const { username, password, birthdate, email, imageURL, role } = req.body;
   // Check if username already exists in the database
   const existingUser = await UserModel.findOne({ username: username });
