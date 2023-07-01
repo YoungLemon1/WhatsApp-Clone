@@ -156,35 +156,119 @@ userRouter.post("/", createUserValidationRules, validate, async (req, res) => {
   }
 });
 
-userRouter.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const requiredFields = ["name", "username", "password"];
-  const { name, username, password, birthdate, email, imageURL, role } =
-    req.body;
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  if (!requiredFields.every((field) => field in req.body)) {
-    res.status(400).json({ error: "Missing required fields" });
-    return;
-  }
-  const user = await UserModel.findOne({ _id: id });
-  if (!user) {
-    return res.status(400).json({
-      error: "Bad request: user does not exist",
-    });
-  }
-  try {
-    user.username = username;
-    user.password = hashedPassword;
-    user.birthdate = birthdate;
-    user.role = role;
-    await user.save();
+// Update user validation rules
+const updateUserValidationRules = [
+  param("id").notEmpty().withMessage("User ID is required"),
+  body("username").optional().trim().escape(),
+  body("password")
+    .optional()
+    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/)
+    .withMessage(
+      "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
+    )
+    .trim(),
+  body("birthdate").optional().isDate().withMessage("Invalid birthdate"),
+  body("email").optional().trim().normalizeEmail(),
+  // Add more validation rules as needed
+];
 
-    res.status(200).json(user);
+userRouter.put(
+  "/:id",
+  updateUserValidationRules,
+  validate,
+  async (req, res) => {
+    const { id } = req.params;
+    const { name, username, password, birthdate, email, imageURL, role } =
+      req.body;
+    const user = await UserModel.findOne({ _id: id });
+    if (!user) {
+      return res.status(409).json({
+        error: "Bad request: user does not exist",
+      });
+    }
+    try {
+      user.username = username;
+      user.password = hashedPassword;
+      user.birthdate = birthdate;
+      user.role = role;
+      await user.save();
+
+      res.status(200).json(user);
+    } catch (err) {
+      console.error(err.stack);
+      res.status(500).json({
+        error: "Internal server error: failed to update user",
+      });
+    }
+  }
+);
+
+// PATCH user route
+userRouter.patch(
+  "/:id",
+  updateUserValidationRules,
+  validate,
+  async (req, res) => {
+    const { id } = req.params;
+    const { username, password, birthdate, email, imageURL, role } = req.body;
+
+    try {
+      const user = await UserModel.findById(id);
+
+      if (!user) {
+        return res.status(400).json({
+          error: "Bad request: user does not exist",
+        });
+      }
+
+      if (username) {
+        user.username = username;
+      }
+      if (password) {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        user.password = hashedPassword;
+      }
+      if (birthdate) {
+        user.birthdate = birthdate;
+      }
+      if (email) {
+        user.email = email;
+      }
+      if (imageURL) {
+        user.imageURL = imageURL;
+      }
+      if (role) {
+        user.role = role;
+      }
+
+      await user.save();
+
+      res.status(200).json(user);
+    } catch (err) {
+      console.error(err.stack);
+      res.status(500).json({
+        error: "Internal server error: failed to update user",
+      });
+    }
+  }
+);
+
+// PATCH All users route
+userRouter.patch("/update-all", async (req, res) => {
+  const { field, value } = req.body;
+
+  try {
+    // Update all users with the provided field and value
+    await UserModel.updateMany({}, { [field]: value });
+
+    res.status(200).json({
+      success: "All users updated successfully",
+    });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: failed to update user",
+      error: "Internal server error: failed to update users",
     });
   }
 });
