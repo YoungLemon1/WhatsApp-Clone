@@ -22,6 +22,9 @@ userRouter.get("/:id", async (req, res) => {
     const { id } = req;
 
     const user = await UserModel.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
     res.status(200).json(user);
   } catch (err) {
     console.error(err.stack);
@@ -31,9 +34,9 @@ userRouter.get("/:id", async (req, res) => {
   }
 });
 
-userRouter.get("/search/:username", async (req, res) => {
+userRouter.get("/", async (req, res) => {
   try {
-    const { username } = req.params;
+    const { username } = req.query;
     const user = await UserModel.findOne({ username: username });
     res.status(200).json(user);
   } catch (err) {
@@ -108,7 +111,7 @@ userRouter.post("/", validationRules, validate, async (req, res) => {
   // Check if username already exists in the database
   const existingUser = await UserModel.findOne({ username: username });
   if (existingUser) {
-    return res.status(200).json({
+    return res.status(409).json({
       message: "Username already exists",
     });
   }
