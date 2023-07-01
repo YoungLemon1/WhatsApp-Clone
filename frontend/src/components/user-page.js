@@ -7,7 +7,7 @@ import ChatHistory from "./chatHistory";
 
 function UserPage({ user, setUser }) {
   const [chatHistory, setChatHistory] = useState([]);
-  const [chatSearch, setChatSearch] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [isUserInChat, setIsUserInChat] = useState(false);
   const [currentChat, setCurrentChat] = useState({});
   const [searchError, setSearchError] = useState("");
@@ -24,10 +24,10 @@ function UserPage({ user, setUser }) {
   }
 
   async function tryEnterChatroom() {
-    if (!chatSearch) {
+    if (!searchText) {
       return;
     }
-    const chat = chatHistory.find((c) => c.name === chatSearch);
+    const chat = chatHistory.find((c) => c.name === searchText);
     if (chat) {
       enterChat(chat);
       return;
@@ -38,7 +38,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resUserSearch = await Axios.get(
-        `http://localhost:5000/users?username=${chatSearch}`
+        `http://localhost:5000/users?username=${searchText}`
       );
       userData = resUserSearch.data;
     } catch (error) {
@@ -48,7 +48,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resGroupChatSearch = await Axios.get(
-        `http://localhost:5000/chatrooms?chartroomName=${chatSearch}`
+        `http://localhost:5000/chatrooms?chartroomName=${searchText}`
       );
       chatroomData = resGroupChatSearch.data;
     } catch (error) {
@@ -100,7 +100,7 @@ function UserPage({ user, setUser }) {
             <input
               id="chat-search-bar"
               onChange={(event) => {
-                setChatSearch(event.target.value);
+                setSearchText(event.target.value);
                 setSearchError("");
               }}
               onKeyDown={(event) => {
@@ -110,7 +110,7 @@ function UserPage({ user, setUser }) {
             ></input>
             <button
               className="submit-btn"
-              disabled={chatSearch === ""}
+              disabled={searchText === ""}
               onClick={tryEnterChatroom}
             >
               Enter Chat

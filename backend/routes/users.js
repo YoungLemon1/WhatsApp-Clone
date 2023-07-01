@@ -102,7 +102,7 @@ const validationRules = [
       "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
     )
     .trim(),
-  body("email").trim().normalizeEmail().withMessage("Invalid email format"),
+  body("email").trim().normalizeEmail(),
   // Add more validation rules as needed
 ];
 
