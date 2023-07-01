@@ -5,6 +5,21 @@ const chatRoomRouter = Router();
 
 chatRoomRouter.get("/", async (req, res) => {
   try {
+    const { chatroomName } = req.query;
+    const chatrooms = await ChatRoom.findOne({
+      name: chatroomName,
+    });
+    res.status(200).json(chatrooms);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching chatrooms",
+    });
+  }
+});
+
+chatRoomRouter.get("/", async (req, res) => {
+  try {
     const chatrooms = await ChatRoom.find({});
     res.status(200).json(chatrooms);
   } catch (err) {
@@ -24,21 +39,6 @@ chatRoomRouter.get("/:id", async (req, res) => {
     console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: Failure fetching chatroom",
-    });
-  }
-});
-
-chatRoomRouter.get("/", async (req, res) => {
-  try {
-    const { chatroomName } = req.query;
-    const chatrooms = await ChatRoom.findOne({
-      name: chatroomName,
-    });
-    res.status(200).json(chatrooms);
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: Failure fetching chatrooms",
     });
   }
 });
