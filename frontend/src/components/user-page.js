@@ -38,7 +38,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resUserSearch = await Axios.get(
-        `http://localhost:5000/users/search/${chatSearch}`
+        `http://localhost:5000/users?username=${chatSearch}`
       );
       userData = resUserSearch.data;
     } catch (error) {
@@ -48,7 +48,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resGroupChatSearch = await Axios.get(
-        `http://localhost:5000/chatrooms/search/${chatSearch}`
+        `http://localhost:5000/chatrooms?chartroomName=${chatSearch}`
       );
       chatroomData = resGroupChatSearch.data;
     } catch (error) {
