@@ -19,7 +19,8 @@ userRouter.get("/", async (req, res) => {
 
 userRouter.get("/:id", async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req;
+
     const user = await UserModel.findById(id);
     res.status(200).json(user);
   } catch (err) {
@@ -74,55 +75,67 @@ userRouter.post("/auth", async (req, res) => {
   }
 });
 
-userRouter.post(
-  "/",
-  [
-    body("username")
-      .notEmpty()
-      .withMessage("Username is required")
-      .trim()
-      .escape(),
-    ,
-    body("password").notEmpty().withMessage("Password is required").trim(),
-    body("email").trim().normalizeEmail(),
-    // Add more sanitization rules as needed
-  ],
-  async (req, res) => {
-    const requiredFields = ["username", "password"];
-    const { username, password, birthdate, email, imageURL, role } = req.body;
-    if (!requiredFields.every((field) => field in req.body)) {
-      res.status(400).json({ error: "Missing required fields" });
-      return;
-    }
-    // Check if username already exists in the database
-    const existingUser = await UserModel.findOne({ username: username });
-    if (existingUser) {
-      return res.status(200).json({
-        message: "Username already exists",
-      });
-    }
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({
-        error:
-          "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number.",
-      });
-    }
-    const newUser = new UserModel(req.body);
-    try {
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
-      newUser.password = hashedPassword;
-    } catch (err) {
-      console.error(err.stack);
-      res.status(500).json({
-        error: "Internal server error: failed to encrypt user password",
-      });
-    }
-    await newUser.save();
-    res.status(201).json(newUser);
+// Validation middleware
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
-);
+  next();
+};
+
+// Validation rules
+const validationRules = [
+  body("username")
+    .notEmpty()
+    .withMessage("Username is required")
+    .trim()
+    .escape(),
+  body("password")
+    .notEmpty()
+    .withMessage("Password is required")
+    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/)
+    .withMessage(
+      "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
+    )
+    .trim(),
+  body("email").trim().normalizeEmail().withMessage("Invalid email format"),
+  // Add more validation rules as needed
+];
+
+userRouter.post("/", validationRules, validate, async (req, res) => {
+  const { username, password, birthdate, email, imageURL, role } = req.body;
+  // Check if username already exists in the database
+  const existingUser = await UserModel.findOne({ username: username });
+  if (existingUser) {
+    return res.status(200).json({
+      message: "Username already exists",
+    });
+  }
+  // Create a new user
+  const newUser = new UserModel(req.body);
+  try {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    newUser.password = hashedPassword;
+  } catch (err) {
+    console.error(err.stack);
+    return res.status(500).json({
+      error: "Internal server error: failed to encrypt user password",
+    });
+  }
+
+  // Save the new user to the database
+  try {
+    await newUser.save();
+    return res.status(201).json(newUser);
+  } catch (err) {
+    console.error(err.stack);
+    return res.status(500).json({
+      error: "Internal server error: failed to save user",
+    });
+  }
+});
 
 userRouter.put("/:id", async (req, res) => {
   const { id } = req.params;
