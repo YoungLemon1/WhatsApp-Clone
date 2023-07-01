@@ -1,5 +1,5 @@
 import { Router } from "express";
-import crypto from "crypto";
+import { body, validationResult } from "express-validator";
 import bcrypt, { hash } from "bcrypt";
 import UserModel from "../models/user.js";
 
@@ -74,41 +74,55 @@ userRouter.post("/auth", async (req, res) => {
   }
 });
 
-userRouter.post("/", async (req, res) => {
-  const requiredFields = ["username", "password"];
-  const { username, password, birthdate, email, imageURL, role } = req.body;
-  if (!requiredFields.every((field) => field in req.body)) {
-    res.status(400).json({ error: "Missing required fields" });
-    return;
+userRouter.post(
+  "/",
+  [
+    body("username")
+      .notEmpty()
+      .withMessage("Username is required")
+      .trim()
+      .escape(),
+    ,
+    body("password").notEmpty().withMessage("Password is required").trim(),
+    body("email").trim().normalizeEmail(),
+    // Add more sanitization rules as needed
+  ],
+  async (req, res) => {
+    const requiredFields = ["username", "password"];
+    const { username, password, birthdate, email, imageURL, role } = req.body;
+    if (!requiredFields.every((field) => field in req.body)) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+    // Check if username already exists in the database
+    const existingUser = await UserModel.findOne({ username: username });
+    if (existingUser) {
+      return res.status(200).json({
+        message: "Username already exists",
+      });
+    }
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        error:
+          "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number.",
+      });
+    }
+    const newUser = new UserModel(req.body);
+    try {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      newUser.password = hashedPassword;
+    } catch (err) {
+      console.error(err.stack);
+      res.status(500).json({
+        error: "Internal server error: failed to encrypt user password",
+      });
+    }
+    await newUser.save();
+    res.status(201).json(newUser);
   }
-  // Check if username already exists in the database
-  const existingUser = await UserModel.findOne({ username: username });
-  if (existingUser) {
-    return res.status(200).json({
-      message: "Username already exists",
-    });
-  }
-  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
-  if (!passwordRegex.test(password)) {
-    return res.status(400).json({
-      error:
-        "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number.",
-    });
-  }
-  const newUser = new UserModel(req.body);
-  try {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    newUser.password = hashedPassword;
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: failed to encrypt user password",
-    });
-  }
-  await newUser.save();
-  res.status(201).json(newUser);
-});
+);
 
 userRouter.put("/:id", async (req, res) => {
   const { id } = req.params;
