@@ -255,23 +255,35 @@ userRouter.patch(
 );
 
 // PATCH All users route
-userRouter.patch("/update-all", async (req, res) => {
-  const { field, value } = req.body;
+// PATCH All users validation rules
+const updateAllUsersValidationRules = [
+  body("field").notEmpty().withMessage("Field is required").escape(),
+  body("value").notEmpty().withMessage("Value is required").escape(),
+];
 
-  try {
-    // Update all users with the provided field and value
-    await UserModel.updateMany({}, { [field]: value });
+// PATCH All users route
+userRouter.patch(
+  "/update-all",
+  updateAllUsersValidationRules,
+  validate,
+  async (req, res) => {
+    const { field, value } = req.body;
 
-    res.status(200).json({
-      success: "All users updated successfully",
-    });
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: failed to update users",
-    });
+    try {
+      // Update all users with the provided field and value
+      await UserModel.updateMany({}, { [field]: value });
+
+      res.status(200).json({
+        success: "All users updated successfully",
+      });
+    } catch (err) {
+      console.error(err.stack);
+      res.status(500).json({
+        error: "Internal server error: failed to update users",
+      });
+    }
   }
-});
+);
 
 userRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
