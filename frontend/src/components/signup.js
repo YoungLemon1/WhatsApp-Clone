@@ -61,17 +61,17 @@ function Signup({ closeModal }) {
 
       if (imageURL === "") delete user.imageURL;
       const res = await Axios.post("http://localhost:5000/users", user);
-
-      if (res.data.message) {
-        setUsernameError(`Username ${username} already exists`);
-        return;
-      }
-
+      console.log("user created", res.data);
       alert("User created");
       closeModal();
     } catch (error) {
+      const res = error.response;
       console.error("Error creating user:", error);
-      alert("Request failed");
+      if (res && res.status === 409) {
+        console.error("Username already exists", error);
+        setUsernameError(`Username already exists`);
+        return;
+      }
     }
   }
 
