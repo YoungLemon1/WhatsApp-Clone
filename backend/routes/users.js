@@ -120,7 +120,7 @@ userRouter.post("/", createUserValidationRules, validate, async (req, res) => {
   const existingUser = await UserModel.findOne({ username: username });
   if (existingUser) {
     return res.status(409).json({
-      message: "Username already exists",
+      error: "Username already exists",
     });
   }
   // Create a new user
