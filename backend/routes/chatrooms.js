@@ -85,18 +85,31 @@ chatRoomRouter.post(
   }
 );
 
-chatRoomRouter.patch("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const chatroom = await ChatRoom.findById(id);
-    res.status(200).json(chatroom);
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: Failure fetching chatroom",
-    });
+const updateChatroomValidationRules = [
+  body("id").notEmpty().withMessage("Chatroom ID is required"),
+  body("name").notEmpty().withMessage("Chatroom name is required"),
+  body("createdAt").optional().isDate().withMessage("Invalid date"),
+  body("lastUpdatedAt").optional().isDate().withMessage("Invalid date"),
+  // Add more validation rules as needed
+];
+
+chatRoomRouter.patch(
+  "/:id",
+  updateChatroomValidationRules,
+  validate,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const chatroom = await ChatRoom.findById(id);
+      res.status(200).json(chatroom);
+    } catch (err) {
+      console.error(err.stack);
+      res.status(500).json({
+        error: "Internal server error: Failure fetching chatroom",
+      });
+    }
   }
-});
+);
 
 chatRoomRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;

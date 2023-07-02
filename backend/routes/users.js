@@ -250,7 +250,7 @@ userRouter.patch(
 // PATCH All users validation rules
 const updateAllUsersValidationRules = [
   body("field").notEmpty().withMessage("Field is required").escape(),
-  body("value").notEmpty().withMessage("Value is required").escape(),
+  body("value").optional(),
 ];
 
 // PATCH All users route
