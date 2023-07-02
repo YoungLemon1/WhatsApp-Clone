@@ -1,18 +1,10 @@
 import { Router } from "express";
 import { body, validationResult } from "express-validator";
+import validate from "./validation/valdiate.js";
 import bcrypt, { hash } from "bcrypt";
 import UserModel from "../models/user.js";
 
 const userRouter = Router();
-
-// Validation middleware
-const validate = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-};
 
 userRouter.get("/", async (req, res) => {
   try {

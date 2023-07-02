@@ -31,23 +31,24 @@ function Signup({ closeModal }) {
     if (!username) {
       console.error("Error: empty username");
       setUsernameError("Please enter your username");
-      return;
+      return false;
     } else if (!password) {
       console.error("Error: empty password");
       setPasswordError("Please enter your password");
-      return;
+      return false;
     } else if (password !== passwordConfirmation) {
       console.error("Error: passwords don't match");
       return;
     } else if (!validatePassword(password)) {
       console.error("invalid password");
-      return;
+      return false;
     }
+    return true;
   }
 
-  const createUser = async (event) => {
+  async function createUser(event) {
     event.preventDefault();
-    validateNewUser();
+    if (!validateNewUser()) return;
     try {
       const user = {
         username,
@@ -72,7 +73,7 @@ function Signup({ closeModal }) {
       console.error("Error creating user:", error);
       alert("Request failed");
     }
-  };
+  }
 
   return (
     <div className="form-container">
