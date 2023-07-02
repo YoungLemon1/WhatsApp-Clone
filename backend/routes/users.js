@@ -158,7 +158,7 @@ userRouter.post("/", createUserValidationRules, validate, async (req, res) => {
 
 // Update user validation rules
 const updateUserValidationRules = [
-  param("id").notEmpty().withMessage("User ID is required"),
+  body("id").notEmpty().withMessage("User ID is required"),
   body("username").optional().trim().escape(),
   body("password")
     .optional()
