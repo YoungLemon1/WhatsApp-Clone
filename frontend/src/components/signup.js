@@ -19,6 +19,7 @@ function Signup({ closeModal }) {
   const handleBirthDateChange = (date) => {
     setBirthdate(date);
   };
+
   function validatePassword(password) {
     // Regex pattern to match the password requirements
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
@@ -26,8 +27,7 @@ function Signup({ closeModal }) {
     return passwordRegex.test(password);
   }
 
-  const createUser = async (event) => {
-    event.preventDefault();
+  function validateNewUser() {
     if (!username) {
       console.error("Error: empty username");
       setUsernameError("Please enter your username");
@@ -43,6 +43,11 @@ function Signup({ closeModal }) {
       console.error("invalid password");
       return;
     }
+  }
+
+  const createUser = async (event) => {
+    event.preventDefault();
+    validateNewUser();
     try {
       const user = {
         username,

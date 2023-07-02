@@ -1,7 +1,17 @@
 import { Router } from "express";
 import ChatRoom from "../models/chatroom.js";
+import { body, validationResult } from "express-validator";
 import User from "../models/user.js";
 const chatRoomRouter = Router();
+
+// Validation middleware
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+};
 
 chatRoomRouter.get("/", async (req, res) => {
   try {
@@ -43,27 +53,46 @@ chatRoomRouter.get("/:id", async (req, res) => {
   }
 });
 
-chatRoomRouter.post("/", async (req, res) => {
-  const { id, chatName, createdAt, isGroupChat, ChatPicture } = req.body;
-
-  const existingChat = await ChatRoom.findById(id);
-  if (existingChat) {
-    return res.status(400).json({
-      error: "Chatroom already exists",
-    });
+const arrayNotEmpty = (value) => {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error("Empty array error");
   }
-  try {
-    const newChatroom = new ChatRoom(req.body);
-    await newChatroom.save();
+  return true;
+};
 
-    res.status(201).json(newChatroom);
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: failed to create chatroom",
-    });
+const craeteChatValidatioRules = [
+  body("members")
+    .custom(arrayNotEmpty)
+    .withMessage("Chatroom cannot be without members"),
+  body("name").notEmpty().withMessage("Chatroom name is required").trim(),
+];
+
+chatRoomRouter.post(
+  "/",
+  craeteChatValidatioRules,
+  validate,
+  async (req, res) => {
+    const { id, chatName, createdAt, isGroupChat, ChatPicture } = req.body;
+
+    const existingChat = await ChatRoom.findById(id);
+    if (existingChat) {
+      return res.status(400).json({
+        error: "Chatroom already exists",
+      });
+    }
+    try {
+      const newChatroom = new ChatRoom(req.body);
+      await newChatroom.save();
+
+      res.status(201).json(newChatroom);
+    } catch (err) {
+      console.error(err.stack);
+      res.status(500).json({
+        error: "Internal server error: failed to create chatroom",
+      });
+    }
   }
-});
+);
 
 chatRoomRouter.patch("/:id", async (req, res) => {
   try {
