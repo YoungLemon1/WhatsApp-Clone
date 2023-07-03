@@ -208,7 +208,7 @@ const createMessageValidationRules = [
     .withMessage("Cannot send empty messages")
     .trim()
     .escape(),
-  body("createdAt").notEmpty().isDate().withMessage("Invalid date"),
+  body("createdAt").optional().isDate().withMessage("Invalid date"),
   body().custom((value, { req }) => {
     const { recipient, chatroom } = req.body;
     if ((recipient && chatroom) || (!recipient && !chatroom)) {
