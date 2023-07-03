@@ -273,6 +273,7 @@ label {
   display: block;
   flex-wrap: wrap;
   text-align: left;
+  color: #ffffff;
   min-height: 1.5rem;
   width: max-content;
   max-width: 20vw;
@@ -291,7 +292,6 @@ label {
 
 .chat-window .chat-body .message.current-user {
   align-self: flex-start;
-  color: #ffffff;
   background-color: #06702f;
 }
 
