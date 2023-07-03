@@ -14,7 +14,7 @@ chatRoomRouter.get("/", async (req, res) => {
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: Failure fetching chatrooms",
+      error: "Internal server error: Failure fetching chatroom",
     });
   }
 });
@@ -63,14 +63,7 @@ chatRoomRouter.post(
   craeteChatValidatioRules,
   validate,
   async (req, res) => {
-    const { id, chatName, createdAt, isGroupChat, ChatPicture } = req.body;
-
-    const existingChat = await ChatRoom.findById(id);
-    if (existingChat) {
-      return res.status(400).json({
-        error: "Chatroom already exists",
-      });
-    }
+    const { members, name, imageURL, createdAt, lastUpdatedAt } = req.body;
     try {
       const newChatroom = new ChatRoom(req.body);
       await newChatroom.save();

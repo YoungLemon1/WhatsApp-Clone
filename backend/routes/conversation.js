@@ -9,26 +9,29 @@ conversationRouter.get("/", async (req, res) => {
   try {
     const { username } = req.query;
     const otherUser = await User.findOne({ username: username });
-    const chatrooms = await Conversation.findOne({
+    if (!otherUser) {
+      return res.status(400).json({ error: "Invalid username" });
+    }
+    const conversation = await Conversation.findOne({
       $in: { members: otherUser._id },
     });
-    res.status(200).json(chatrooms);
+    res.status(200).json(conversation);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: Failure fetching chatrooms",
+      error: "Internal server error: Failure fetching coversation",
     });
   }
 });
 
 conversationRouter.get("/", async (req, res) => {
   try {
-    const chatrooms = await Conversation.find({});
-    res.status(200).json(chatrooms);
+    const conversations = await Conversation.find({});
+    res.status(200).json(conversations);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: Failure fetching chatrooms",
+      error: "Internal server error: Failure fetching coversations",
     });
   }
 });
@@ -36,12 +39,12 @@ conversationRouter.get("/", async (req, res) => {
 conversationRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const chatroom = await Conversation.findById(id);
-    res.status(200).json(chatroom);
+    const conversation = await Conversation.findById(id);
+    res.status(200).json(conversation);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: Failure fetching chatroom",
+      error: "Internal server error: Failure fetching coversations",
     });
   }
 });
@@ -53,16 +56,18 @@ const arrayNotEmpty = (value) => {
   return true;
 };
 
-const craeteChatValidatioRules = [
+const craeteCoversationValidatioRules = [
   body("members")
     .custom(arrayNotEmpty)
-    .withMessage("Chatroom cannot be without members"),
+    .withMessage("Coversation cannot be without members")
+    .length(2)
+    .withMessage("Coversation must have exactly 2 members"),
   body("name").notEmpty().withMessage("Chatroom name is required").trim(),
 ];
 
 conversationRouter.post(
   "/",
-  craeteChatValidatioRules,
+  craeteCoversationValidatioRules,
   validate,
   async (req, res) => {
     const { id, chatName, createdAt, isGroupChat, ChatPicture } = req.body;
