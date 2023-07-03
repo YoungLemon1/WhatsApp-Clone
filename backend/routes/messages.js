@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import validate from "./validation/valdiate.js";
+import mongoose from "mongoose";
 import Message from "../models/message.js";
 import User from "../models/user.js";
 import Chatroom from "../models/chatroom.js";
@@ -71,84 +72,108 @@ messageRouter.get("/", async (req, res) => {
 messageRouter.get("/last-messages", async (req, res) => {
   try {
     const { userID } = req.query;
-    console.log("user id", userID);
-    // Match messages for the user where recipient or sender is the user
-    const userInteractions = await Message.aggregate([
-      {
-        $match: {
-          $or: [{ recipient: userID }, { sender: userID }],
-        },
-      },
-      // Group messages by the other user or chatroom
-      {
-        $group: {
-          _id: {
-            $cond: {
-              if: { $eq: ["$chatroom", null] },
-              then: {
-                $cond: {
-                  if: { $eq: ["$sender", userID] },
-                  then: "$recipient",
-                  else: "$sender",
-                },
-              },
-              else: "$chatroom",
-            },
-          },
-          lastMessage: { $last: "$$ROOT" },
-        },
-      },
-      // Sort the messages by createdAt in descending order
-      {
-        $sort: { "lastMessage.createdAt": -1 },
-      },
-    ]);
+    console.log(userID);
 
-    // Fetch additional details for other users or chatrooms
-    const interactionIds = userInteractions.map(
-      (interaction) => interaction._id
-    );
-    const [otherUsers, chatrooms] = await Promise.all([
-      User.find({ _id: { $in: interactionIds } }),
-      Chatroom.find({ _id: { $in: interactionIds } }),
-    ]);
+    // Fetch the chatrooms where the user is a member
+    const userMessages = await Message.find({
+      $or: [
+        { sender: userID, chatroom: null },
+        { recipient: userID, chatroom: null },
+      ],
+    });
+    // Map the chatrooms to the desired format
+    const otherUsersIDs = [
+      ...new Set(
+        userMessages.map((message) => {
+          const otherUserID = message.sender.equals(userID)
+            ? message.recipient
+            : message.sender;
+          return otherUserID.toString();
+        })
+      ),
+    ];
 
-    // Create the final chat history array
-    const chatHistory = userInteractions.map((interaction) => {
-      const lastMessage = interaction.lastMessage;
-      const isGroupChat = lastMessage.chatroom !== null;
+    const otherUsers = await User.find({ _id: { $in: otherUsersIDs } });
+
+    const otherUsersMap = otherUsers.reduce((map, user) => {
+      map[user._id] = user;
+      return map;
+    }, {});
+
+    console.log("other users", otherUsersIDs);
+
+    // An array of last messages between the user and another user
+    const conversationLastMessages = otherUsersIDs.map((otherUser) => {
+      const conversation = userMessages.filter(
+        (message) =>
+          message.recipient.equals(otherUser) ||
+          message.sender.equals(otherUser)
+      );
+      const lastMessage = conversation.reduce((latest, message) => {
+        if (!latest || message.createdAt > latest.createdAt) {
+          return message;
+        }
+        return latest;
+      }, null);
+      return lastMessage;
+    });
+
+    const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
+    const chatroomLastMessages = await Message.find({
+      _id: {
+        $in: userChatrooms
+          .map((chatroom) => chatroom.lastMessage)
+          .filter((lastMessage) => lastMessage !== undefined),
+      },
+    });
+
+    const chatroomsMap = userChatrooms.reduce((map, chatroom) => {
+      map[chatroom._id] = chatroom;
+      return map;
+    }, {});
+
+    //All last messages in user to user conversation or in chatroom sorted in descending order
+    const lastMessages = [
+      ...conversationLastMessages,
+      ...chatroomLastMessages,
+    ].sort((a, b) => b.createdAt - a.createdAt);
+
+    // Modify the chatHistory mapping to use the userMap
+    const chatHistory = lastMessages.map((lastMessage) => {
+      const messageID = lastMessage._id;
+      const sender = lastMessage.sender;
+      const messageContent = lastMessage.message;
+      const createdAt = lastMessage.createdAt;
+      const isGroupChat = lastMessage.chatroom != null;
 
       if (!isGroupChat) {
         const otherUserID = lastMessage.sender.equals(userID)
           ? lastMessage.recipient
           : lastMessage.sender;
-        const otherUser = otherUsers.find((user) =>
-          user._id.equals(otherUserID)
-        );
+        const otherUser = otherUsersMap[otherUserID];
         return {
           id: otherUserID,
-          name: otherUser.username,
-          imageURL: otherUser.imageURL,
+          name: otherUsersMap[otherUserID].username,
+          imageURL: otherUsersMap[otherUserID].imageURL,
           lastMessage: {
-            id: lastMessage._id,
-            sender: lastMessage.sender,
-            message: lastMessage.message,
+            id: messageID,
+            sender: sender,
+            message: messageContent,
             createdAt: lastMessage.createdAt,
           },
         };
       } else {
-        const chatroom = chatrooms.find((room) =>
-          room._id.equals(interaction._id)
-        );
+        const chatroomID = lastMessage.chatroom;
+        const chatroom = chatroomsMap[chatroomID];
         return {
-          id: chatroom._id,
+          id: chatroomID,
           name: chatroom.name,
           imageURL: chatroom.imageURL,
           lastMessage: {
-            id: lastMessage._id,
-            sender: lastMessage.sender,
-            message: lastMessage.message,
-            createdAt: lastMessage.createdAt,
+            id: messageID,
+            sender: sender,
+            message: messageContent,
+            createdAt: createdAt,
           },
         };
       }
@@ -174,8 +199,6 @@ messageRouter.get("/:id", async (req, res) => {
     });
   }
 });
-
-function chatroomOrRecipient() {}
 
 const createMessageValidationRules = [
   body("sender").notEmpty().withMessage("Sender is required").trim().escape(),
