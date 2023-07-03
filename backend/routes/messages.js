@@ -239,6 +239,29 @@ messageRouter.post(
   }
 );
 
+messageRouter.patch("/", async (req, res) => {
+  const { fieldToUpdate, updatedValue } = req.body;
+  try {
+    const updateResult = await UserMessage.updateMany(
+      {},
+      { [fieldToUpdate]: updatedValue }
+    );
+    if (updateResult.nModified === 0) {
+      return res.status(400).json({
+        error: "No messages found to update",
+      });
+    }
+    res.status(200).json({
+      success: "Messages updated successfully",
+    });
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failed to update messages",
+    });
+  }
+});
+
 messageRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
