@@ -62,7 +62,8 @@ const craeteCoversationValidatioRules = [
     .withMessage("Coversation cannot be without members")
     .length(2)
     .withMessage("Coversation must have exactly 2 members"),
-  body("name").notEmpty().withMessage("Chatroom name is required").trim(),
+  body("createdAt").optional().isDate().withMessage("Invalid date"),
+  body("lastUpdatedAt").optional().isDate().withMessage("Invalid date"),
 ];
 
 conversationRouter.post(

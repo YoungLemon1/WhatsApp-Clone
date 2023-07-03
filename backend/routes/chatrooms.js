@@ -55,7 +55,12 @@ const craeteChatValidatioRules = [
   body("members")
     .custom(arrayNotEmpty)
     .withMessage("Chatroom cannot be without members"),
-  body("name").notEmpty().withMessage("Chatroom name is required").trim(),
+  body("name")
+    .notEmpty()
+    .withMessage("Chatroom name is required")
+    .trim()
+    .escape(),
+  body("imageURL").optional().trim().escape(),
 ];
 
 chatRoomRouter.post(
@@ -80,6 +85,9 @@ chatRoomRouter.post(
 
 const updateChatroomValidationRules = [
   body("id").notEmpty().withMessage("Chatroom ID is required"),
+  body("members")
+    .custom(arrayNotEmpty)
+    .withMessage("Chatroom cannot be without members"),
   body("name").notEmpty().withMessage("Chatroom name is required"),
   body("createdAt").optional().isDate().withMessage("Invalid date"),
   body("lastUpdatedAt").optional().isDate().withMessage("Invalid date"),
