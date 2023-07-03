@@ -285,6 +285,10 @@ label {
   word-wrap: break-word;
 }
 
+.chat-window .chat-body .message-container .message p {
+  margin: 0;
+}
+
 .chat-window .chat-body .message.current-user {
   align-self: flex-start;
   color: #ffffff;
