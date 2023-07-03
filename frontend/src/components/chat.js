@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Axios from "axios";
 import ScrollableFeed from "react-scrollable-feed";
+import { io } from "socket.io-client";
 
 function Chat({
   chat,
@@ -14,11 +15,13 @@ function Chat({
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
 
+  const socket = useRef(null);
   const userID = useRef(null);
   const chatID = useRef(null);
   const isGroupChat = useRef(false);
 
   useEffect(() => {
+    socket.current = io("http://localhost:5000");
     userID.current = loggedUser._id;
     chatID.current = chat.id;
     isGroupChat.current = chat.isGroupChat;
@@ -34,6 +37,8 @@ function Chat({
         const data = res.data;
         console.log(data);
         setMessages(data);
+        socket.current.connect();
+        socket.current.emit("join-chat", userID.current);
       } catch (error) {
         console.error("Failed to fetch messages", error);
       }

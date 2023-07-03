@@ -72,7 +72,7 @@ messageRouter.get("/", async (req, res) => {
 messageRouter.get("/last-messages", async (req, res) => {
   try {
     const { userID } = req.query;
-    console.log(userID);
+    //console.log(userID);
 
     // Fetch the chatrooms where the user is a member
     const userMessages = await Message.find({
@@ -100,7 +100,7 @@ messageRouter.get("/last-messages", async (req, res) => {
       return map;
     }, {});
 
-    console.log("other users", otherUsersIDs);
+    //console.log("other users", otherUsersIDs);
 
     // An array of last messages between the user and another user
     const conversationLastMessages = otherUsersIDs.map((otherUser) => {
