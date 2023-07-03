@@ -66,7 +66,6 @@ function Chat({
       ...(isGroupChat.current
         ? { chatroom: chatID.current }
         : { recipient: chatID.current }),
-      createdAt: Date.now(),
     };
     console.log("message payload", message);
     try {
