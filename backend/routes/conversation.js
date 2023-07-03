@@ -60,7 +60,7 @@ const craeteCoversationValidatioRules = [
   body("members")
     .custom(arrayNotEmpty)
     .withMessage("Coversation cannot be without members")
-    .length(2)
+    .isArray({ min: 2, max: 2 })
     .withMessage("Coversation must have exactly 2 members"),
   body("createdAt").optional().isDate().withMessage("Invalid date"),
   body("lastUpdatedAt").optional().isDate().withMessage("Invalid date"),
@@ -71,45 +71,40 @@ conversationRouter.post(
   craeteCoversationValidatioRules,
   validate,
   async (req, res) => {
-    const { id, chatName, createdAt, isGroupChat, ChatPicture } = req.body;
+    const { members, createdAt, lastUpdatedAt } = req.body;
 
-    const existingChat = await Conversation.findById(id);
-    if (existingChat) {
+    const existingConversations = await Conversation.find();
+    if (
+      Array.isArray(existingConversations) ||
+      existingConversations.length !== 0
+    ) {
       return res.status(400).json({
-        error: "Chatroom already exists",
+        error: "Conversation already exists",
       });
     }
     try {
-      const newChatroom = new Conversation(req.body);
-      await newChatroom.save();
+      const newConversation = new Conversation(req.body);
+      await newConversation.save();
 
-      res.status(201).json(newChatroom);
+      res.status(201).json(newConversation);
     } catch (err) {
       console.error(err.stack);
       res.status(500).json({
-        error: "Internal server error: failed to create chatroom",
+        error: "Internal server error: failed to create conversation",
       });
     }
   }
 );
 
-const updateChatroomValidationRules = [
-  body("id").notEmpty().withMessage("Chatroom ID is required"),
-  body("name").notEmpty().withMessage("Chatroom name is required"),
-  body("createdAt").optional().isDate().withMessage("Invalid date"),
-  body("lastUpdatedAt").optional().isDate().withMessage("Invalid date"),
-  // Add more validation rules as needed
-];
-
 conversationRouter.patch(
   "/:id",
-  updateChatroomValidationRules,
+  craeteCoversationValidatioRules,
   validate,
   async (req, res) => {
     try {
       const { id } = req.params;
-      const chatroom = await Conversation.findById(id);
-      res.status(200).json(chatroom);
+      const conversation = await Conversation.findById(id);
+      res.status(200).json(conversation);
     } catch (err) {
       console.error(err.stack);
       res.status(500).json({

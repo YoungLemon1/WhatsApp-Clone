@@ -83,20 +83,9 @@ chatRoomRouter.post(
   }
 );
 
-const updateChatroomValidationRules = [
-  body("id").notEmpty().withMessage("Chatroom ID is required"),
-  body("members")
-    .custom(arrayNotEmpty)
-    .withMessage("Chatroom cannot be without members"),
-  body("name").notEmpty().withMessage("Chatroom name is required"),
-  body("createdAt").optional().isDate().withMessage("Invalid date"),
-  body("lastUpdatedAt").optional().isDate().withMessage("Invalid date"),
-  // Add more validation rules as needed
-];
-
 chatRoomRouter.patch(
   "/:id",
-  updateChatroomValidationRules,
+  craeteChatValidatioRules,
   validate,
   async (req, res) => {
     try {

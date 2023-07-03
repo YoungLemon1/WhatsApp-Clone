@@ -242,7 +242,7 @@ messageRouter.post(
 messageRouter.patch("/", async (req, res) => {
   const { fieldToUpdate, updatedValue } = req.body;
   try {
-    const updateResult = await UserMessage.updateMany(
+    const updateResult = await Message.updateMany(
       {},
       { [fieldToUpdate]: updatedValue }
     );
@@ -265,7 +265,7 @@ messageRouter.patch("/", async (req, res) => {
 messageRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedMessage = await UserMessage.findByIdAndDelete(id);
+    const deletedMessage = await Message.findByIdAndDelete(id);
     if (!deletedMessage) {
       return res.status(400).json({
         error: "message does not exist",
