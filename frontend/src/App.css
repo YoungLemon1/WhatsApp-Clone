@@ -276,7 +276,7 @@ label {
   min-height: 1.5rem;
   width: max-content;
   max-width: 20vw;
-  border-radius: 5%;
+  border-radius: 5px;
   margin: 0.5rem;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
