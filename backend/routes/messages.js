@@ -226,15 +226,6 @@ messageRouter.post(
   validate,
   async (req, res) => {
     const { sender, recipient, chatroom, message, createdAt } = req.body;
-    /*
-    if ((recipient && chatroom) || (!recipient && !chatroom)) {
-      res.status(400).json({
-        error:
-          "Message target undefined: message must include either recipient or chatroom id",
-      });
-      return;
-    }
-    */
     try {
       const newMessage = new Message(req.body);
       await newMessage.save();
