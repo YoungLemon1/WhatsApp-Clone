@@ -148,25 +148,9 @@ userRouter.post("/", createUserValidationRules, validate, async (req, res) => {
   }
 });
 
-// Update user validation rules
-const updateUserValidationRules = [
-  body("_id").notEmpty().withMessage("User ID is required"),
-  body("username").optional().trim().escape(),
-  body("password")
-    .optional()
-    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/)
-    .withMessage(
-      "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
-    )
-    .trim(),
-  body("birthdate").optional().isDate().withMessage("Invalid birthdate"),
-  body("email").optional().trim().normalizeEmail(),
-  // Add more validation rules as needed
-];
-
 userRouter.put(
   "/:id",
-  updateUserValidationRules,
+  createUserValidationRules,
   validate,
   async (req, res) => {
     const { id } = req.params;
@@ -198,7 +182,7 @@ userRouter.put(
 // PATCH user route
 userRouter.patch(
   "/:id",
-  updateUserValidationRules,
+  createUserValidationRules,
   validate,
   async (req, res) => {
     const { id } = req.params;
