@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { body, validationResult } from "express-validator";
+import { body } from "express-validator";
+import validate from "./validation/valdiate.js";
 import Message from "../models/message.js";
 import User from "../models/user.js";
 import Chatroom from "../models/chatroom.js";
@@ -198,37 +199,55 @@ messageRouter.get("/:id", async (req, res) => {
   }
 });
 
-messageRouter.post("/", async (req, res) => {
-  const { sender, recipient, chatroom, message, createdAt } = req.body;
-  if (!sender) {
-    res.status(400).json({ error: "No sender" });
-    return;
-  }
-  if ((recipient && chatroom) || (!recipient && !chatroom)) {
-    res.status(400).json({
-      error:
-        "Message target undefined: message must include either recipient or chatroom id",
-    });
-    return;
-  }
-  if (!message || message === "") {
-    res.status(400).json({
-      error: "Cannot send empty messages",
-    });
-  }
+function chatroomOrRecipient() {}
 
-  try {
-    const newMessage = new Message(req.body);
-    await newMessage.save();
+const createMessageValidationRules = [
+  body("sender").notEmpty().withMessage("Sender is required").trim().escape(),
+  body("message")
+    .notEmpty()
+    .withMessage("Cannot send empty messages")
+    .trim()
+    .escape(),
+  body("createdAt").notEmpty().isDate().withMessage("Invalid date"),
+  body().custom((value, { req }) => {
+    const { recipient, chatroom } = req.body;
+    if ((recipient && chatroom) || (!recipient && !chatroom)) {
+      throw new Error(
+        "Message target undefined: message must include either recipient or chatroom id"
+      );
+    }
+    return true;
+  }),
+];
 
-    res.status(201).json(newMessage);
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: failed to create message",
-    });
+messageRouter.post(
+  "/",
+  createMessageValidationRules,
+  validate,
+  async (req, res) => {
+    const { sender, recipient, chatroom, message, createdAt } = req.body;
+    /*
+    if ((recipient && chatroom) || (!recipient && !chatroom)) {
+      res.status(400).json({
+        error:
+          "Message target undefined: message must include either recipient or chatroom id",
+      });
+      return;
+    }
+    */
+    try {
+      const newMessage = new Message(req.body);
+      await newMessage.save();
+
+      res.status(201).json(newMessage);
+    } catch (err) {
+      console.error(err.stack);
+      res.status(500).json({
+        error: "Internal server error: failed to create message",
+      });
+    }
   }
-});
+);
 
 messageRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
