@@ -7,6 +7,7 @@ import { configDotenv } from "dotenv";
 import userRouter from "./routes/users.js";
 import messageRouter from "./routes/messages.js";
 import chatroomRouter from "./routes/chatrooms.js";
+import conversationRouter from "./routes/conversation.js";
 
 configDotenv();
 
@@ -38,6 +39,7 @@ mongoose
 app.use("/users", userRouter);
 app.use("/messages", messageRouter);
 app.use("/chatrooms", chatroomRouter);
+app.use("/conversations", conversationRouter);
 
 io.on("connection", (socket) => {
   console.log(socket.id + " connected");

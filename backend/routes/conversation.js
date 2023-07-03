@@ -2,13 +2,15 @@ import { Router } from "express";
 import { body } from "express-validator";
 import validate from "./validation/valdiate.js";
 import Conversation from "../models/conversation.js";
+import User from "../models/user.js";
 const conversationRouter = Router();
 
 conversationRouter.get("/", async (req, res) => {
   try {
-    const { otherUser } = req.query;
+    const { username } = req.query;
+    const otherUser = await User.findOne({ username: username });
     const chatrooms = await Conversation.findOne({
-      name: otherUser,
+      $in: { members: otherUser._id },
     });
     res.status(200).json(chatrooms);
   } catch (err) {
