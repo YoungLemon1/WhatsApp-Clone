@@ -203,6 +203,10 @@ label {
   margin: 1rem;
 }
 
+#user-page #chat-history {
+  height: 30rem;
+}
+
 #user-page #chat-history .chat-history-item {
   padding-right: 0.4rem;
   padding-left: 0.4rem;
