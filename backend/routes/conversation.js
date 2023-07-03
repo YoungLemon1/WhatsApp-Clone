@@ -103,7 +103,10 @@ conversationRouter.patch(
   async (req, res) => {
     try {
       const { id } = req.params;
-      const conversation = await Conversation.findById(id);
+      const updateResult = await Conversation.findByIdAndUpdate(id, {
+        [fieldToUpdate]: updatedValue,
+      });
+      updateResult.save();
       res.status(200).json(conversation);
     } catch (err) {
       console.error(err.stack);

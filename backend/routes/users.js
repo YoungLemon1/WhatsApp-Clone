@@ -239,7 +239,7 @@ const updateAllUsersValidationRules = [
 
 // PATCH All users route
 userRouter.patch(
-  "/update-all",
+  "/",
   updateAllUsersValidationRules,
   validate,
   async (req, res) => {
@@ -247,8 +247,15 @@ userRouter.patch(
 
     try {
       // Update all users with the provided field and value
-      await UserModel.updateMany({}, { [field]: value });
-
+      const updateResult = await UserModel.updateMany({}, { [field]: value });
+      updateResult.forEach((doc) => {
+        doc.save((saveErr) => {
+          if (saveErr) {
+            // Handle save error
+            console.error("Failed to save document:", saveErr);
+          }
+        });
+      });
       res.status(200).json({
         success: "All users updated successfully",
       });

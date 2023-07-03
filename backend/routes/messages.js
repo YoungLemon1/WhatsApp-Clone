@@ -251,6 +251,14 @@ messageRouter.patch("/", async (req, res) => {
         error: "No messages found to update",
       });
     }
+    updateResult.forEach((doc) => {
+      doc.save((saveErr) => {
+        if (saveErr) {
+          // Handle save error
+          console.error("Failed to save document:", saveErr);
+        }
+      });
+    });
     res.status(200).json({
       success: "Messages updated successfully",
     });
