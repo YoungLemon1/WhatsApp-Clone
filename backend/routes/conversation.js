@@ -107,7 +107,7 @@ conversationRouter.patch(
         [fieldToUpdate]: updatedValue,
       });
       updateResult.save();
-      res.status(200).json(conversation);
+      res.status(200).json(updateResult);
     } catch (err) {
       console.error(err.stack);
       res.status(500).json({

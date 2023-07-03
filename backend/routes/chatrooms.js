@@ -88,10 +88,14 @@ chatRoomRouter.patch(
   craeteChatValidatioRules,
   validate,
   async (req, res) => {
+    const { fieldToUpdate, updatedValue } = req.body;
     try {
       const { id } = req.params;
-      const chatroom = await ChatRoom.findById(id);
-      res.status(200).json(chatroom);
+      const updateResult = await ChatRoom.findByIdAndUpdate(id, {
+        [fieldToUpdate]: updatedValue,
+      });
+      updateResult.save();
+      res.status(200).json(updateResult);
     } catch (err) {
       console.error(err.stack);
       res.status(500).json({
@@ -100,7 +104,6 @@ chatRoomRouter.patch(
     }
   }
 );
-
 chatRoomRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {

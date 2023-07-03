@@ -243,11 +243,13 @@ userRouter.patch(
   updateAllUsersValidationRules,
   validate,
   async (req, res) => {
-    const { field, value } = req.body;
-
     try {
+      const { fieldToUpdate, updatedValue } = req.body;
       // Update all users with the provided field and value
-      const updateResult = await UserModel.updateMany({}, { [field]: value });
+      const updateResult = await UserModel.updateMany(
+        {},
+        { [fieldToUpdate]: updatedValue }
+      );
       updateResult.forEach((doc) => {
         doc.save((saveErr) => {
           if (saveErr) {
