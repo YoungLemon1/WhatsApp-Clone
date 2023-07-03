@@ -1,14 +1,14 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import validate from "./validation/valdiate.js";
-import ChatRoom from "../models/chatroom.js";
-const chatRoomRouter = Router();
+import Conversation from "../models/conversation.js";
+const conversationRouter = Router();
 
-chatRoomRouter.get("/", async (req, res) => {
+conversationRouter.get("/", async (req, res) => {
   try {
-    const { chatroomName } = req.query;
-    const chatrooms = await ChatRoom.findOne({
-      name: chatroomName,
+    const { conversationName } = req.query;
+    const chatrooms = await Conversation.findOne({
+      name: conversationName,
     });
     res.status(200).json(chatrooms);
   } catch (err) {
@@ -19,9 +19,9 @@ chatRoomRouter.get("/", async (req, res) => {
   }
 });
 
-chatRoomRouter.get("/", async (req, res) => {
+conversationRouter.get("/", async (req, res) => {
   try {
-    const chatrooms = await ChatRoom.find({});
+    const chatrooms = await Conversation.find({});
     res.status(200).json(chatrooms);
   } catch (err) {
     console.error(err.stack);
@@ -31,10 +31,10 @@ chatRoomRouter.get("/", async (req, res) => {
   }
 });
 
-chatRoomRouter.get("/:id", async (req, res) => {
+conversationRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const chatroom = await ChatRoom.findById(id);
+    const chatroom = await Conversation.findById(id);
     res.status(200).json(chatroom);
   } catch (err) {
     console.error(err.stack);
@@ -58,21 +58,21 @@ const craeteChatValidatioRules = [
   body("name").notEmpty().withMessage("Chatroom name is required").trim(),
 ];
 
-chatRoomRouter.post(
+conversationRouter.post(
   "/",
   craeteChatValidatioRules,
   validate,
   async (req, res) => {
     const { id, chatName, createdAt, isGroupChat, ChatPicture } = req.body;
 
-    const existingChat = await ChatRoom.findById(id);
+    const existingChat = await Conversation.findById(id);
     if (existingChat) {
       return res.status(400).json({
         error: "Chatroom already exists",
       });
     }
     try {
-      const newChatroom = new ChatRoom(req.body);
+      const newChatroom = new Conversation(req.body);
       await newChatroom.save();
 
       res.status(201).json(newChatroom);
@@ -93,14 +93,14 @@ const updateChatroomValidationRules = [
   // Add more validation rules as needed
 ];
 
-chatRoomRouter.patch(
+conversationRouter.patch(
   "/:id",
   updateChatroomValidationRules,
   validate,
   async (req, res) => {
     try {
       const { id } = req.params;
-      const chatroom = await ChatRoom.findById(id);
+      const chatroom = await Conversation.findById(id);
       res.status(200).json(chatroom);
     } catch (err) {
       console.error(err.stack);
@@ -111,10 +111,10 @@ chatRoomRouter.patch(
   }
 );
 
-chatRoomRouter.delete("/:id", async (req, res) => {
+conversationRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedChatroom = await ChatRoom.findByIdAndDelete(id);
+    const deletedChatroom = await Conversation.findByIdAndDelete(id);
     if (!deletedChatroom) {
       return res.status(400).json({
         error: "chatroom does not exist",
@@ -131,4 +131,4 @@ chatRoomRouter.delete("/:id", async (req, res) => {
   }
 });
 
-export default chatRoomRouter;
+export default conversationRouter;
