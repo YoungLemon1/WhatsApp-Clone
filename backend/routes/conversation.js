@@ -6,9 +6,9 @@ const conversationRouter = Router();
 
 conversationRouter.get("/", async (req, res) => {
   try {
-    const { conversationName } = req.query;
+    const { otherUser } = req.query;
     const chatrooms = await Conversation.findOne({
-      name: conversationName,
+      name: otherUser,
     });
     res.status(200).json(chatrooms);
   } catch (err) {

@@ -7,10 +7,10 @@ const chatRoomRouter = Router();
 chatRoomRouter.get("/", async (req, res) => {
   try {
     const { chatroomName } = req.query;
-    const chatrooms = await ChatRoom.findOne({
+    const chatroom = await ChatRoom.findOne({
       name: chatroomName,
     });
-    res.status(200).json(chatrooms);
+    res.status(200).json(chatroom);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
