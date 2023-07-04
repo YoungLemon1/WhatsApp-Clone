@@ -73,15 +73,6 @@ conversationRouter.post(
   async (req, res) => {
     const { members, createdAt, lastUpdatedAt } = req.body;
 
-    const existingConversations = await Conversation.find();
-    if (
-      Array.isArray(existingConversations) ||
-      existingConversations.length !== 0
-    ) {
-      return res.status(400).json({
-        error: "Conversation already exists",
-      });
-    }
     try {
       const newConversation = new Conversation(req.body);
       await newConversation.save();
