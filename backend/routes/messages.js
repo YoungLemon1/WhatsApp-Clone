@@ -10,13 +10,10 @@ const messageRouter = Router();
 
 messageRouter.get("/", async (req, res) => {
   try {
-    const { userID, otherUserID } = req.query;
-    const conversation = await Conversation.findOne({
-      $all: [userID, otherUserID],
-    });
+    const { conversationID } = req.query;
     // Fetch the messages between the logged-in user and the other user
     let messages = await Message.find({
-      conversation: conversation,
+      conversation: conversationID,
     });
 
     if (messages.length > 1) {
