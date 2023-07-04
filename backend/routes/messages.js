@@ -71,22 +71,14 @@ messageRouter.get("/", async (req, res) => {
 messageRouter.get("/last-messages", async (req, res) => {
   try {
     const { userID } = req.query;
-    //console.log(userID);
-
-    const conversations = await Conversation.find({
-      members: { $in: [userID] },
-    });
-    const chatrooms = await Chatroom.find({ members: { $in: [userID] } });
-
-    const conversationIds = conversations.map((conversation) =>
-      conversation._id.toString()
-    );
-    const chatroomIds = chatrooms.map((chatroom) => chatroom._id.toString());
+    console.log("user id", userID);
 
     const userConversations = await Conversation.find({
-      _id: { $in: conversationIds },
+      members: { $in: [userID] },
     }).populate("members");
-    const userChatrooms = await Chatroom.find({ _id: { $in: chatroomIds } });
+    console.log("conversations", userConversations);
+    const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
+    console.log("chatrooms", userChatrooms);
 
     const userMap = {};
     userConversations.forEach((conversation) => {
@@ -99,6 +91,8 @@ messageRouter.get("/last-messages", async (req, res) => {
         }
       });
     });
+
+    console.log("user conversations", userConversations);
 
     const lastMessages = await Message.aggregate([
       // Match messages for the user where recipient or sender is the user
@@ -138,6 +132,8 @@ messageRouter.get("/last-messages", async (req, res) => {
         $limit: 10, // Adjust the limit as per your requirement
       },
     ]);
+
+    console.log("last messages", lastMessages);
 
     // Create the final chat history array
     const chatHistory = lastMessages.map((message) => {
