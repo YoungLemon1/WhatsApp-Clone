@@ -29,14 +29,13 @@ function Chat({
     async function fetchMessages() {
       try {
         if (chat.id == null || messages.length === 0) {
-          console.error("Failed to fetch messages: Empty chat");
+          console.error("Failed to fetch messages: Empty chat", chat.id);
           return;
         }
         const res = await Axios.get(
           `http://localhost:5000/messages?${chat.id}`
         );
         const data = res.data;
-        console.log(data);
         setMessages(data);
         socket.current.connect();
         socket.current.emit("join-chat", userID.current);
@@ -51,7 +50,7 @@ function Chat({
   function exitChat() {
     setCurrentChat(null);
     setSearchText("");
-    if (!isGroupChat.current && messages.length === 0) {
+    if (chat.id == null && messages.length === 0) {
       console.log("chat history", chatHistory);
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
       setChatHistory(updatedChatHistory);
@@ -66,6 +65,7 @@ function Chat({
   }
 
   async function sendMessage() {
+    let conversationID;
     if (chat.id == null) {
       try {
         const conversation = {
@@ -76,8 +76,8 @@ function Chat({
           conversation
         );
         const data = res.data;
+        conversationID = res.data._id;
         console.log("user conversation created", data);
-        chat.id = data._id.toString();
       } catch {
         console.error("Failed to create conversation");
       }
@@ -87,7 +87,7 @@ function Chat({
       message: messageContent,
       ...(isGroupChat.current
         ? { chatroom: chatID.current }
-        : { conversation: chatID.current }),
+        : { conversation: chatID.current ? chatID.current : conversationID }),
     };
     console.log("message payload", message);
     try {
