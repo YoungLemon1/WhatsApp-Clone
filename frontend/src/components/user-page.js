@@ -60,7 +60,8 @@ function UserPage({ user, setUser }) {
 
     if (userData) {
       const userChat = {
-        id: userData.conversationId,
+        id: null,
+        members: [user._id, userData._id],
         name: userData.username,
         imageURL: userData.imageURL,
         isGroupChat: false,

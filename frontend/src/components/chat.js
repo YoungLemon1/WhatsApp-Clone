@@ -28,6 +28,10 @@ function Chat({
     console.log(userID.current, chatID.current, isGroupChat.current);
     async function fetchMessages() {
       try {
+        if (chat.id == null || messages.length === 0) {
+          console.error("Failed to fetch messages: Empty chat");
+          return;
+        }
         const res = await Axios.get(
           `http://localhost:5000/messages?${chat.id}`
         );
@@ -42,7 +46,7 @@ function Chat({
     }
 
     fetchMessages();
-  }, [chat.id, loggedUser._id, chat.isGroupChat]);
+  }, [chat.id, loggedUser._id, chat.isGroupChat, messages.length]);
 
   function exitChat() {
     setCurrentChat(null);
@@ -62,6 +66,22 @@ function Chat({
   }
 
   async function sendMessage() {
+    if (chat.id == null) {
+      try {
+        const conversation = {
+          members: chat.members,
+        };
+        const res = await Axios.post(
+          "http://localhost:5000/conversations",
+          conversation
+        );
+        const data = res.data;
+        console.log("user conversation created", data);
+        chat.id = data._id.toString();
+      } catch {
+        console.error("Failed to create conversation");
+      }
+    }
     const message = {
       sender: userID.current,
       message: messageContent,
@@ -93,7 +113,7 @@ function Chat({
           src={chat.imageURL}
           alt="chat profile"
         ></img>
-        <h4 className="chat-name">{chat.name}</h4>
+        <h4 className="chat-name">{chat.interactedWith}</h4>
       </div>
       <div className="chat-body">
         <ScrollableFeed>

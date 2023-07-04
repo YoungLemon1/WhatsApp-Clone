@@ -11,7 +11,7 @@ userRouter.get("/", async (req, res) => {
   try {
     const { username } = req.query;
     const user = await UserModel.findOne({ username: username });
-    res.status(200).json({ user });
+    res.status(200).json(user);
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
