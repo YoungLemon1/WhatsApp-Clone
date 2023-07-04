@@ -21,7 +21,7 @@ function Chat({
   const isGroupChat = useRef(false);
 
   useEffect(() => {
-    socket.current = io("http://localhost:5000");
+    //socket.current = io("http://localhost:5000");
     userID.current = loggedUser._id;
     chatID.current = chat.id;
     isGroupChat.current = chat.isGroupChat;
@@ -113,7 +113,7 @@ function Chat({
           src={chat.imageURL}
           alt="chat profile"
         ></img>
-        <h4 className="chat-name">{chat.interactedWith}</h4>
+        <h4 className="chat-name">{chat.title}</h4>
       </div>
       <div className="chat-body">
         <ScrollableFeed>

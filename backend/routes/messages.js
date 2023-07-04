@@ -111,11 +111,7 @@ messageRouter.get("/last-messages", async (req, res) => {
       {
         $group: {
           _id: {
-            $cond: {
-              if: { $eq: ["$chatroom", null] },
-              then: "$conversation",
-            },
-            else: "$chatroom",
+            $cond: [{ $eq: ["$chatroom", null] }, "$conversation", "$chatroom"],
           },
           lastMessage: { $last: "$$ROOT" },
         },

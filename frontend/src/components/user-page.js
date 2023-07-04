@@ -62,7 +62,7 @@ function UserPage({ user, setUser }) {
       const userChat = {
         id: null,
         members: [user._id, userData._id],
-        name: userData.username,
+        title: userData.username,
         imageURL: userData.imageURL,
         isGroupChat: false,
       };
@@ -72,7 +72,7 @@ function UserPage({ user, setUser }) {
       const chatroom = {
         id: chatroomData._id,
         members: chatroomData.members,
-        name: chatroomData.groupChatName,
+        title: chatroomData.groupChatName,
         imageURL: chatroomData.groupChatPicture,
         isGroupChat: true,
       };
