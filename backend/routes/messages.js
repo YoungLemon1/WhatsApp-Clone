@@ -72,16 +72,39 @@ messageRouter.get("/last-messages", async (req, res) => {
   try {
     const { userID } = req.query;
     //console.log(userID);
-    const [userConversations, userChatrooms, userMessages] = await Promise.all([
-      Conversation.find({ _id: { $in: conversationIds } }).populate("members"),
-      Chatroom.find({ _id: { $in: chatroomIds } }),
-      Message.find({
-        $or: [
-          { conversation: { $in: conversationIds } },
-          { chatroom: { $in: chatroomIds } },
-        ],
-      }),
-    ]);
+
+    const conversations = await Conversation.find({
+      members: { $in: [userID] },
+    });
+    const chatrooms = await Chatroom.find({ members: { $in: [userID] } });
+
+    const conversationIds = conversations.map((conversation) =>
+      conversation._id.toString()
+    );
+    const chatroomIds = chatrooms.map((chatroom) => chatroom._id.toString());
+
+    const userConversations = await Conversation.find({
+      _id: { $in: conversationIds },
+    }).populate("members");
+    const userChatrooms = await Chatroom.find({ _id: { $in: chatroomIds } });
+    const userMessages = await Message.find({
+      $or: [
+        { conversation: { $in: conversationIds } },
+        { chatroom: { $in: chatroomIds } },
+      ],
+    });
+
+    const userMap = {};
+    userConversations.forEach((conversation) => {
+      conversation.members.forEach((member) => {
+        if (!userMap[member._id]) {
+          userMap[member._id] = {
+            username: member.username,
+            imageURL: member.imageURL,
+          };
+        }
+      });
+    });
 
     const lastMessages = await Message.aggregate([
       // Match messages for the user where recipient or sender is the user
@@ -135,8 +158,8 @@ messageRouter.get("/last-messages", async (req, res) => {
         const conversation = userConversations.find((conversation) =>
           conversation?._id.equals(message.conversation)
         );
-        const otherUser = conversation.members.find(
-          (member) => !member._id.equals(userID)
+        const otherUser = userMap.get(
+          conversation.members.find((member) => !member._id.equals(userID))
         );
         interactionID = conversation._id.toString();
         interactedWith = otherUser.username;
