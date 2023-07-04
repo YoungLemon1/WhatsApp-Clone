@@ -3,6 +3,7 @@ import { body } from "express-validator";
 import validate from "./validation/valdiate.js";
 import bcrypt, { hash } from "bcrypt";
 import UserModel from "../models/user.js";
+import mongoose from "mongoose";
 
 const userRouter = Router();
 
@@ -10,7 +11,7 @@ userRouter.get("/", async (req, res) => {
   try {
     const { username } = req.query;
     const user = await UserModel.findOne({ username: username });
-    res.status(200).json(user);
+    res.status(200).json({ user });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
