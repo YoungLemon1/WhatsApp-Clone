@@ -87,12 +87,6 @@ messageRouter.get("/last-messages", async (req, res) => {
       _id: { $in: conversationIds },
     }).populate("members");
     const userChatrooms = await Chatroom.find({ _id: { $in: chatroomIds } });
-    const userMessages = await Message.find({
-      $or: [
-        { conversation: { $in: conversationIds } },
-        { chatroom: { $in: chatroomIds } },
-      ],
-    });
 
     const userMap = {};
     userConversations.forEach((conversation) => {
