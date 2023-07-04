@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Axios from "axios";
 import Chat from "./chat";
 import moment from "moment";
+import { v4 as uuidv4 } from "uuid";
 import { Button } from "react-bootstrap";
 import ChatHistory from "./chatHistory";
 
@@ -59,8 +60,9 @@ function UserPage({ user, setUser }) {
     console.log("group data", chatroomData);
 
     if (userData) {
+      const temporaryConversationId = uuidv4();
       const userChat = {
-        id: userData._id,
+        id: temporaryConversationId,
         name: userData.username,
         imageURL: userData.imageURL,
         isGroupChat: false,
