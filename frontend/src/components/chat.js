@@ -26,13 +26,10 @@ function Chat({
     chatID.current = chat.id;
     isGroupChat.current = chat.isGroupChat;
     console.log(userID.current, chatID.current, isGroupChat.current);
-    const queryParams = chat.isGroupChat
-      ? `chatroomID=${chat.id}`
-      : `userID=${loggedUser._id}&otherUserID=${chat.id}`;
     async function fetchMessages() {
       try {
         const res = await Axios.get(
-          `http://localhost:5000/messages?${queryParams}`
+          `http://localhost:5000/messages?${chat.id}`
         );
         const data = res.data;
         console.log(data);
@@ -70,7 +67,7 @@ function Chat({
       message: messageContent,
       ...(isGroupChat.current
         ? { chatroom: chatID.current }
-        : { recipient: chatID.current }),
+        : { conversation: chatID.current }),
     };
     console.log("message payload", message);
     try {
@@ -79,20 +76,6 @@ function Chat({
       console.log("message created", data);
       emptyMessage();
       setMessages([...messages, data]);
-      chat.lastMessage = {
-        id: data._id.toString(),
-        sender: data.sender.toString(),
-        message: data.message,
-        createdAt: data.createdAt,
-      };
-      /*
-      if(isGroupChat.current)
-      {
-         const res = await Axios.patch("http://localhost:5000/chatrooms", message.chatroom);
-      }
-      */
-      console.log(chat.lastMessage);
-      console.log(messages);
     } catch {
       console.error("Failed to send message");
     }
