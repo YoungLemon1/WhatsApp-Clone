@@ -22,29 +22,29 @@ function ChatHistory({ loggedUserID, dateFormat, enterChat }) {
   return (
     <div id="chat-history">
       <ScrollableFeed>
-        {userInteractions.map((chat) => {
+        {userInteractions.map((interaction) => {
           const sender =
-            chat.lastMessage.sender === loggedUserID ? "You: " : "";
+            interaction.lastMessage.sender === loggedUserID ? "You: " : "";
           return (
             <div
               className="chat-history-item"
-              key={chat.id}
-              onClick={() => enterChat(chat)}
+              key={interaction.id}
+              onClick={() => enterChat(interaction)}
             >
               <div id="conversation-details">
                 <img
                   className="profile-img"
-                  src={chat.imageURL}
-                  alt={`${chat.name} profile`}
+                  src={interaction.imageURL}
+                  alt={`${interaction.interactedWith} profile`}
                 ></img>
-                <h4>{chat.name}</h4>
+                <h4>{interaction.name}</h4>
               </div>
               <div id="last-message">
                 <p>
                   {sender}
-                  {chat.lastMessage.message}
+                  {interaction.lastMessage.message}
                 </p>
-                <small>{dateFormat(chat.lastMessage.createdAt)}</small>
+                <small>{dateFormat(interaction.lastMessage.createdAt)}</small>
               </div>
               <hr></hr>
             </div>
