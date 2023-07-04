@@ -6,9 +6,9 @@ const MessageSchema = new Schema({
     ref: "User",
     required: true,
   },
-  recipient: {
+  conversation: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Conversation",
   },
   chatroom: {
     type: Schema.Types.ObjectId,
