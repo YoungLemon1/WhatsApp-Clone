@@ -28,7 +28,7 @@ function Chat({
     console.log(userID.current, chatID.current, isGroupChat.current);
     async function fetchMessages() {
       try {
-        if (chat.id == null || messages.length === 0) {
+        if (chat.id == null) {
           console.error("Failed to fetch messages: Empty chat", chat.id);
           return;
         }
@@ -37,8 +37,8 @@ function Chat({
         );
         const data = res.data;
         setMessages(data);
-        socket.current.connect();
-        socket.current.emit("join-chat", userID.current);
+        //socket.current.connect();
+        //socket.current.emit("join-chat", userID.current);
       } catch (error) {
         console.error("Failed to fetch messages", error);
       }
@@ -113,7 +113,7 @@ function Chat({
           src={chat.imageURL}
           alt="chat profile"
         ></img>
-        <h4 className="chat-name">{chat.title}</h4>
+        <h4 className="chat-name">{chat.title ?? "Error: undefined chat"}</h4>
       </div>
       <div className="chat-body">
         <ScrollableFeed>
