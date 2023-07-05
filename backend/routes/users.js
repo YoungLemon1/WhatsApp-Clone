@@ -155,8 +155,7 @@ userRouter.put(
   validate,
   async (req, res) => {
     const { id } = req.params;
-    const { name, username, password, birthdate, email, imageURL, role } =
-      req.body;
+    const { username, password, birthdate, email, imageURL, role } = req.body;
     const user = await UserModel.findOne({ _id: id });
     if (!user) {
       return res.status(409).json({
