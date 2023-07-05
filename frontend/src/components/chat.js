@@ -20,30 +20,6 @@ function Chat({
   const isGroupChat = useRef(false);
 
   console.log("chat", chat);
-  useEffect(() => {
-    //socket.current = io("http://localhost:5000");
-    userID.current = loggedUser._id;
-    chatID.current = chat.id;
-    isGroupChat.current = chat.isGroupChat;
-    async function fetchMessages() {
-      try {
-        const queryParams = isGroupChat.current
-          ? `chatroom/?chatroomID=${chat.id}`
-          : `conversation/?conversationID=${chat.id}`;
-        const res = await Axios.get(
-          `http://localhost:5000/messages/${queryParams}`
-        );
-        const data = res.data;
-        setMessages(data);
-        //socket.current.connect();
-        //socket.current.emit("join-chat", userID.current);
-      } catch (error) {
-        console.error("Failed to fetch messages", error);
-      }
-    }
-
-    fetchMessages();
-  }, [chat.id, loggedUser._id, chat.isGroupChat]);
 
   useEffect(() => {
     // Listen for the "new-message" event
@@ -57,6 +33,28 @@ function Chat({
       socket.off("send_message");
     };
   }, [socket]);
+
+  useEffect(() => {
+    userID.current = loggedUser._id;
+    chatID.current = chat.id;
+    isGroupChat.current = chat.isGroupChat;
+    async function fetchMessages() {
+      try {
+        const queryParams = isGroupChat.current
+          ? `chatroom/?chatroomID=${chat.id}`
+          : `conversation/?conversationID=${chat.id}`;
+        const res = await Axios.get(
+          `http://localhost:5000/messages/${queryParams}`
+        );
+        const data = res.data;
+        setMessages(data);
+      } catch (error) {
+        console.error("Failed to fetch messages", error);
+      }
+    }
+
+    fetchMessages();
+  }, [chat.id, loggedUser._id, chat.isGroupChat]);
 
   async function exitChat() {
     if (!isGroupChat.current && messages.length === 0) {
