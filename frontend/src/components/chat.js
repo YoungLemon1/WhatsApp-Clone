@@ -77,9 +77,10 @@ function Chat({
           conversation
         );
         const data = res.data;
+        conversationID = data._id.toString();
         console.log("user conversation created", data);
-      } catch {
-        console.error("Failed to create conversation");
+      } catch (error) {
+        console.error("Failed to create conversation", error);
       }
     }
     const message = {
@@ -87,7 +88,9 @@ function Chat({
       message: messageContent,
       ...(isGroupChat.current
         ? { chatroom: chatID.current }
-        : { conversation: chatID.current ? chatID.current : conversationID }),
+        : {
+            conversation: conversationID ? conversationID : chatID.current,
+          }),
     };
     console.log("message payload", message);
     try {
