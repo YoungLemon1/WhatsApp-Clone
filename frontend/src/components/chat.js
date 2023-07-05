@@ -32,9 +32,11 @@ function Chat({
           console.error("Failed to fetch messages: Empty chat", chat.id);
           return;
         }
-        const chatType = isGroupChat.current ? "chatroom" : "conversation";
+        const queryParams = isGroupChat.current
+          ? `chatroom/?chatroomID=${chat.id}`
+          : `conversation/?conversationID=${chat.id}`;
         const res = await Axios.get(
-          `http://localhost:5000/messages?/${chatType}/${chat.id}`
+          `http://localhost:5000/messages/${queryParams}`
         );
         const data = res.data;
         setMessages(data);
