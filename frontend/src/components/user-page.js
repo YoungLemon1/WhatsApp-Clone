@@ -60,19 +60,15 @@ function UserPage({ user, setUser }) {
 
     if (userData) {
       const members = [user._id, userData._id];
-      const coversation = {
-        members: members,
-      };
-      const res = await Axios.post(
-        "http://localhost:5000/conversations",
-        coversation
+      const sortedMembers = members.map((member) => member.toString()).sort();
+      console.log("sorted", sortedMembers);
+      const tempChatId = sortedMembers.reduce(
+        (acc, member) => acc + member,
+        ""
       );
-      console.log(
-        `conversation created with ${user.username} and ${userData.username}`,
-        res.data
-      );
+      console.log("tempId", tempChatId);
       const userChat = {
-        id: res.data._id.toString(),
+        id: tempChatId,
         members: members,
         title: userData.username,
         imageURL: userData.imageURL,
@@ -84,8 +80,8 @@ function UserPage({ user, setUser }) {
       const chatroom = {
         id: chatroomData._id,
         members: chatroomData.members,
-        title: chatroomData.groupChatName,
-        imageURL: chatroomData.groupChatPicture,
+        title: chatroomData.name,
+        imageURL: chatroomData.imageURL,
         isGroupChat: true,
       };
       setChatHistory([...chatHistory, chatroom]);

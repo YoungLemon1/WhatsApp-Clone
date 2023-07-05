@@ -25,10 +25,9 @@ function Chat({
     userID.current = loggedUser._id;
     chatID.current = chat.id;
     isGroupChat.current = chat.isGroupChat;
-    console.log(userID.current, chatID.current, isGroupChat.current);
     async function fetchMessages() {
       try {
-        if (chat.id == null) {
+        if (messages.length === 0) {
           console.error("Failed to fetch messages: Empty chat", chat.id);
           return;
         }
@@ -52,10 +51,6 @@ function Chat({
 
   async function exitChat() {
     if (!isGroupChat.current && messages.length === 0) {
-      const res = await Axios.delete(
-        `http://localhost:5000/conversations/${chat.id}`
-      );
-      console.log("conversation deleted", res.data);
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
       setChatHistory(updatedChatHistory);
       console.log("chat history", updatedChatHistory);
@@ -72,7 +67,7 @@ function Chat({
 
   async function sendMessage() {
     let conversationID;
-    if (chat.id == null) {
+    if (!isGroupChat.current && messages.length === 0) {
       try {
         const conversation = {
           members: chat.members,
@@ -82,7 +77,6 @@ function Chat({
           conversation
         );
         const data = res.data;
-        conversationID = res.data._id;
         console.log("user conversation created", data);
       } catch {
         console.error("Failed to create conversation");
@@ -101,6 +95,7 @@ function Chat({
       const data = res.data;
       console.log("message created", data);
       chat.lastMessage = data;
+      chat.lastUpdatedAt = data.createdAt;
       emptyMessage();
       setMessages([...messages, data]);
     } catch {
