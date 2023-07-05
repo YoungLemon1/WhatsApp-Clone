@@ -49,7 +49,6 @@ function Chat({
   }, [chat.id, loggedUser._id, chat.isGroupChat, messages.length]);
 
   async function exitChat() {
-    setCurrentChat(null);
     if (!isGroupChat.current && messages.length === 0) {
       const res = await Axios.delete(
         `http://localhost:5000/conversations/${chat.id}`
@@ -59,6 +58,8 @@ function Chat({
       setChatHistory(updatedChatHistory);
       console.log("chat history", updatedChatHistory);
     }
+    setCurrentChat(null);
+    console.log("exited chat");
   }
 
   function emptyMessage() {
@@ -97,6 +98,7 @@ function Chat({
       const res = await Axios.post("http://localhost:5000/messages", message);
       const data = res.data;
       console.log("message created", data);
+      chat.lastMessage = data;
       emptyMessage();
       setMessages([...messages, data]);
     } catch {
