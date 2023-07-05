@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Axios from "axios";
 import Chat from "./chat";
 import moment from "moment";
 import he from "he";
 import { Button } from "react-bootstrap";
+import { io } from "socket.io-client";
 import ChatHistory from "./chatHistory";
 
 function UserPage({ user, setUser }) {
@@ -11,6 +12,17 @@ function UserPage({ user, setUser }) {
   const [searchText, setSearchText] = useState("");
   const [currentChat, setCurrentChat] = useState(null);
   const [searchError, setSearchError] = useState("");
+  const socket = useRef(null);
+
+  useEffect(() => {
+    // Initialize the socket connection
+    socket.current = io("http://localhost:5000");
+
+    // Clean up the socket connection on component unmount
+    return () => {
+      socket.current.disconnect();
+    };
+  }, []);
 
   function dateFormat(date) {
     if (date) {
@@ -135,6 +147,7 @@ function UserPage({ user, setUser }) {
           <ChatHistory
             chatHistory={chatHistory}
             setChatHistory={setChatHistory}
+            socket={socket.current}
             loggedUserID={user._id}
             dateFormat={dateFormat}
             decodeText={decodeText}
@@ -145,6 +158,7 @@ function UserPage({ user, setUser }) {
         <Chat
           chat={currentChat}
           setCurrentChat={setCurrentChat}
+          socket={socket.current}
           loggedUser={user}
           chatHistory={chatHistory}
           setChatHistory={setChatHistory}

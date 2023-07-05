@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import Axios from "axios";
 import ScrollableFeed from "react-scrollable-feed";
-import { io } from "socket.io-client";
 
 function Chat({
   chat,
   setCurrentChat,
+  socket,
   loggedUser,
   chatHistory,
   setChatHistory,
@@ -15,7 +15,6 @@ function Chat({
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
 
-  const socket = useRef(null);
   const userID = useRef(null);
   const chatID = useRef(null);
   const isGroupChat = useRef(false);
@@ -45,6 +44,19 @@ function Chat({
 
     fetchMessages();
   }, [chat.id, loggedUser._id, chat.isGroupChat]);
+
+  useEffect(() => {
+    // Listen for the "new-message" event
+    socket.on("send-message", (message) => {
+      // Add the message to the messages list
+      // ...
+    });
+
+    // Clean up the event listener on component unmount
+    return () => {
+      socket.off("send-message");
+    };
+  }, [socket]);
 
   async function exitChat() {
     if (!isGroupChat.current && messages.length === 0) {
