@@ -142,7 +142,7 @@ messageRouter.get("/last-messages", async (req, res) => {
           room._id.equals(interaction.lastMessage.chatroom)
         );
         interactionID = chatroom._id.toString();
-        interactionWith = chatroom.name;
+        interactionWith = chatroom.title;
         imageURL = chatroom.imageURL;
       }
 

@@ -8,7 +8,7 @@ const ChatRoomSchema = new Schema({
       required: true,
     },
   ],
-  name: {
+  title: {
     type: String,
     required: true,
   },

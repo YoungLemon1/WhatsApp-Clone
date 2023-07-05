@@ -6,9 +6,9 @@ const chatRoomRouter = Router();
 
 chatRoomRouter.get("/", async (req, res) => {
   try {
-    const { chatroomName } = req.query;
+    const { chatroomTitle } = req.query;
     const chatroom = await ChatRoom.findOne({
-      name: chatroomName,
+      title: chatroomTitle,
     });
     res.status(200).json(chatroom);
   } catch (err) {
