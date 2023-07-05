@@ -8,7 +8,7 @@ import Chatroom from "../models/chatroom.js";
 import Conversation from "../models/conversation.js";
 const messageRouter = Router();
 
-messageRouter.get("/", async (req, res) => {
+messageRouter.get("/conversation", async (req, res) => {
   try {
     const { conversationID } = req.query;
     // Fetch the messages between the logged-in user and the other user
@@ -31,7 +31,7 @@ messageRouter.get("/", async (req, res) => {
   }
 });
 
-messageRouter.get("/", async (req, res) => {
+messageRouter.get("/chatroom", async (req, res) => {
   try {
     const { chatroomID } = req.query;
 

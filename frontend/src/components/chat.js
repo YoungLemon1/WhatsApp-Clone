@@ -20,6 +20,7 @@ function Chat({
   const chatID = useRef(null);
   const isGroupChat = useRef(false);
 
+  console.log("chat", chat);
   useEffect(() => {
     //socket.current = io("http://localhost:5000");
     userID.current = loggedUser._id;
@@ -32,8 +33,9 @@ function Chat({
           console.error("Failed to fetch messages: Empty chat", chat.id);
           return;
         }
+        const chatType = isGroupChat.current ? "chatroom" : "conversation";
         const res = await Axios.get(
-          `http://localhost:5000/messages?${chat.id}`
+          `http://localhost:5000/messages?/${chatType}/${chat.id}`
         );
         const data = res.data;
         setMessages(data);
@@ -113,7 +115,9 @@ function Chat({
           src={chat.imageURL}
           alt="chat profile"
         ></img>
-        <h4 className="chat-name">{chat.title ?? "Error: undefined chat"}</h4>
+        <h4 className="chat-name">
+          {chat.interactedWith ?? "Error: undefined chat"}
+        </h4>
       </div>
       <div className="chat-body">
         <ScrollableFeed>
