@@ -9,7 +9,6 @@ function Chat({
   loggedUser,
   chatHistory,
   setChatHistory,
-  setSearchText,
   dateFormat,
 }) {
   const [messages, setMessages] = useState([]);
@@ -49,11 +48,13 @@ function Chat({
     fetchMessages();
   }, [chat.id, loggedUser._id, chat.isGroupChat, messages.length]);
 
-  function exitChat() {
+  async function exitChat() {
     setCurrentChat(null);
-    setSearchText("");
-    if (chat.id == null && messages.length === 0) {
-      console.log("chat history", chatHistory);
+    if (!isGroupChat.current && messages.length === 0) {
+      const res = await Axios.delete(
+        `http://localhost:5000/conversations/${chat.id}`
+      );
+      console.log("conversation deleted", res.data);
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
       setChatHistory(updatedChatHistory);
       console.log("chat history", updatedChatHistory);
@@ -115,9 +116,7 @@ function Chat({
           src={chat.imageURL}
           alt="chat profile"
         ></img>
-        <h4 className="chat-name">
-          {chat.interactedWith ?? "Error: undefined chat"}
-        </h4>
+        <h4 className="chat-name">{chat.title ?? "Error: undefined chat"}</h4>
       </div>
       <div className="chat-body">
         <ScrollableFeed>

@@ -59,9 +59,21 @@ function UserPage({ user, setUser }) {
     console.log("group data", chatroomData);
 
     if (userData) {
+      const members = [user._id, userData._id];
+      const coversation = {
+        members: members,
+      };
+      const res = await Axios.post(
+        "http://localhost:5000/conversations",
+        coversation
+      );
+      console.log(
+        `conversation created with ${user.username} and ${userData.username}`,
+        res.data
+      );
       const userChat = {
-        id: null,
-        members: [user._id, userData._id],
+        id: res.data._id.toString(),
+        members: members,
         title: userData.username,
         imageURL: userData.imageURL,
         isGroupChat: false,
@@ -82,6 +94,7 @@ function UserPage({ user, setUser }) {
   }
 
   function enterChat(chat) {
+    setSearchText("");
     setCurrentChat(chat);
   }
 
@@ -133,7 +146,6 @@ function UserPage({ user, setUser }) {
           loggedUser={user}
           chatHistory={chatHistory}
           setChatHistory={setChatHistory}
-          setSearchText={setSearchText}
           dateFormat={dateFormat}
         ></Chat>
       )}

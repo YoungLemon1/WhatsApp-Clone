@@ -95,7 +95,13 @@ messageRouter.get("/last-messages", async (req, res) => {
       // Group messages by the other user or chatroom
       {
         $group: {
-          _id: "$conversation",
+          _id: {
+            $cond: [
+              { $eq: ["$chatroom", undefined] },
+              "$chatroom",
+              "$conversation",
+            ],
+          },
           lastMessage: { $last: "$$ROOT" },
         },
       },
@@ -112,8 +118,8 @@ messageRouter.get("/last-messages", async (req, res) => {
     console.log("last messages", userInteractions);
 
     // Create the final chat history array
+    console.log("user interactions", userInteractions);
     const chatHistory = userInteractions.map((interaction) => {
-      console.log("last interaction", interaction);
       const lastMessage = interaction.lastMessage;
       const isGroupChat = lastMessage.chatroom !== undefined;
       let interactionID = null;
@@ -126,7 +132,7 @@ messageRouter.get("/last-messages", async (req, res) => {
         const otherUser = conversation.members.find(
           (member) => member._id.toString() != userID
         );
-        console.log(otherUser);
+        console.log("other user", otherUser);
         interactionID = conversation._id.toString();
 
         interactedWith = otherUser.username;
@@ -241,6 +247,25 @@ messageRouter.patch("/", async (req, res) => {
     console.error(err.stack);
     res.status(500).json({
       error: "Internal server error: Failed to update messages",
+    });
+  }
+});
+
+messageRouter.delete("/", async (req, res) => {
+  try {
+    const deletedMessages = await Message.deleteMany({});
+    if (!deletedMessages) {
+      return res.status(400).json({
+        error: "no messages exist",
+      });
+    }
+    resres.status(200).json({
+      success: "message deleted successfully",
+    });
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: failed to delete message",
     });
   }
 });
