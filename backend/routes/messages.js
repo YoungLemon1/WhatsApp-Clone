@@ -205,9 +205,15 @@ messageRouter.post(
   createMessageValidationRules,
   validate,
   async (req, res) => {
-    const { sender, conversation, chatroom, message, createdAt } = req.body;
+    const { sender, conversation, chatroom, message } = req.body;
     try {
-      const newMessage = new Message(req.body);
+      const newMessage = new Message({
+        sender,
+        conversation,
+        chatroom,
+        message,
+        createdAt: Date.now(),
+      });
       await newMessage.save();
 
       res.status(201).json(newMessage);
