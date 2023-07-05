@@ -74,24 +74,11 @@ messageRouter.get("/last-messages", async (req, res) => {
       members: { $in: [userID] },
     }).populate("members");
     console.log("conversations", userConversations);
+
     const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
     console.log("chatrooms", userChatrooms);
 
-    const userMap = {};
-    userConversations.forEach((conversation) => {
-      conversation.members.forEach((member) => {
-        if (!userMap[member._id]) {
-          userMap[member._id] = {
-            username: member.username,
-            imageURL: member.imageURL,
-          };
-        }
-      });
-    });
-
-    console.log("user conversations", userConversations);
-
-    const lastMessages = await Message.aggregate([
+    const userInteractions = await Message.aggregate([
       // Match messages for the user where recipient or sender is the user
       {
         $match: {
@@ -110,9 +97,7 @@ messageRouter.get("/last-messages", async (req, res) => {
       // Group messages by the other user or chatroom
       {
         $group: {
-          _id: {
-            $cond: [{ $eq: ["$chatroom", null] }, "$conversation", "$chatroom"],
-          },
+          _id: "$conversation",
           lastMessage: { $last: "$$ROOT" },
         },
       },
@@ -126,30 +111,31 @@ messageRouter.get("/last-messages", async (req, res) => {
       },
     ]);
 
-    console.log("last messages", lastMessages);
+    console.log("last messages", userInteractions);
 
     // Create the final chat history array
-    const chatHistory = lastMessages.map((message) => {
-      const lastMessage = message.lastMessage;
-      const isGroupChat = lastMessage.chatroom !== null;
-
+    const chatHistory = userInteractions.map((interaction) => {
+      console.log("last interaction", interaction);
+      const lastMessage = interaction.lastMessage;
+      const isGroupChat = lastMessage.chatroom !== undefined;
       let interactionID = null;
       let interactedWith = null;
       let imageURL = null;
-
       if (!isGroupChat) {
         const conversation = userConversations.find((conversation) =>
-          conversation?._id.equals(message.conversation)
+          conversation._id.equals(interaction.lastMessage.conversation)
         );
-        const otherUser = userMap.get(
-          conversation.members.find((member) => !member._id.equals(userID))
+        const otherUser = conversation.members.find(
+          (member) => member._id.toString() != userID
         );
+        console.log(otherUser);
         interactionID = conversation._id.toString();
+
         interactedWith = otherUser.username;
         imageURL = otherUser.imageURL;
       } else {
         const chatroom = userChatrooms.find((room) =>
-          room?._id.equals(message.chatroom)
+          room._id.equals(interaction.lastMessage.chatroom)
         );
         interactionID = chatroom._id.toString();
         interactedWith = chatroom.name;
