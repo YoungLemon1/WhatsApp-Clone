@@ -25,22 +25,6 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log(`Connected to MongoDB`);
-    console.log(`Connected to database: ${mongoose.connection.name}`);
-  })
-  .catch((err) => {
-    console.error("Error connecting to Mongo", err);
-  });
-
-//routers
-app.use("/users", userRouter);
-app.use("/messages", messageRouter);
-app.use("/chatrooms", chatroomRouter);
-app.use("/conversations", conversationRouter);
-
 io.on("connection", (socket) => {
   console.log(socket.id + " connected");
 
@@ -59,6 +43,22 @@ io.on("connection", (socket) => {
     console.log(socket.id + " disconnected");
   });
 });
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log(`Connected to MongoDB`);
+    console.log(`Connected to database: ${mongoose.connection.name}`);
+  })
+  .catch((err) => {
+    console.error("Error connecting to Mongo", err);
+  });
+
+//routers
+app.use("/users", userRouter);
+app.use("/messages", messageRouter);
+app.use("/chatrooms", chatroomRouter);
+app.use("/conversations", conversationRouter);
 
 // API routes
 /*app.use("/api/auth", require("./routes/auth"));
