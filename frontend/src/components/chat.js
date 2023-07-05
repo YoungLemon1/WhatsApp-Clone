@@ -47,14 +47,14 @@ function Chat({
 
   useEffect(() => {
     // Listen for the "new-message" event
-    socket.on("send-message", (message) => {
+    socket.on("send_message", (message) => {
       // Add the message to the messages list
       // ...
     });
 
     // Clean up the event listener on component unmount
     return () => {
-      socket.off("send-message");
+      socket.off("send_message");
     };
   }, [socket]);
 
