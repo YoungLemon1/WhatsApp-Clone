@@ -10,6 +10,7 @@ function Chat({
   chatHistory,
   setChatHistory,
   dateFormat,
+  decodeText,
 }) {
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
@@ -129,7 +130,7 @@ function Chat({
                       : "other-user"
                   }`}
                 >
-                  <p>{message.message}</p>
+                  <p dangerouslySetInnerHTML={{ __html: message.message }}></p>
                   <small>{dateFormat(message.createdAt)}</small>
                 </div>
               </div>

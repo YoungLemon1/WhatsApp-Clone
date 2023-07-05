@@ -149,6 +149,7 @@ function UserPage({ user, setUser }) {
           chatHistory={chatHistory}
           setChatHistory={setChatHistory}
           dateFormat={dateFormat}
+          decodeText={decodeText}
         ></Chat>
       )}
       <div />

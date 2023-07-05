@@ -7,6 +7,7 @@ function ChatHistory({
   setChatHistory,
   loggedUserID,
   dateFormat,
+  decodeText,
   enterChat,
 }) {
   useEffect(() => {
@@ -46,10 +47,11 @@ function ChatHistory({
                 <h4>{interaction.title}</h4>
               </div>
               <div id="last-message">
-                <p>
-                  {sender}
-                  {lastMessage.message}
-                </p>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: `${sender} ${lastMessage.message}`,
+                  }}
+                ></p>
                 <small>{dateFormat(lastMessage.createdAt)}</small>
               </div>
               <hr></hr>
