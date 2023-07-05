@@ -1,9 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import validate from "./validation/valdiate.js";
-import mongoose from "mongoose";
 import Message from "../models/message.js";
-import User from "../models/user.js";
 import Chatroom from "../models/chatroom.js";
 import Conversation from "../models/conversation.js";
 const messageRouter = Router();
