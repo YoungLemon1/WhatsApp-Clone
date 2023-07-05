@@ -123,7 +123,7 @@ messageRouter.get("/last-messages", async (req, res) => {
       const lastMessage = interaction.lastMessage;
       const isGroupChat = lastMessage.chatroom !== undefined;
       let interactionID = null;
-      let interactedWith = null;
+      let interactionWith = null;
       let imageURL = null;
       if (!isGroupChat) {
         const conversation = userConversations.find((conversation) =>
@@ -135,20 +135,20 @@ messageRouter.get("/last-messages", async (req, res) => {
         console.log("other user", otherUser);
         interactionID = conversation._id.toString();
 
-        interactedWith = otherUser.username;
+        interactionWith = otherUser.username;
         imageURL = otherUser.imageURL;
       } else {
         const chatroom = userChatrooms.find((room) =>
           room._id.equals(interaction.lastMessage.chatroom)
         );
         interactionID = chatroom._id.toString();
-        interactedWith = chatroom.name;
+        interactionWith = chatroom.name;
         imageURL = chatroom.imageURL;
       }
 
       return {
         id: interactionID,
-        interactedWith,
+        title: interactionWith,
         imageURL,
         lastMessage: {
           id: lastMessage._id,

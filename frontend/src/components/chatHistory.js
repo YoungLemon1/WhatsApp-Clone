@@ -41,7 +41,7 @@ function ChatHistory({
                 <img
                   className="profile-img"
                   src={interaction.imageURL}
-                  alt={`${interaction.interactedWith} profile`}
+                  alt={`${interaction.title} profile`}
                 ></img>
                 <h4>{interaction.interactedWith}</h4>
               </div>
