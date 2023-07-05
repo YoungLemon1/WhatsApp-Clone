@@ -59,6 +59,7 @@ io.on("connection", (socket) => {
     console.log(socket.id + " disconnected");
   });
 });
+
 // API routes
 /*app.use("/api/auth", require("./routes/auth"));
 app.use("/api/users", require("./routes/users"));
