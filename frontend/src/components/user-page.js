@@ -95,28 +95,32 @@ function UserPage({ user, setUser }) {
             </Button>
           </div>
           <div id="loged-user-username"></div>
-          <div id="chat-search">
-            <input
-              id="chat-search-bar"
-              onChange={(event) => {
-                setSearchText(event.target.value);
-                setSearchError("");
-              }}
-              onKeyDown={(event) => {
-                event.key === "Enter" && tryEnterChatroom();
-              }}
-              placeholder="Chat with a user or a group"
-            ></input>
-            <button
-              className="submit-btn"
-              disabled={searchText === ""}
-              onClick={tryEnterChatroom}
-            >
-              Enter Chat
-            </button>
-            <div>{searchError}</div>
+          <div className="chat-search">
+            <div>
+              <input
+                id="chat-search-bar"
+                onChange={(event) => {
+                  setSearchText(event.target.value);
+                  setSearchError("");
+                }}
+                onKeyDown={(event) => {
+                  event.key === "Enter" && tryEnterChatroom();
+                }}
+                placeholder="Chat with a user or a group"
+              ></input>
+              <button
+                className="submit-btn"
+                disabled={searchText === ""}
+                onClick={tryEnterChatroom}
+              >
+                Enter Chat
+              </button>
+            </div>
+            <div className="search-error">{searchError}</div>
           </div>
           <ChatHistory
+            chatHistory={chatHistory}
+            setChatHistory={setChatHistory}
             loggedUserID={user._id}
             dateFormat={dateFormat}
             enterChat={enterChat}
