@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Axios from "axios";
 import ScrollableFeed from "react-scrollable-feed";
 
-function ChatHistory({ loggedUserID, dateFormat, enterChat }) {
-  const [userInteractions, setUserInteractions] = useState([]);
+function ChatHistory({
+  chatHistory,
+  setChatHistory,
+  loggedUserID,
+  dateFormat,
+  enterChat,
+}) {
   useEffect(() => {
     async function fetchData() {
       try {
@@ -11,20 +16,21 @@ function ChatHistory({ loggedUserID, dateFormat, enterChat }) {
           `http://localhost:5000/messages/last-messages?userID=${loggedUserID}`
         );
         const data = res.data;
-        setUserInteractions(data);
+        setChatHistory(data);
         console.log("successfully fetched user chat history", data);
       } catch (error) {
         console.error("Failed to fetch user chat history", error);
       }
     }
     fetchData();
-  }, [loggedUserID]);
+  }, [loggedUserID, setChatHistory]);
   return (
     <div id="chat-history">
       <ScrollableFeed>
-        {userInteractions.map((interaction) => {
+        {chatHistory.map((interaction) => {
           const sender =
             interaction.lastMessage.sender === loggedUserID ? "You: " : "";
+          const lastMessage = interaction.lastMessage;
           return (
             <div
               className="chat-history-item"
@@ -37,14 +43,14 @@ function ChatHistory({ loggedUserID, dateFormat, enterChat }) {
                   src={interaction.imageURL}
                   alt={`${interaction.interactedWith} profile`}
                 ></img>
-                <h4>{interaction.name}</h4>
+                <h4>{interaction.interactedWith}</h4>
               </div>
               <div id="last-message">
                 <p>
                   {sender}
-                  {interaction.lastMessage.message}
+                  {lastMessage.message}
                 </p>
-                <small>{dateFormat(interaction.lastMessage.createdAt)}</small>
+                <small>{dateFormat(lastMessage.createdAt)}</small>
               </div>
               <hr></hr>
             </div>
