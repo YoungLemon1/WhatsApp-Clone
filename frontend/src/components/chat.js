@@ -27,10 +27,6 @@ function Chat({
     isGroupChat.current = chat.isGroupChat;
     async function fetchMessages() {
       try {
-        if (messages.length === 0) {
-          console.error("Failed to fetch messages: Empty chat", chat.id);
-          return;
-        }
         const queryParams = isGroupChat.current
           ? `chatroom/?chatroomID=${chat.id}`
           : `conversation/?conversationID=${chat.id}`;
@@ -47,7 +43,7 @@ function Chat({
     }
 
     fetchMessages();
-  }, [chat.id, loggedUser._id, chat.isGroupChat, messages.length]);
+  }, [chat.id, loggedUser._id, chat.isGroupChat]);
 
   async function exitChat() {
     if (!isGroupChat.current && messages.length === 0) {

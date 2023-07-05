@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Axios from "axios";
 import Chat from "./chat";
 import moment from "moment";
+import he from "he";
 import { Button } from "react-bootstrap";
 import ChatHistory from "./chatHistory";
 
@@ -15,6 +16,10 @@ function UserPage({ user, setUser }) {
     if (date) {
       return moment(date).format("HH:mm");
     } else return "";
+  }
+
+  function decodeText(text) {
+    he.decode(text);
   }
 
   function logout() {
@@ -132,6 +137,7 @@ function UserPage({ user, setUser }) {
             setChatHistory={setChatHistory}
             loggedUserID={user._id}
             dateFormat={dateFormat}
+            decodeText={decodeText}
             enterChat={enterChat}
           ></ChatHistory>
         </div>
