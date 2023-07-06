@@ -47,11 +47,9 @@ function ChatHistory({
                 <h4>{interaction.title}</h4>
               </div>
               <div id="last-message">
-                <p
-                  dangerouslySetInnerHTML={{
-                    __html: `${sender} ${lastMessage.message}`,
-                  }}
-                ></p>
+                <p>
+                  {sender} {lastMessage.message}
+                </p>
                 <small>{dateFormat(lastMessage.createdAt)}</small>
               </div>
               <hr></hr>

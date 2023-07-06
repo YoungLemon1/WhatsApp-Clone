@@ -22,7 +22,7 @@ function UserPage({ user, setUser }) {
     return () => {
       socket.current.disconnect();
     };
-  }, []);
+  }, [user]);
 
   function dateFormat(date) {
     if (date) {

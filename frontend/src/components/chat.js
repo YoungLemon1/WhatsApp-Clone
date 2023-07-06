@@ -140,7 +140,7 @@ function Chat({
                       : "other-user"
                   }`}
                 >
-                  <p dangerouslySetInnerHTML={{ __html: message.message }}></p>
+                  <p>{message.message}</p>
                   <small>{dateFormat(message.createdAt)}</small>
                 </div>
               </div>

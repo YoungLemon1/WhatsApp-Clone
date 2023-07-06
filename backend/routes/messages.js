@@ -181,12 +181,8 @@ messageRouter.get("/:id", async (req, res) => {
 });
 
 const createMessageValidationRules = [
-  body("sender").notEmpty().withMessage("Sender is required").trim().escape(),
-  body("message")
-    .notEmpty()
-    .withMessage("Cannot send empty messages")
-    .trim()
-    .escape(),
+  body("sender").notEmpty().withMessage("Sender is required").trim(),
+  body("message").notEmpty().withMessage("Cannot send empty messages").trim(),
   body("createdAt").optional().isDate().withMessage("Invalid date"),
   body().custom((value, { req }) => {
     const { conversation, chatroom } = req.body;
