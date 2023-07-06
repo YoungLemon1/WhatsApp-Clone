@@ -1,53 +1,43 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import validate from "./validation/valdiate.js";
+import mongoose from "mongoose";
 import Message from "../models/message.js";
 import Chatroom from "../models/chatroom.js";
 import Conversation from "../models/conversation.js";
 const messageRouter = Router();
 
-messageRouter.get("/conversation", async (req, res) => {
+messageRouter.get("/", async (req, res) => {
   try {
-    const { conversationID } = req.query;
+    const { chatId } = req.query;
+
+    let messages;
+    let members;
     // Fetch the messages between the logged-in user and the other user
-    let messages = await Message.find({
-      conversation: conversationID,
-    });
+    const conversation = await Conversation.findById(chatId);
+    const chatroomm = await Chatroom.findById(chatId);
+    console.log(chatroomm);
 
-    if (messages.length > 1) {
-      messages = messages.sort((a, b) => a.createdAt - b.createdAt);
+    if (conversation) {
+      members = conversation.members;
+      messages = await Message.find({
+        conversation: new mongoose.Types.ObjectId(chatId),
+      }).sort({ createdAt: 1 });
+    } else if (chatroomm) {
+      members = chatroomm.members;
+      messages = await Message.find({
+        chatroom: new mongoose.Types.ObjectId(chatId),
+      }).sort({ createdAt: 1 });
+    } else {
+      res.status(400).json({ error: "Invalid chat id" });
     }
-
-    const conversation = await Conversation.findById(conversationID);
 
     // Retrieve the user objects for the logged-in user and the other user
-    res.status(200).json({ messages, members: conversation.members });
+    res.status(200).json({ messages, members });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
-      error: "Internal server error: Failure fetching user-to-user messages",
-    });
-  }
-});
-
-messageRouter.get("/chatroom", async (req, res) => {
-  try {
-    const { chatroomID } = req.query;
-
-    // Fetch the messages inside the chatroom
-    let messages = await Message.find({
-      chatroom: chatroomID,
-    });
-
-    if (messages.length > 1) {
-      messages = messages.sort((a, b) => a.createdAt - b.createdAt);
-    }
-
-    res.status(200).json(messages);
-  } catch (err) {
-    console.error(err.stack);
-    res.status(500).json({
-      error: "Internal server error: Failure fetching chatroom messages",
+      error: "Internal server error: Failure fetching chat messages",
     });
   }
 });

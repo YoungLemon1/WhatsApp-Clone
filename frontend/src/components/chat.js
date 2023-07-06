@@ -34,17 +34,14 @@ function Chat({
   useEffect(() => {
     userID.current = loggedUser._id;
     chatID.current = chat.id;
-    isGroupChat.current = chat.isGroupChat;
     async function fetchMessages() {
       if (chat.newChat) return;
       try {
-        const queryParams = isGroupChat.current
-          ? `chatroom/?chatroomID=${chat.id}`
-          : `conversation/?conversationID=${chat.id}`;
         const res = await Axios.get(
-          `http://localhost:5000/messages/${queryParams}`
+          `http://localhost:5000/messages?chatId=${chat.id}`
         );
         const data = res.data;
+        isGroupChat.current = data.isGroupChat;
         chat.members = data.members;
         setMessages(data.messages);
         console.log(chat.members);

@@ -13,7 +13,7 @@ function ChatHistory({
   useEffect(() => {
     if (!socket) return;
 
-    const fetchUser = async (conversationId) => {
+    const fetchConversation = async (conversationId) => {
       try {
         const res = await Axios.get(
           `http://localhost:5000/conversations/${conversationId}`
@@ -63,7 +63,7 @@ function ChatHistory({
       } else {
         const fetchChatData =
           collection === "conversations"
-            ? fetchUser(conversation)
+            ? fetchConversation(conversation)
             : fetchChatroom(chatroom);
 
         fetchChatData.then((chatData) => {
