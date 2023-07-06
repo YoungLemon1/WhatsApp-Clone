@@ -25,6 +25,18 @@ function ChatHistory({
     }
     fetchData();
   }, [loggedUserID, setChatHistory]);
+
+  useEffect(() => {
+    // Add the event listener for receiving messages
+    socket.on("receive_message", (data) => {
+      // * update chat history *
+    });
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      socket.off("receive_message");
+    };
+  }, [socket]);
   return (
     <div id="chat-history">
       <ScrollableFeed>
