@@ -62,6 +62,7 @@ function Chat({
       setChatHistory(updatedChatHistory);
       console.log("chat history", updatedChatHistory);
     }
+    socket.emit("leave_room", chatID.current);
     setCurrentChat(null);
     console.log("exited chat");
   }
