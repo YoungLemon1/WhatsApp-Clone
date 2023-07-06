@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import Axios from "axios";
 import Chat from "./chat";
 import moment from "moment";
-import he from "he";
 import { Button } from "react-bootstrap";
 import { io } from "socket.io-client";
 import ChatHistory from "./chatHistory";
