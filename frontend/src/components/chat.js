@@ -22,15 +22,14 @@ function Chat({
   console.log("chat", chat);
 
   useEffect(() => {
-    // Listen for the "new-message" event
-    socket.on("send_message", (message) => {
-      // Add the message to the messages list
-      // ...
+    // Add the event listener for receiving messages
+    socket.on("receive_message", (data) => {
+      setMessages([...messages, data]);
     });
 
-    // Clean up the event listener on component unmount
+    // Clean up the event listener when the component unmounts
     return () => {
-      socket.off("send_message");
+      socket.off("receive_message");
     };
   }, [socket]);
 
@@ -109,6 +108,7 @@ function Chat({
       chat.lastUpdatedAt = data.createdAt;
       emptyMessage();
       setMessages([...messages, data]);
+      socket.emit("send_message", data, chatID.current);
     } catch {
       console.error("Failed to send message");
     }
