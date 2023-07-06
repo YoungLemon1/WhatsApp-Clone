@@ -8,6 +8,7 @@ import userRouter from "./routes/users.js";
 import messageRouter from "./routes/messages.js";
 import chatroomRouter from "./routes/chatrooms.js";
 import conversationRouter from "./routes/conversation.js";
+import { log } from "console";
 
 configDotenv();
 
@@ -25,8 +26,16 @@ const io = new Server(server, {
   },
 });
 
+const usersSockets = {};
+
 io.on("connection", (socket) => {
-  console.log("socket id " + socket.id + " connected");
+  console.log(`socket id ${socket.id} connected`);
+
+  socket.on("user_connected", (userId) => {
+    console.log("user connected", userId);
+    usersSockets[userId] = socket.id;
+    console.log("user sokcets", usersSockets);
+  });
 
   socket.on("join_room", (data) => {
     socket.join(data);
@@ -36,14 +45,24 @@ io.on("connection", (socket) => {
     socket.leave(data);
     console.log(`user ${socket.id} left room ${data}`);
   });
-  socket.on("send_message", (data, room) => {
-    socket.to(room).emit("receive_message", data);
+  socket.on("send_message", (data, recipients) => {
+    const recipientSockets = recipients.map(
+      (recipient) => usersSockets[recipient]
+    );
+    recipientSockets.forEach((recipient) => {
+      socket.to(recipient).emit("receive_message", data);
+    });
   });
   socket.on("disconnect", () => {
-    console.log(socket.id + " disconnected");
+    console.log(`socket id ${socket.id} disconnected`);
+
+    const userId = Object.keys(usersSockets).find(
+      (key) => usersSockets[key] === socket.id
+    );
+    if (userId) {
+      delete usersSockets[userId];
+    }
   });
-  socket.on("user_connected", (data) => console.log("user connected", data));
-  socket.on("test", (data) => console.log(data));
 });
 
 mongoose

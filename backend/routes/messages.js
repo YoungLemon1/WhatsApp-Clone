@@ -18,9 +18,10 @@ messageRouter.get("/conversation", async (req, res) => {
       messages = messages.sort((a, b) => a.createdAt - b.createdAt);
     }
 
-    // Retrieve the user objects for the logged-in user and the other user
+    const conversation = await Conversation.findById(conversationID);
 
-    res.status(200).json(messages);
+    // Retrieve the user objects for the logged-in user and the other user
+    res.status(200).json({ messages, members: conversation.members });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({

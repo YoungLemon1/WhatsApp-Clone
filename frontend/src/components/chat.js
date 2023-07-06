@@ -18,11 +18,10 @@ function Chat({
   const chatID = useRef(null);
   const isGroupChat = useRef(false);
 
-  console.log("chat", chat);
-
   useEffect(() => {
     // Add the event listener for receiving messages
     socket.on("receive_message", (data) => {
+      console.log("meesage received");
       setMessages([...messages, data]);
     });
 
@@ -30,13 +29,14 @@ function Chat({
     return () => {
       socket.off("receive_message");
     };
-  }, [socket, messages]);
+  }, [socket, chat.members, messages]);
 
   useEffect(() => {
     userID.current = loggedUser._id;
     chatID.current = chat.id;
     isGroupChat.current = chat.isGroupChat;
     async function fetchMessages() {
+      if (chat.newChat) return;
       try {
         const queryParams = isGroupChat.current
           ? `chatroom/?chatroomID=${chat.id}`
@@ -45,21 +45,24 @@ function Chat({
           `http://localhost:5000/messages/${queryParams}`
         );
         const data = res.data;
-        setMessages(data);
+        chat.members = data.members;
+        setMessages(data.messages);
+        console.log(chat.members);
       } catch (error) {
         console.error("Failed to fetch messages", error);
       }
     }
 
     fetchMessages();
-  }, [chat.id, loggedUser._id, chat.isGroupChat]);
+  }, [chat, loggedUser._id, chat.isGroupChat]);
 
   async function exitChat() {
     if (!isGroupChat.current && messages.length === 0) {
+      delete chat.members;
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
       setChatHistory(updatedChatHistory);
       console.log("chat history", updatedChatHistory);
-    }
+    } else if (chat.newChat) delete chat.newChat;
     socket.emit("leave_room", chatID.current);
     setCurrentChat(null);
     console.log("exited chat");
@@ -107,13 +110,13 @@ function Chat({
       chat.lastUpdatedAt = data.createdAt;
       emptyMessage();
       setMessages([...messages, data]);
-      socket.emit("send_message", data, chatID.current);
+      const recipients = chat.members;
+      console.log("message recepients", recipients);
+      socket.emit("send_message", data, recipients);
     } catch {
       console.error("Failed to send message");
     }
   }
-
-  console.log(chat);
   return (
     <div className="chat-window">
       <div className="chat-header">

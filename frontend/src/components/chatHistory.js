@@ -11,16 +11,86 @@ function ChatHistory({
   enterChat,
 }) {
   useEffect(() => {
-    if (socket) {
-      // Add the event listener for receiving messages
-      socket.on("receive_message", (data) => {});
+    if (!socket) return;
 
-      // Clean up the event listener when the component unmounts
-      return () => {
-        socket.off("receive_message");
-      };
-    }
-  }, [socket]);
+    const fetchUser = async (conversationId) => {
+      try {
+        const res = await Axios.get(
+          `http://localhost:5000/conversations/${conversationId}`
+        );
+        return res.data;
+      } catch (error) {
+        console.log("Failed to fetch user", error);
+      }
+    };
+
+    const fetchChatroom = async (chatroomId) => {
+      try {
+        const res = await Axios.get(
+          `http://localhost:5000/chatrooms/${chatroomId}`
+        );
+        return res.data;
+      } catch (error) {
+        console.log("Failed to fetch chatroom", error);
+      }
+    };
+
+    const handleMessageReceived = (data) => {
+      const { conversation, chatroom, ...messageData } = data;
+
+      const chatId = conversation || chatroom;
+      const collection = conversation ? "conversations" : "chatrooms";
+
+      const chatExists = chatHistory.some((chat) => chat.id === chatId);
+
+      if (chatExists) {
+        setChatHistory((prevChatHistory) => {
+          return prevChatHistory.map((chat) => {
+            if (chat.id === chatId) {
+              return {
+                ...chat,
+                lastMessage: {
+                  id: data._id.toString(),
+                  sender: messageData.sender,
+                  message: messageData.message,
+                  createdAt: messageData.createdAt,
+                },
+              };
+            }
+            return chat;
+          });
+        });
+      } else {
+        const fetchChatData =
+          collection === "conversations"
+            ? fetchUser(conversation)
+            : fetchChatroom(chatroom);
+
+        fetchChatData.then((chatData) => {
+          const newChat = {
+            id: chatId,
+            title: chatData.username || chatData.title,
+            imageURL: chatData.imageURL,
+            lastMessage: {
+              id: data._id.toString(),
+              sender: messageData.sender,
+              message: messageData.message,
+              createdAt: messageData.createdAt,
+            },
+          };
+          setChatHistory((prevChatHistory) => [newChat, ...prevChatHistory]);
+        });
+      }
+    };
+
+    // Add the event listener for receiving messages
+    socket.on("receive_message", handleMessageReceived);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      socket.off("receive_message", handleMessageReceived);
+    };
+  }, [socket, chatHistory, setChatHistory]);
 
   useEffect(() => {
     async function fetchData() {
@@ -41,23 +111,23 @@ function ChatHistory({
   return (
     <div id="chat-history">
       <ScrollableFeed>
-        {chatHistory.map((interaction) => {
+        {chatHistory.map((chat) => {
           const sender =
-            interaction.lastMessage.sender === loggedUserID ? "You: " : "";
-          const lastMessage = interaction.lastMessage;
+            chat.lastMessage.sender === loggedUserID ? "You: " : "";
+          const lastMessage = chat.lastMessage;
           return (
             <div
               className="chat-history-item"
-              key={interaction.id}
-              onClick={() => enterChat(interaction)}
+              key={chat.id}
+              onClick={() => enterChat(chat)}
             >
               <div id="conversation-details">
                 <img
                   className="profile-img"
-                  src={interaction.imageURL}
-                  alt={`${interaction.title} profile`}
+                  src={chat.imageURL}
+                  alt={`${chat.title} profile`}
                 ></img>
-                <h4>{interaction.title}</h4>
+                <h4>{chat.title}</h4>
               </div>
               <div id="last-message">
                 <p>

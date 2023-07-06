@@ -16,12 +16,16 @@ function UserPage({ user, setUser }) {
   useEffect(() => {
     // Initialize the socket connection
     socket.current = io("http://localhost:5000");
-    socket.current.emit("user_connected", user);
     // Clean up the socket connection on component unmount
     return () => {
       socket.current.disconnect();
     };
-  }, [user]);
+  }, []);
+
+  useEffect(() => {
+    const userId = user._id.toString();
+    socket.current.emit("user_connected", userId);
+  }, [user._id]);
 
   function dateFormat(date) {
     if (date) {
@@ -85,6 +89,7 @@ function UserPage({ user, setUser }) {
         title: userData.username,
         imageURL: userData.imageURL,
         isGroupChat: false,
+        newChat: true,
       };
       setChatHistory([...chatHistory, userChat]);
       enterChat(userChat);
