@@ -66,15 +66,15 @@ messageRouter.get("/", async (req, res) => {
 messageRouter.get("/last-messages", async (req, res) => {
   try {
     const { userID } = req.query;
-    console.log("user id", userID);
+    //console.log("user id", userID);
 
     const userConversations = await Conversation.find({
       members: { $in: [userID] },
     }).populate("members");
-    console.log("conversations", userConversations);
+    //console.log("conversations", userConversations);
 
     const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
-    console.log("chatrooms", userChatrooms);
+    //console.log("chatrooms", userChatrooms);
 
     const userInteractions = await Message.aggregate([
       // Match messages for the user where recipient or sender is the user
@@ -115,10 +115,10 @@ messageRouter.get("/last-messages", async (req, res) => {
       },
     ]);
 
-    console.log("last messages", userInteractions);
+    //console.log("last messages", userInteractions);
 
     // Create the final chat history array
-    console.log("user interactions", userInteractions);
+    //console.log("user interactions", userInteractions);
     const chatHistory = userInteractions.map((interaction) => {
       const lastMessage = interaction.lastMessage;
       const isGroupChat = lastMessage.chatroom !== undefined;
@@ -132,7 +132,6 @@ messageRouter.get("/last-messages", async (req, res) => {
         const otherUser = conversation.members.find(
           (member) => member._id.toString() != userID
         );
-        console.log("other user", otherUser);
         interactionID = conversation._id.toString();
 
         interactionWith = otherUser.username;
