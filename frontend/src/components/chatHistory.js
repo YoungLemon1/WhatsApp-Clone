@@ -20,7 +20,7 @@ function ChatHistory({
         );
         return res.data;
       } catch (error) {
-        console.log("Failed to fetch user", error);
+        console.log("Failed to fetch conversation", error);
       }
     };
 

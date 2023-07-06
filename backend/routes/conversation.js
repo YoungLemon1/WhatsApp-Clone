@@ -8,12 +8,12 @@ const conversationRouter = Router();
 conversationRouter.get("/", async (req, res) => {
   try {
     const { username } = req.query;
-    const otherUser = await User.findOne({ username: username });
-    if (!otherUser) {
+    const user = await User.findOne({ username: username });
+    if (!user) {
       return res.status(400).json({ error: "Invalid username" });
     }
     const conversation = await Conversation.findOne({
-      $in: { members: otherUser._id },
+      $in: { members: user._id },
     });
     res.status(200).json(conversation);
   } catch (err) {
@@ -40,6 +40,19 @@ conversationRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const conversation = await Conversation.findById(id);
+    res.status(200).json(conversation);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching coversations",
+    });
+  }
+});
+
+conversationRouter.get("/add-members/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const conversation = await Conversation.findById(id).populate("members");
     res.status(200).json(conversation);
   } catch (err) {
     console.error(err.stack);
