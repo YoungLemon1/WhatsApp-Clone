@@ -31,7 +31,7 @@ function Chat({
     return () => {
       socket.off("receive_message");
     };
-  }, [socket]);
+  }, [socket, messages]);
 
   useEffect(() => {
     userID.current = loggedUser._id;
