@@ -89,14 +89,13 @@ function Chat({
         console.error("Failed to create conversation", error);
       }
     }
+    console.log(isGroupChat.current);
     const message = {
       sender: userID.current,
       message: messageContent,
       ...(isGroupChat.current
         ? { chatroom: chatID.current }
-        : {
-            conversation: conversationID ? conversationID : chatID.current,
-          }),
+        : { conversation: conversationID ? conversationID : chatID.current }),
     };
     console.log("message payload", message);
     try {

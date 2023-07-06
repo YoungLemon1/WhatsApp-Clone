@@ -11,19 +11,22 @@ messageRouter.get("/", async (req, res) => {
   try {
     const { chatId } = req.query;
 
-    let messages;
+    let isGroupChat;
     let members;
+    let messages;
     // Fetch the messages between the logged-in user and the other user
     const conversation = await Conversation.findById(chatId);
     const chatroomm = await Chatroom.findById(chatId);
     console.log(chatroomm);
 
     if (conversation) {
+      isGroupChat = false;
       members = conversation.members;
       messages = await Message.find({
         conversation: new mongoose.Types.ObjectId(chatId),
       }).sort({ createdAt: 1 });
     } else if (chatroomm) {
+      isGroupChat = true;
       members = chatroomm.members;
       messages = await Message.find({
         chatroom: new mongoose.Types.ObjectId(chatId),
@@ -33,7 +36,7 @@ messageRouter.get("/", async (req, res) => {
     }
 
     // Retrieve the user objects for the logged-in user and the other user
-    res.status(200).json({ messages, members });
+    res.status(200).json({ isGroupChat, members, messages });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
