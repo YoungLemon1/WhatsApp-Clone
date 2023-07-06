@@ -17,7 +17,7 @@ function UserPage({ user, setUser }) {
   useEffect(() => {
     // Initialize the socket connection
     socket.current = io("http://localhost:5000");
-
+    socket.current.emit("user_connected", user);
     // Clean up the socket connection on component unmount
     return () => {
       socket.current.disconnect();
