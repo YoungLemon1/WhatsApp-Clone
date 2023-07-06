@@ -38,7 +38,7 @@ function UserPage({ user, setUser }) {
     setUser(null);
   }
 
-  async function tryEnterChatroom() {
+  async function tryEnterChat() {
     if (!searchText) {
       return;
     }
@@ -62,10 +62,10 @@ function UserPage({ user, setUser }) {
     }
 
     try {
-      const resGroupChatSearch = await Axios.get(
-        `http://localhost:5000/chatrooms?chartroomName=${searchText}`
+      const resChatroomSearch = await Axios.get(
+        `http://localhost:5000/chatrooms?chatroomTitle=${searchText}`
       );
-      chatroomData = resGroupChatSearch.data;
+      chatroomData = resChatroomSearch.data;
     } catch (error) {
       console.error("chatroom search error", error);
       // Handle the error for the group chat search API request
@@ -97,7 +97,7 @@ function UserPage({ user, setUser }) {
       const chatroom = {
         id: chatroomData._id,
         members: chatroomData.members,
-        title: chatroomData.name,
+        title: chatroomData.title,
         imageURL: chatroomData.imageURL,
         isGroupChat: true,
       };
@@ -131,14 +131,14 @@ function UserPage({ user, setUser }) {
                   setSearchError("");
                 }}
                 onKeyDown={(event) => {
-                  event.key === "Enter" && tryEnterChatroom();
+                  event.key === "Enter" && tryEnterChat();
                 }}
                 placeholder="Chat with a user or a group"
               ></input>
               <button
                 className="submit-btn"
                 disabled={searchText === ""}
-                onClick={tryEnterChatroom}
+                onClick={tryEnterChat}
               >
                 Enter Chat
               </button>

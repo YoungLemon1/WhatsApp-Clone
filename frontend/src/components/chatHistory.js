@@ -112,9 +112,10 @@ function ChatHistory({
     <div id="chat-history">
       <ScrollableFeed>
         {chatHistory.map((chat) => {
+          const lastMessage = chat.lastMessage;
+          if (!lastMessage) return null;
           const sender =
             chat.lastMessage.sender === loggedUserID ? "You: " : "";
-          const lastMessage = chat.lastMessage;
           return (
             <div
               className="chat-history-item"
@@ -130,9 +131,7 @@ function ChatHistory({
                 <h4>{chat.title}</h4>
               </div>
               <div id="last-message">
-                <p>
-                  {sender} {lastMessage.message}
-                </p>
+                <p>{sender + lastMessage.message}</p>
                 <small>{dateFormat(lastMessage.createdAt)}</small>
               </div>
               <hr></hr>
