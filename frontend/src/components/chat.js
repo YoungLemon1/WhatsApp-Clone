@@ -10,7 +10,6 @@ function Chat({
   chatHistory,
   setChatHistory,
   dateFormat,
-  decodeText,
 }) {
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");

@@ -30,10 +30,6 @@ function UserPage({ user, setUser }) {
     } else return "";
   }
 
-  function decodeText(text) {
-    he.decode(text);
-  }
-
   function logout() {
     console.log(`${user.username} logged out successefully`);
     setUser(null);
@@ -147,11 +143,10 @@ function UserPage({ user, setUser }) {
           </div>
           <ChatHistory
             chatHistory={chatHistory}
-            setChatHistory={setChatHistory}
             socket={socket.current}
+            setChatHistory={setChatHistory}
             loggedUserID={user._id}
             dateFormat={dateFormat}
-            decodeText={decodeText}
             enterChat={enterChat}
           ></ChatHistory>
         </div>
@@ -164,7 +159,6 @@ function UserPage({ user, setUser }) {
           chatHistory={chatHistory}
           setChatHistory={setChatHistory}
           dateFormat={dateFormat}
-          decodeText={decodeText}
         ></Chat>
       )}
       <div />

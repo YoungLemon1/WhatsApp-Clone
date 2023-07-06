@@ -5,9 +5,9 @@ import ScrollableFeed from "react-scrollable-feed";
 function ChatHistory({
   chatHistory,
   setChatHistory,
+  socket,
   loggedUserID,
   dateFormat,
-  decodeText,
   enterChat,
 }) {
   useEffect(() => {
