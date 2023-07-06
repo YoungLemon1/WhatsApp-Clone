@@ -74,45 +74,39 @@ function Chat({
   async function sendMessage() {
     let conversationID;
     if (!isGroupChat.current && messages.length === 0) {
-      try {
-        const conversation = {
-          members: chat.members,
-        };
-        const res = await Axios.post(
-          "http://localhost:5000/conversations",
-          conversation
-        );
-        const data = res.data;
-        conversationID = data._id.toString();
-        console.log("user conversation created", data);
-      } catch (error) {
-        console.error("Failed to create conversation", error);
-      }
+      const conversation = {
+        members: chat.members,
+      };
+      const res = await Axios.post(
+        "http://localhost:5000/conversations",
+        conversation
+      );
+      conversationID = res.data._id.toString();
+      console.log("User conversation created", res.data);
     }
-    console.log(isGroupChat.current);
+
     const message = {
       sender: userID.current,
       message: messageContent,
       ...(isGroupChat.current
         ? { chatroom: chatID.current }
-        : { conversation: conversationID ? conversationID : chatID.current }),
+        : { conversation: conversationID || chatID.current }),
     };
+
     console.log("message payload", message);
-    try {
-      const res = await Axios.post("http://localhost:5000/messages", message);
-      const data = res.data;
-      console.log("message created", data);
-      chat.lastMessage = data;
-      chat.lastUpdatedAt = data.createdAt;
-      emptyMessage();
-      setMessages([...messages, data]);
-      const recipients = chat.members;
-      console.log("message recepients", recipients);
-      socket.emit("send_message", data, recipients);
-    } catch {
-      console.error("Failed to send message");
-    }
+
+    const res = await Axios.post("http://localhost:5000/messages", message);
+    const data = res.data;
+    console.log("Message created", data);
+    chat.lastMessage = data;
+    chat.lastUpdatedAt = data.createdAt;
+    emptyMessage();
+    setMessages([...messages, data]);
+    const recipients = chat.members;
+    console.log("Message recepients", recipients);
+    socket.emit("send_message", data, recipients);
   }
+
   return (
     <div className="chat-window">
       <div className="chat-header">
