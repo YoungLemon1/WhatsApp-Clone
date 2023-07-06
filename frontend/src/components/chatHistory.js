@@ -11,6 +11,18 @@ function ChatHistory({
   enterChat,
 }) {
   useEffect(() => {
+    if (socket) {
+      // Add the event listener for receiving messages
+      socket.on("receive_message", (data) => {});
+
+      // Clean up the event listener when the component unmounts
+      return () => {
+        socket.off("receive_message");
+      };
+    }
+  }, [socket]);
+
+  useEffect(() => {
     async function fetchData() {
       try {
         const res = await Axios.get(
@@ -26,17 +38,6 @@ function ChatHistory({
     fetchData();
   }, [loggedUserID, setChatHistory]);
 
-  useEffect(() => {
-    // Add the event listener for receiving messages
-    socket.on("receive_message", (data) => {
-      // * update chat history *
-    });
-
-    // Clean up the event listener when the component unmounts
-    return () => {
-      socket.off("receive_message");
-    };
-  }, [socket]);
   return (
     <div id="chat-history">
       <ScrollableFeed>
