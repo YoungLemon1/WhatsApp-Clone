@@ -35,62 +35,54 @@ function ChatHistory({
       }
     };
 
-    const handleMessageReceived = (data) => {
-      const { conversation, chatroom, ...messageData } = data;
+    socket.on(
+      "receive_message",
+      (message, senderData) => {
+        const chatId = message.conversation || message.chatroom;
+        const chatExists = chatHistory.some((chat) => chat.id === chatId);
 
-      const chatId = conversation || chatroom;
-      const collection = conversation ? "conversations" : "chatrooms";
-
-      const chatExists = chatHistory.some((chat) => chat.id === chatId);
-
-      if (chatExists) {
-        setChatHistory((prevChatHistory) => {
-          return prevChatHistory.map((chat) => {
-            if (chat.id === chatId) {
-              return {
-                ...chat,
-                lastMessage: {
-                  id: data._id.toString(),
-                  sender: messageData.sender,
-                  message: messageData.message,
-                  createdAt: messageData.createdAt,
-                },
-              };
-            }
-            return chat;
+        if (chatExists) {
+          setChatHistory((prevChatHistory) => {
+            return prevChatHistory.map((chat) => {
+              if (chat.id === chatId) {
+                return {
+                  ...chat,
+                  lastMessage: {
+                    id: message._id.toString(),
+                    sender: message.sender,
+                    message: message.message,
+                    createdAt: message.createdAt,
+                  },
+                };
+              }
+              return chat;
+            });
           });
-        });
-      } else {
-        const fetchChatData =
-          collection === "conversations"
-            ? fetchConversation(conversation)
-            : fetchChatroom(chatroom);
-
-        fetchChatData.then((chatData) => {
+        } else {
           const newChat = {
             id: chatId,
-            title: chatData.username || chatData.title,
-            imageURL: chatData.imageURL,
+            title: senderData.username,
+            imageURL: senderData.imageURL,
             lastMessage: {
-              id: data._id.toString(),
-              sender: messageData.sender,
-              message: messageData.message,
-              createdAt: messageData.createdAt,
+              id: message._id.toString(),
+              sender: message.sender,
+              message: message.message,
+              createdAt: message.createdAt,
             },
           };
           setChatHistory((prevChatHistory) => [newChat, ...prevChatHistory]);
-        });
-      }
-    };
+        }
 
-    // Add the event listener for receiving messages
-    socket.on("receive_message", handleMessageReceived);
+        // Add the event listener for receiving messages
 
-    // Clean up the event listener when the component unmounts
-    return () => {
-      socket.off("receive_message", handleMessageReceived);
-    };
-  }, [socket, chatHistory, setChatHistory]);
+        // Clean up the event listener when the component unmounts
+        return () => {
+          socket.off("receive_message");
+        };
+      },
+      [socket, chatHistory, setChatHistory]
+    );
+  });
 
   useEffect(() => {
     async function fetchData() {

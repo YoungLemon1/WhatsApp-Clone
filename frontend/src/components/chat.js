@@ -20,9 +20,9 @@ function Chat({
 
   useEffect(() => {
     // Add the event listener for receiving messages
-    socket.on("receive_message", (data) => {
+    socket.on("receive_message", (message) => {
       console.log("meesage received");
-      setMessages([...messages, data]);
+      setMessages([...messages, message]);
     });
 
     // Clean up the event listener when the component unmounts
@@ -104,7 +104,14 @@ function Chat({
     setMessages([...messages, data]);
     const recipients = chat.members;
     console.log("Message recepients", recipients);
-    socket.emit("send_message", data, recipients);
+    socket.emit(
+      "send_message",
+      data,
+      recipients,
+      ...(isGroupChat.current
+        ? null
+        : { username: loggedUser.username, imageURL: loggedUser.imageURL })
+    );
   }
 
   return (

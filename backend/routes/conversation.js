@@ -49,11 +49,18 @@ conversationRouter.get("/:id", async (req, res) => {
   }
 });
 
-conversationRouter.get("/add-members/:id", async (req, res) => {
+conversationRouter.get("/otherUser", async (req, res) => {
   try {
-    const { id } = req.params;
-    const conversation = await Conversation.findById(id).populate("members");
-    res.status(200).json(conversation);
+    const { loggedUserId, conversationId } = req.query;
+    const conversation = await Conversation.findById(conversationId).populate(
+      "members"
+    );
+    const otherUser = conversation.members.find(
+      (member) => !member._id.equals(loggedUserId)
+    );
+    res
+      .status(200)
+      .json({ title: otherUser.username, imageURL: otherUser.imageURL });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({

@@ -45,12 +45,12 @@ io.on("connection", (socket) => {
     socket.leave(data);
     console.log(`user ${socket.id} left room ${data}`);
   });
-  socket.on("send_message", (data, recipients) => {
+  socket.on("send_message", (message, recipients, senderData) => {
     const recipientSockets = recipients.map(
       (recipient) => usersSockets[recipient]
     );
     recipientSockets.forEach((recipient) => {
-      socket.to(recipient).emit("receive_message", data);
+      socket.to(recipient).emit("receive_message", message, senderData);
     });
   });
   socket.on("disconnect", () => {
