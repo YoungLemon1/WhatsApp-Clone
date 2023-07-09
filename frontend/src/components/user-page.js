@@ -125,7 +125,7 @@ function UserPage({ user, setUser }) {
           <div className="chat-search">
             <div>
               <input
-                id="chat-search-bar"
+                className="search-bar"
                 onChange={(event) => {
                   setSearchText(event.target.value);
                   setSearchError("");

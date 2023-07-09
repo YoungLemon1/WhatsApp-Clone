@@ -223,6 +223,10 @@ label {
   margin: 1rem;
 }
 
+.search-bar {
+  width: 14rem;
+}
+
 .profile-img {
   margin: 0.5rem;
   width: 2rem;
