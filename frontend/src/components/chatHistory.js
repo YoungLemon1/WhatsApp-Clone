@@ -21,14 +21,11 @@ function ChatHistory({
         setChatHistory((prevChatHistory) => {
           return prevChatHistory.map((chat) => {
             if (chat.id === chatId) {
-              return {
-                ...chat,
-                lastMessage: {
-                  id: message._id.toString(),
-                  sender: message.sender,
-                  message: message.message,
-                  createdAt: message.createdAt,
-                },
+              chat.lastMessage = {
+                id: message._id.toString(),
+                sender: message.sender,
+                message: message.message,
+                createdAt: message.createdAt,
               };
             }
             return chat;
