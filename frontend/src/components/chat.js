@@ -21,7 +21,8 @@ function Chat({
   useEffect(() => {
     // Add the event listener for receiving messages
     socket.on("receive_message", (data) => {
-      const message = data.message;
+      console.log("data", data);
+      const message = data;
       console.log("meesage received");
       setMessages([...messages, message]);
     });
@@ -63,7 +64,7 @@ function Chat({
     } else if (chat.newChat) delete chat.newChat;
     socket.emit("leave_room", chatID.current);
     setCurrentChat(null);
-    console.log("exited chat");
+    console.log(`${loggedUser.username} exited chat ${chat.id}`);
   }
 
   function emptyMessage() {
@@ -74,6 +75,7 @@ function Chat({
 
   async function sendMessage() {
     let conversationID;
+    if (messageContent.length === 0) return;
     if (!isGroupChat.current && messages.length === 0) {
       const conversation = {
         members: chat.members,

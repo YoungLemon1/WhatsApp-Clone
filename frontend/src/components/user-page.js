@@ -133,6 +133,7 @@ function UserPage({ user, setUser }) {
     setSearchText("");
     socket.current.emit("join_room", chat.id);
     setCurrentChat(chat);
+    console.log(`${user.username} entered chat ${chat.id}`);
   }
 
   return (
