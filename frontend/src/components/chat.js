@@ -20,7 +20,8 @@ function Chat({
 
   useEffect(() => {
     // Add the event listener for receiving messages
-    socket.on("receive_message", (message) => {
+    socket.on("receive_message", (data) => {
+      const message = data.message;
       console.log("meesage received");
       setMessages([...messages, message]);
     });
@@ -108,12 +109,7 @@ function Chat({
       imageURL: loggedUser.imageURL,
     };
     console.log("Message recepients", recipients);
-    socket.emit(
-      "send_message",
-      data,
-      recipients,
-      ...(isGroupChat.current ? null : senderData)
-    );
+    socket.emit("send_message", data, recipients, senderData);
   }
 
   return (
