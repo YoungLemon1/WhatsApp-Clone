@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import Axios from "axios";
 import ScrollableFeed from "react-scrollable-feed";
 
 function ChatHistory({
@@ -13,92 +12,51 @@ function ChatHistory({
   useEffect(() => {
     if (!socket) return;
 
-    const fetchConversation = async (conversationId) => {
-      try {
-        const res = await Axios.get(
-          `http://localhost:5000/conversations/${conversationId}`
-        );
-        return res.data;
-      } catch (error) {
-        console.log("Failed to fetch conversation", error);
-      }
-    };
+    // Add the event listener for receiving messages
+    socket.on("receive_message", (message, senderData) => {
+      const chatId = message.conversation || message.chatroom;
+      const chatExists = chatHistory.some((chat) => chat.id === chatId);
 
-    const fetchChatroom = async (chatroomId) => {
-      try {
-        const res = await Axios.get(
-          `http://localhost:5000/chatrooms/${chatroomId}`
-        );
-        return res.data;
-      } catch (error) {
-        console.log("Failed to fetch chatroom", error);
-      }
-    };
-
-    socket.on(
-      "receive_message",
-      (message, senderData) => {
-        const chatId = message.conversation || message.chatroom;
-        const chatExists = chatHistory.some((chat) => chat.id === chatId);
-
-        if (chatExists) {
-          setChatHistory((prevChatHistory) => {
-            return prevChatHistory.map((chat) => {
-              if (chat.id === chatId) {
-                return {
-                  ...chat,
-                  lastMessage: {
-                    id: message._id.toString(),
-                    sender: message.sender,
-                    message: message.message,
-                    createdAt: message.createdAt,
-                  },
-                };
-              }
-              return chat;
-            });
+      if (chatExists) {
+        setChatHistory((prevChatHistory) => {
+          return prevChatHistory.map((chat) => {
+            if (chat.id === chatId) {
+              return {
+                ...chat,
+                lastMessage: {
+                  id: message._id.toString(),
+                  sender: message.sender,
+                  message: message.message,
+                  createdAt: message.createdAt,
+                },
+              };
+            }
+            return chat;
           });
-        } else {
-          const newChat = {
-            id: chatId,
-            title: senderData.username,
-            imageURL: senderData.imageURL,
-            lastMessage: {
-              id: message._id.toString(),
-              sender: message.sender,
-              message: message.message,
-              createdAt: message.createdAt,
-            },
-          };
-          setChatHistory((prevChatHistory) => [newChat, ...prevChatHistory]);
-        }
-
-        // Add the event listener for receiving messages
-
-        // Clean up the event listener when the component unmounts
-        return () => {
-          socket.off("receive_message");
+        });
+      } else {
+        const newChat = {
+          id: chatId,
+          title: senderData.username,
+          imageURL: senderData.imageURL,
+          lastMessage: {
+            id: message._id.toString(),
+            sender: message.sender,
+            message: message.message,
+            createdAt: message.createdAt,
+          },
         };
-      },
-      [socket, chatHistory, setChatHistory]
-    );
-  });
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await Axios.get(
-          `http://localhost:5000/messages/last-messages?userID=${loggedUserID}`
-        );
-        const data = res.data;
-        setChatHistory(data);
-        console.log("successfully fetched user chat history", data);
-      } catch (error) {
-        console.error("Failed to fetch user chat history", error);
+        setChatHistory((prevChatHistory) => [newChat, ...prevChatHistory]);
       }
-    }
-    fetchData();
-  }, [loggedUserID, setChatHistory]);
+    });
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      if (socket) {
+        socket.off("receive_message");
+      }
+    };
+  }, [socket, chatHistory, setChatHistory]);
 
   return (
     <div id="chat-history">

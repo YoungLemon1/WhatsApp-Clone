@@ -103,14 +103,16 @@ function Chat({
     emptyMessage();
     setMessages([...messages, data]);
     const recipients = chat.members;
+    const senderData = {
+      username: loggedUser.username,
+      imageURL: loggedUser.imageURL,
+    };
     console.log("Message recepients", recipients);
     socket.emit(
       "send_message",
       data,
       recipients,
-      ...(isGroupChat.current
-        ? null
-        : { username: loggedUser.username, imageURL: loggedUser.imageURL })
+      ...(isGroupChat.current ? null : senderData)
     );
   }
 

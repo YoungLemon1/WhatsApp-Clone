@@ -27,6 +27,29 @@ function UserPage({ user, setUser }) {
     socket.current.emit("user_connected", userId);
   }, [user._id]);
 
+  useEffect(() => {
+    if (!socket) return;
+    // Fetch the initial chat history
+    async function fetchChatHistory() {
+      try {
+        const userId = user._id.toString();
+        const res = await Axios.get(
+          `http://localhost:5000/messages/last-messages?userID=${userId}`
+        );
+        const data = res.data;
+        setChatHistory(data);
+        console.log("successfully fetched user chat history", data);
+      } catch (error) {
+        console.error("Failed to fetch user chat history", error);
+      }
+    }
+
+    // Fetch the initial chat history and add event listener on socket change
+    fetchChatHistory();
+
+    // Fetch the initial chat history and add event listener on socket change
+  }, [socket, setChatHistory, user._id]);
+
   function dateFormat(date) {
     if (date) {
       return moment(date).format("HH:mm");
