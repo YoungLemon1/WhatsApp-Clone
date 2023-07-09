@@ -20,9 +20,7 @@ function Chat({
 
   useEffect(() => {
     // Add the event listener for receiving messages
-    socket.on("receive_message", (data) => {
-      console.log("data", data);
-      const message = data;
+    socket.on("receive_message", (message) => {
       console.log("meesage received");
       setMessages([...messages, message]);
     });
@@ -140,6 +138,11 @@ function Chat({
                       : "other-user"
                   }`}
                 >
+                  <p>
+                    {isGroupChat.current && message.sender.role !== "system"
+                      ? message.sender.username
+                      : ""}
+                  </p>
                   <p>{message.message}</p>
                   <small>{dateFormat(message.createdAt)}</small>
                 </div>

@@ -17,7 +17,6 @@ messageRouter.get("/", async (req, res) => {
     // Fetch the messages between the logged-in user and the other user
     const conversation = await Conversation.findById(chatId);
     const chatroomm = await Chatroom.findById(chatId);
-    console.log(chatroomm);
 
     if (conversation) {
       isGroupChat = false;
@@ -30,11 +29,13 @@ messageRouter.get("/", async (req, res) => {
       members = chatroomm.members;
       messages = await Message.find({
         chatroom: new mongoose.Types.ObjectId(chatId),
-      }).sort({ createdAt: 1 });
+      })
+        .sort({ createdAt: 1 })
+        .populate({ path: "sender", select: "username imageURL role" });
+      console.log(messages);
     } else {
       res.status(400).json({ error: "Invalid chat id" });
     }
-
     // Retrieve the user objects for the logged-in user and the other user
     res.status(200).json({ isGroupChat, members, messages });
   } catch (err) {
@@ -64,7 +65,7 @@ messageRouter.get("/last-messages", async (req, res) => {
 
     const userConversations = await Conversation.find({
       members: { $in: [userID] },
-    }).populate("members");
+    }).populate({ path: "members", select: "username imageURL" });
     //console.log("conversations", userConversations);
 
     const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
@@ -81,7 +82,9 @@ messageRouter.get("/last-messages", async (req, res) => {
               },
             },
             {
-              chatroom: { $in: userChatrooms.map((chatroom) => chatroom._id) },
+              chatroom: {
+                $in: userChatrooms.map((chatroom) => chatroom._id),
+              },
             },
           ],
         },
@@ -91,7 +94,7 @@ messageRouter.get("/last-messages", async (req, res) => {
         $group: {
           _id: {
             $cond: [
-              { $eq: ["$chatroom", undefined] },
+              { $eq: ["$chatroom", undefined || null] },
               "$chatroom",
               "$conversation",
             ],
@@ -105,11 +108,11 @@ messageRouter.get("/last-messages", async (req, res) => {
       },
       // Limit the result to the desired number of messages
       {
-        $limit: 10, // Adjust the limit as per your requirement
+        $limit: 30, // Adjust the limit as per your requirement
       },
     ]);
 
-    //console.log("last messages", userInteractions);
+    console.log("User interactions", userInteractions);
 
     // Create the final chat history array
     //console.log("user interactions", userInteractions);
