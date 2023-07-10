@@ -133,18 +133,26 @@ function Chat({
                 <div
                   key={message._id}
                   className={`message ${
-                    message.sender === loggedUser._id
+                    message.sender.role === "system"
+                      ? "system"
+                      : message.sender._id === loggedUser._id
                       ? "current-user"
                       : "other-user"
                   }`}
                 >
                   <p>
-                    {isGroupChat.current && message.sender.role !== "system"
+                    {isGroupChat.current &&
+                    message.sender._id !== loggedUser._id &&
+                    message.sender.role !== "system"
                       ? message.sender.username
                       : ""}
                   </p>
                   <p>{message.message}</p>
-                  <small>{dateFormat(message.createdAt)}</small>
+                  <small>
+                    {message.sender.role !== "system"
+                      ? dateFormat(message.createdAt)
+                      : ""}
+                  </small>
                 </div>
               </div>
             );

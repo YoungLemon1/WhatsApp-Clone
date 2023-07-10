@@ -23,7 +23,9 @@ messageRouter.get("/", async (req, res) => {
       members = conversation.members;
       messages = await Message.find({
         conversation: new mongoose.Types.ObjectId(chatId),
-      }).sort({ createdAt: 1 });
+      })
+        .populate({ path: "sender", select: "username imageURL role" })
+        .sort({ createdAt: 1 });
     } else if (chatroomm) {
       isGroupChat = true;
       members = chatroomm.members;

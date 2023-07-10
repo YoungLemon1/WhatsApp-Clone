@@ -285,7 +285,7 @@ label {
   color: #ffffff;
   min-height: 1.5rem;
   width: max-content;
-  max-width: 20vw;
+  max-width: 25vw;
   border-radius: 5px;
   margin: 0.5rem;
   padding-left: 0.5rem;
@@ -307,6 +307,11 @@ label {
 .chat-window .chat-body .message.other-user {
   align-self: flex-end;
   background-color: #a3aaacdc;
+}
+
+.chat-window .chat-body .message.system {
+  align-self: center;
+  background-color: #9fd1f3f1;
 }
 
 .chat-window .chat-footer {
