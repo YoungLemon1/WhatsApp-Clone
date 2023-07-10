@@ -163,11 +163,16 @@ label {
 #logout-container #logout {
   display: block;
   border: none;
-  background-color: rgb(117, 117, 117);
+  color: black;
+  background-color: inherit;
   margin-top: 0.4rem;
   margin-right: 1.5rem;
   margin-left: 1.5rem;
   align-self: flex-end;
+}
+
+#logout-container #logout:hover {
+  background-color: rgba(235, 232, 232, 0.918);
 }
 
 #error-container {
