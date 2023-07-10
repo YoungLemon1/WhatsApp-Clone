@@ -34,7 +34,6 @@ messageRouter.get("/", async (req, res) => {
       })
         .sort({ createdAt: 1 })
         .populate({ path: "sender", select: "username imageURL role" });
-      console.log(messages);
     } else {
       res.status(400).json({ error: "Invalid chat id" });
     }
@@ -96,7 +95,7 @@ messageRouter.get("/last-messages", async (req, res) => {
         $group: {
           _id: {
             $cond: [
-              { $eq: ["$chatroom", undefined || null] },
+              { $eq: [{ $ifNull: ["$conversation", null] }, null] },
               "$chatroom",
               "$conversation",
             ],
