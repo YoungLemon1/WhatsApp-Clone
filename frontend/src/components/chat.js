@@ -55,18 +55,6 @@ function Chat({
     fetchMessages();
   }, [chat, loggedUser._id, chat.isGroupChat]);
 
-  async function exitChat() {
-    if (!isGroupChat.current && messages.length === 0) {
-      delete chat.members;
-      const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
-      setChatHistory(updatedChatHistory);
-      console.log("chat history", updatedChatHistory);
-    } else if (chat.newChat) delete chat.newChat;
-    socket.emit("leave_room", chatID.current);
-    setCurrentChat(null);
-    console.log(`${loggedUser.username} exited chat ${chat.id}`);
-  }
-
   function emptyMessage() {
     setMessageContent("");
     const textInput = document.getElementById("message-text");
@@ -121,6 +109,18 @@ function Chat({
     };
     console.log("Message recepients", recipients);
     socket.emit("send_message", data, recipients, senderData);
+  }
+
+  async function exitChat() {
+    if (!isGroupChat.current && messages.length === 0) {
+      delete chat.members;
+      const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
+      setChatHistory(updatedChatHistory);
+      console.log("chat history", updatedChatHistory);
+    } else if (chat.newChat) delete chat.newChat;
+    socket.emit("leave_room", chatID.current);
+    setCurrentChat(null);
+    console.log(`${loggedUser.username} exited chat ${chat.id}`);
   }
 
   return (
