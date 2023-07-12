@@ -103,8 +103,17 @@ function Chat({
     console.log("Message created", data);
     chat.lastMessage = data;
     chat.lastUpdatedAt = data.createdAt;
+    const newMessage = {
+      ...data,
+      sender: {
+        _id: loggedUser._id,
+        username: loggedUser.username,
+        imageURL: loggedUser.imageURL,
+        role: loggedUser.role,
+      },
+    };
     emptyMessage();
-    setMessages([...messages, data]);
+    setMessages([...messages, newMessage]);
     const recipients = chat.members;
     const senderData = {
       username: loggedUser.username,
@@ -140,7 +149,8 @@ function Chat({
                     className={`message ${
                       message.sender.role === "system"
                         ? "system"
-                        : message.sender._id === loggedUser._id
+                        : message.sender._id.toString() ===
+                          loggedUser._id.toString()
                         ? "current-user"
                         : "other-user"
                     }`}
