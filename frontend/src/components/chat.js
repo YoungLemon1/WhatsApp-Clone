@@ -147,7 +147,7 @@ function Chat({
                   <div
                     key={message._id}
                     className={`message ${
-                      message.sender.role === "system"
+                      message.sender.username === "SYSTEM"
                         ? "system"
                         : message.sender._id.toString() ===
                           loggedUser._id.toString()

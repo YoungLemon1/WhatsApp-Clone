@@ -22,7 +22,7 @@ messageRouter.get("/", async (req, res) => {
       isGroupChat = false;
       members = conversation.members;
       messages = await Message.find({
-        conversation: new mongoose.Types.ObjectId(chatId),
+        conversation: conversation._id,
       })
         .populate({ path: "sender", select: "username imageURL role" })
         .sort({ createdAt: 1 });
@@ -32,7 +32,7 @@ messageRouter.get("/", async (req, res) => {
         isGroupChat = true;
         members = chatroomm.members;
         messages = await Message.find({
-          chatroom: new mongoose.Types.ObjectId(chatId),
+          chatroom: chatroomm._id,
         })
           .sort({ createdAt: 1 })
           .populate({ path: "sender", select: "username imageURL role" });
