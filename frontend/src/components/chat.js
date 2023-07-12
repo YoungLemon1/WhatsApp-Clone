@@ -13,6 +13,7 @@ function Chat({
 }) {
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const userID = useRef(null);
   const chatID = useRef(null);
@@ -44,6 +45,7 @@ function Chat({
         isGroupChat.current = data.isGroupChat;
         chat.members = data.members;
         setMessages(data.messages);
+        setLoading(false);
         console.log(chat.members);
       } catch (error) {
         console.error("Failed to fetch messages", error);
@@ -126,38 +128,42 @@ function Chat({
         <h4 className="chat-name">{chat.title ?? "Error: undefined chat"}</h4>
       </div>
       <div className="chat-body">
-        <ScrollableFeed>
-          {messages.map((message) => {
-            return (
-              <div className="message-container" key={message._id}>
-                <div
-                  key={message._id}
-                  className={`message ${
-                    message.sender.role === "system"
-                      ? "system"
-                      : message.sender._id === loggedUser._id
-                      ? "current-user"
-                      : "other-user"
-                  }`}
-                >
-                  <p>
-                    {isGroupChat.current &&
-                    message.sender._id !== loggedUser._id &&
-                    message.sender.role !== "system"
-                      ? message.sender.username
-                      : ""}
-                  </p>
-                  <p>{message.message}</p>
-                  <small>
-                    {message.sender.role !== "system"
-                      ? dateFormat(message.createdAt)
-                      : ""}
-                  </small>
+        {loading ? (
+          <p className="loading">loading chat messages...</p>
+        ) : (
+          <ScrollableFeed>
+            {messages.map((message) => {
+              return (
+                <div className="message-container" key={message._id}>
+                  <div
+                    key={message._id}
+                    className={`message ${
+                      message.sender.role === "system"
+                        ? "system"
+                        : message.sender._id === loggedUser._id
+                        ? "current-user"
+                        : "other-user"
+                    }`}
+                  >
+                    <p>
+                      {isGroupChat.current &&
+                      message.sender._id !== loggedUser._id &&
+                      message.sender.role !== "system"
+                        ? message.sender.username
+                        : ""}
+                    </p>
+                    <p>{message.message}</p>
+                    <small>
+                      {message.sender.role !== "system"
+                        ? dateFormat(message.createdAt)
+                        : ""}
+                    </small>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </ScrollableFeed>
+              );
+            })}
+          </ScrollableFeed>
+        )}
       </div>
       <div className="chat-footer">
         <input
