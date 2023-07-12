@@ -232,6 +232,10 @@ label {
   width: 14rem;
 }
 
+.loading {
+  margin: 0.3rem;
+}
+
 .profile-img {
   margin: 0.5rem;
   width: 2rem;

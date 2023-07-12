@@ -11,6 +11,7 @@ function UserPage({ user, setUser }) {
   const [searchText, setSearchText] = useState("");
   const [currentChat, setCurrentChat] = useState(null);
   const [searchError, setSearchError] = useState("");
+  const [chatHistoryLoading, setChatHistoryLoading] = useState(true);
   const socket = useRef(null);
 
   useEffect(() => {
@@ -42,6 +43,7 @@ function UserPage({ user, setUser }) {
       } catch (error) {
         console.error("Failed to fetch user chat history", error);
       }
+      setChatHistoryLoading(false);
     }
 
     // Fetch the initial chat history and add event listener on socket change
@@ -173,6 +175,8 @@ function UserPage({ user, setUser }) {
             chatHistory={chatHistory}
             socket={socket.current}
             setChatHistory={setChatHistory}
+            chatHistoryLoading={chatHistoryLoading}
+            setChatHistoryLoading={setChatHistoryLoading}
             loggedUserID={user._id}
             dateFormat={dateFormat}
             enterChat={enterChat}

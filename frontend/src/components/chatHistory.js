@@ -5,6 +5,8 @@ function ChatHistory({
   chatHistory,
   setChatHistory,
   socket,
+  chatHistoryLoading,
+  setChatHistoryLoading,
   loggedUserID,
   dateFormat,
   enterChat,
@@ -57,35 +59,39 @@ function ChatHistory({
 
   return (
     <div id="chat-history">
-      <ScrollableFeed>
-        {chatHistory.map((chat) => {
-          const lastMessage = chat.lastMessage;
-          if (!lastMessage) return null;
-          const sender =
-            chat.lastMessage.sender === loggedUserID ? "You: " : "";
-          return (
-            <div
-              className="chat-history-item"
-              key={chat.id}
-              onClick={() => enterChat(chat)}
-            >
-              <div id="conversation-details">
-                <img
-                  className="profile-img"
-                  src={chat.imageURL}
-                  alt={`${chat.title} profile`}
-                ></img>
-                <h4>{chat.title}</h4>
+      {chatHistoryLoading ? (
+        <p className="loading">Loading chat history...</p>
+      ) : (
+        <ScrollableFeed>
+          {chatHistory.map((chat) => {
+            const lastMessage = chat.lastMessage;
+            if (!lastMessage) return null;
+            const sender =
+              chat.lastMessage.sender === loggedUserID ? "You: " : "";
+            return (
+              <div
+                className="chat-history-item"
+                key={chat.id}
+                onClick={() => enterChat(chat)}
+              >
+                <div id="conversation-details">
+                  <img
+                    className="profile-img"
+                    src={chat.imageURL}
+                    alt={`${chat.title} profile`}
+                  ></img>
+                  <h4>{chat.title}</h4>
+                </div>
+                <div id="last-message">
+                  <p>{sender + lastMessage.message}</p>
+                  <small>{dateFormat(lastMessage.createdAt)}</small>
+                </div>
+                <hr></hr>
               </div>
-              <div id="last-message">
-                <p>{sender + lastMessage.message}</p>
-                <small>{dateFormat(lastMessage.createdAt)}</small>
-              </div>
-              <hr></hr>
-            </div>
-          );
-        })}
-      </ScrollableFeed>
+            );
+          })}
+        </ScrollableFeed>
+      )}
     </div>
   );
 }

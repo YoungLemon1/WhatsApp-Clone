@@ -64,6 +64,7 @@ messageRouter.get("/last-messages", async (req, res) => {
     const { userID } = req.query;
     //console.log("user id", userID);
 
+    const SYSTEM_ID = process.env.SYSTEM_ID;
     const userConversations = await Conversation.find({
       members: { $in: [userID] },
     }).populate({ path: "members", select: "username imageURL" });
@@ -90,7 +91,7 @@ messageRouter.get("/last-messages", async (req, res) => {
           ],
         },
       },
-      // Group messages by the other user or chatroom
+      // group messages by the other user or chatroom
       {
         $group: {
           _id: {
@@ -103,15 +104,34 @@ messageRouter.get("/last-messages", async (req, res) => {
           lastMessage: { $last: "$$ROOT" },
         },
       },
-      // Sort the messages by createdAt in descending order
+      // Perform the additional logic for sorting and finding the sorting message
+      // Sort the userInteractions based on sortingMessage createdAt
       {
         $sort: { "lastMessage.createdAt": -1 },
       },
-      // Limit the result to the desired number of messages
-      {
-        $limit: 30, // Adjust the limit as per your requirement
-      },
     ]);
+
+    userInteractions.map(async (interaction) => {
+      interaction.sortingMessage = interaction.lastMessage;
+      const chatroomId = interaction.lastMessage.chatroom;
+      if (chatroomId) {
+        const chatroomMessages = await Message.find({
+          chatroom: chatroomId,
+        }).populate({ path: "sender", select: "username" });
+        const sortingMessage = chatroomMessages
+          .slice()
+          .reverse()
+          .find(
+            (chatroomMessage) => chatroomMessage.sender.username !== "SYSTEM"
+          );
+        if (sortingMessage) interaction.sortingMessage = sortingMessage;
+        else interaction.sortingMessage = chatroomMessages[0];
+      }
+    });
+
+    userInteractions.sort(
+      (a, b) => b.sortingMessage.createdAt - a.sortingMessage.createdAt
+    );
 
     console.log("User interactions", userInteractions);
 
