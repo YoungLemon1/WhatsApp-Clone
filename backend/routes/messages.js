@@ -14,9 +14,9 @@ messageRouter.get("/", async (req, res) => {
     let isGroupChat;
     let members;
     let messages;
+
     // Fetch the messages between the logged-in user and the other user
     const conversation = await Conversation.findById(chatId);
-    const chatroomm = await Chatroom.findById(chatId);
 
     if (conversation) {
       isGroupChat = false;
@@ -26,16 +26,19 @@ messageRouter.get("/", async (req, res) => {
       })
         .populate({ path: "sender", select: "username imageURL role" })
         .sort({ createdAt: 1 });
-    } else if (chatroomm) {
-      isGroupChat = true;
-      members = chatroomm.members;
-      messages = await Message.find({
-        chatroom: new mongoose.Types.ObjectId(chatId),
-      })
-        .sort({ createdAt: 1 })
-        .populate({ path: "sender", select: "username imageURL role" });
     } else {
-      res.status(400).json({ error: "Invalid chat id" });
+      const chatroomm = await Chatroom.findById(chatId);
+      if (chatroomm) {
+        isGroupChat = true;
+        members = chatroomm.members;
+        messages = await Message.find({
+          chatroom: new mongoose.Types.ObjectId(chatId),
+        })
+          .sort({ createdAt: 1 })
+          .populate({ path: "sender", select: "username imageURL role" });
+      } else {
+        res.status(400).json({ error: "Invalid chat id" });
+      }
     }
     // Retrieve the user objects for the logged-in user and the other user
     res.status(200).json({ isGroupChat, members, messages });
