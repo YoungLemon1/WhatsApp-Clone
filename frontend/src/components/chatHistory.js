@@ -6,7 +6,6 @@ function ChatHistory({
   setChatHistory,
   socket,
   chatHistoryLoading,
-  setChatHistoryLoading,
   loggedUserID,
   dateFormat,
   enterChat,
