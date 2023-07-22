@@ -22,7 +22,7 @@ function Chat({
   useEffect(() => {
     // Add the event listener for receiving messages
     socket.on("receive_message", (message) => {
-      console.log("meesage received");
+      console.log("meesage received", message);
       setMessages([...messages, message]);
     });
 
@@ -36,7 +36,10 @@ function Chat({
     userID.current = loggedUser._id;
     chatID.current = chat.id;
     async function fetchMessages() {
-      if (chat.newChat) return;
+      if (chat.newChat) {
+        setLoading(false);
+        return;
+      }
       try {
         const res = await Axios.get(
           `http://localhost:5000/messages?chatId=${chat.id}`
@@ -85,28 +88,29 @@ function Chat({
     };
 
     console.log("message payload", message);
-
-    const res = await Axios.post("http://localhost:5000/messages", message);
-    const data = res.data;
-    console.log("Message created", data);
-    chat.lastMessage = data;
-    chat.lastUpdatedAt = data.createdAt;
-    const newMessage = {
-      ...data,
-      sender: {
-        _id: loggedUser._id,
-        username: loggedUser.username,
-        imageURL: loggedUser.imageURL,
-        role: loggedUser.role,
-      },
-    };
-    emptyMessage();
-    setMessages([...messages, newMessage]);
     const recipients = chat.members;
     const senderData = {
       username: loggedUser.username,
       imageURL: loggedUser.imageURL,
     };
+    const res = await Axios.post("http://localhost:5000/messages", message);
+    const data = res.data;
+    console.log("Message created", data);
+    chat.lastMessage = data;
+    chat.lastUpdatedAt = data.createdAt;
+    const newMessage = !isGroupChat.current
+      ? data
+      : {
+          ...data,
+          sender: {
+            _id: loggedUser._id,
+            username: loggedUser.username,
+            imageURL: loggedUser.imageURL,
+            role: loggedUser.role,
+          },
+        };
+    emptyMessage();
+    setMessages([...messages, newMessage]);
     console.log("Message recepients", recipients);
     socket.emit("send_message", data, recipients, senderData);
   }
@@ -121,6 +125,91 @@ function Chat({
     socket.emit("leave_room", chatID.current);
     setCurrentChat(null);
     console.log(`${loggedUser.username} exited chat ${chat.id}`);
+  }
+
+  function setMessageClassName(message) {
+    return (
+      <div
+        key={message._id}
+        className={`message ${
+          message.sender.username === "SYSTEM"
+            ? "system"
+            : message.sender._id.toString() === loggedUser._id.toString()
+            ? "current-user"
+            : "other-user"
+        }`}
+      ></div>
+    );
+  }
+
+  function setMessageHeader(message) {
+    return message.sender._id !== loggedUser._id &&
+      message.sender.role !== "system" ? (
+      <p>{message.sender.username}</p>
+    ) : (
+      ""
+    );
+  }
+
+  function setMessageDate(message) {
+    return (
+      <small>
+        {message.sender.role !== "system" ? dateFormat(message.createdAt) : ""}
+      </small>
+    );
+  }
+
+  function mapChatroomMessages() {
+    return messages.map((message) => {
+      return (
+        <div className="message-container" key={message._id}>
+          <div
+            key={message._id}
+            className={`message ${
+              message.sender.username === "SYSTEM"
+                ? "system"
+                : message.sender._id.toString() === userID.current
+                ? "current-user"
+                : "other-user"
+            }`}
+          >
+            <p>
+              {message.sender._id !== userID.current &&
+              message.sender.username !== "SYSTEM"
+                ? message.sender.username
+                : ""}
+            </p>
+            <p>{message.message}</p>
+            <small>
+              {message.sender.username !== "SYSTEM"
+                ? dateFormat(message.createdAt)
+                : ""}
+            </small>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  function mapConversationMessages() {
+    return messages.map((message) => {
+      return (
+        <div className="message-container" key={message._id}>
+          <div
+            key={message._id}
+            className={`message ${
+              message.sender.username === "SYSTEM"
+                ? "system"
+                : message.sender === userID.current
+                ? "current-user"
+                : "other-user"
+            }`}
+          >
+            <p>{message.message}</p>
+          </div>
+        </div>
+      );
+    });
   }
 
   return (
@@ -141,37 +230,9 @@ function Chat({
           <p className="loading">loading chat messages...</p>
         ) : (
           <ScrollableFeed>
-            {messages.map((message) => {
-              return (
-                <div className="message-container" key={message._id}>
-                  <div
-                    key={message._id}
-                    className={`message ${
-                      message.sender.username === "SYSTEM"
-                        ? "system"
-                        : message.sender._id.toString() ===
-                          loggedUser._id.toString()
-                        ? "current-user"
-                        : "other-user"
-                    }`}
-                  >
-                    <p>
-                      {isGroupChat.current &&
-                      message.sender._id !== loggedUser._id &&
-                      message.sender.role !== "system"
-                        ? message.sender.username
-                        : ""}
-                    </p>
-                    <p>{message.message}</p>
-                    <small>
-                      {message.sender.role !== "system"
-                        ? dateFormat(message.createdAt)
-                        : ""}
-                    </small>
-                  </div>
-                </div>
-              );
-            })}
+            {isGroupChat.current
+              ? mapChatroomMessages()
+              : mapConversationMessages()}
           </ScrollableFeed>
         )}
       </div>

@@ -23,9 +23,7 @@ messageRouter.get("/", async (req, res) => {
       members = conversation.members;
       messages = await Message.find({
         conversation: conversation._id,
-      })
-        .populate({ path: "sender", select: "username imageURL role" })
-        .sort({ createdAt: 1 });
+      }).sort({ createdAt: 1 });
     } else {
       const chatroomm = await Chatroom.findById(chatId);
       if (chatroomm) {

@@ -16,21 +16,28 @@ function ChatHistory({
     // Add the event listener for receiving messages
     socket.on("receive_message", (message, senderData) => {
       const chatId = message.conversation || message.chatroom;
-      const chatExists = chatHistory.some((chat) => chat.id === chatId);
+      const chat = chatHistory.find((chat) => chat.id === chatId);
 
-      if (chatExists) {
+      if (chat) {
         setChatHistory((prevChatHistory) => {
-          return prevChatHistory.map((chat) => {
-            if (chat.id === chatId) {
-              chat.lastMessage = {
-                id: message._id.toString(),
-                sender: message.sender,
-                message: message.message,
-                createdAt: message.createdAt,
+          const updatedChatHistory = prevChatHistory.map((prevChat) => {
+            if (prevChat.id === chatId) {
+              return {
+                ...prevChat,
+                lastMessage: {
+                  id: message._id.toString(),
+                  sender: message.sender,
+                  message: message.message,
+                  createdAt: message.createdAt,
+                },
               };
             }
-            return chat;
+            return prevChat;
           });
+          return [
+            chat,
+            ...updatedChatHistory.filter((prevChat) => prevChat.id !== chatId),
+          ];
         });
       } else {
         const newChat = {
