@@ -36,6 +36,21 @@ conversationRouter.get("/", async (req, res) => {
   }
 });
 
+conversationRouter.get("/usernames", async (req, res) => {
+  try {
+    const conversations = await Conversation.find({}).populate({
+      path: "members",
+      select: "username",
+    });
+    res.status(200).json(conversations);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: Failure fetching coversations",
+    });
+  }
+});
+
 conversationRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;

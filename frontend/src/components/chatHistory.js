@@ -17,9 +17,9 @@ function ChatHistory({
     socket.on("receive_message", (message, senderData) => {
       const chatId = message.conversation || message.chatroom;
       const chat = chatHistory.find((chat) => chat.id === chatId);
-      chat.lastMessage = message;
 
       if (chat) {
+        chat.lastMessage = message;
         setChatHistory((prevChatHistory) => [
           chat,
           ...prevChatHistory.filter((prevChat) => prevChat.id !== chatId),
