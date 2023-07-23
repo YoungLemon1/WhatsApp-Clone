@@ -111,6 +111,10 @@ function Chat({
         };
     emptyMessage();
     setMessages([...messages, newMessage]);
+    setChatHistory((prevChatHistory) => [
+      chat,
+      ...prevChatHistory.filter((prevChat) => prevChat.id !== chatID.current),
+    ]);
     console.log("Message recepients", recipients);
     socket.emit("send_message", data, recipients, senderData);
   }

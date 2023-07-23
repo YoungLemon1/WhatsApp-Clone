@@ -17,39 +17,19 @@ function ChatHistory({
     socket.on("receive_message", (message, senderData) => {
       const chatId = message.conversation || message.chatroom;
       const chat = chatHistory.find((chat) => chat.id === chatId);
+      chat.lastMessage = message;
 
       if (chat) {
-        setChatHistory((prevChatHistory) => {
-          const updatedChatHistory = prevChatHistory.map((prevChat) => {
-            if (prevChat.id === chatId) {
-              return {
-                ...prevChat,
-                lastMessage: {
-                  id: message._id.toString(),
-                  sender: message.sender,
-                  message: message.message,
-                  createdAt: message.createdAt,
-                },
-              };
-            }
-            return prevChat;
-          });
-          return [
-            chat,
-            ...updatedChatHistory.filter((prevChat) => prevChat.id !== chatId),
-          ];
-        });
+        setChatHistory((prevChatHistory) => [
+          chat,
+          ...prevChatHistory.filter((prevChat) => prevChat.id !== chatId),
+        ]);
       } else {
         const newChat = {
           id: chatId,
           title: senderData.username,
           imageURL: senderData.imageURL,
-          lastMessage: {
-            id: message._id.toString(),
-            sender: message.sender,
-            message: message.message,
-            createdAt: message.createdAt,
-          },
+          lastMessage: message,
         };
         setChatHistory((prevChatHistory) => [newChat, ...prevChatHistory]);
       }
