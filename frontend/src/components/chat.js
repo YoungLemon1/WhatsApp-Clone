@@ -23,6 +23,7 @@ function Chat({
     // Add the event listener for receiving messages
     socket.on("receive_message", (message) => {
       console.log("meesage received", message);
+      chat.lastMessage = message;
       setMessages([...messages, message]);
     });
 
@@ -30,7 +31,7 @@ function Chat({
     return () => {
       socket.off("receive_message");
     };
-  }, [socket, chat.members, messages]);
+  }, [socket, chat, messages]);
 
   useEffect(() => {
     userID.current = loggedUser._id;
