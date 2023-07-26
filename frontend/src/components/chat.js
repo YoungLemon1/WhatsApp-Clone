@@ -133,84 +133,38 @@ function Chat({
   }
 
   function setMessageClassName(message) {
-    return (
-      <div
-        key={message._id}
-        className={`message ${
-          message.sender.username === "SYSTEM"
-            ? "system"
-            : message.sender._id.toString() === loggedUser._id.toString()
-            ? "current-user"
-            : "other-user"
-        }`}
-      ></div>
-    );
+    let msgString = "message";
+    if (isGroupChat.current) {
+      if (message.sender.username === "SYSTEM") return `${msgString} system`;
+    }
+    return `${msgString} ${
+      message.sender === loggedUser._id.toString()
+        ? "current-user"
+        : "other-user"
+    }`;
   }
 
   function setMessageHeader(message) {
-    return message.sender._id !== loggedUser._id &&
-      message.sender.role !== "system" ? (
-      <p>{message.sender.username}</p>
-    ) : (
-      ""
-    );
+    const senderId = message.sender._id.toString();
+    const senderUsername = message.sender.username;
+    return senderId !== loggedUser._id && senderUsername !== "SYSTEM"
+      ? { senderUsername }
+      : "";
   }
 
   function setMessageDate(message) {
-    return (
-      <small>
-        {message.sender.role !== "system" ? dateFormat(message.createdAt) : ""}
-      </small>
-    );
+    if (isGroupChat.current) if (message.sender.username === "SYSTEM") return;
+    return dateFormat(message.createdAt);
   }
 
-  function mapChatroomMessages() {
+  function mapMessages() {
     return messages.map((message) => {
       return (
         <div className="message-container" key={message._id}>
-          <div
-            key={message._id}
-            className={`message ${
-              message.sender.username === "SYSTEM"
-                ? "system"
-                : message.sender._id.toString() === userID.current
-                ? "current-user"
-                : "other-user"
-            }`}
-          >
-            <p>
-              {message.sender._id !== userID.current &&
-              message.sender.username !== "SYSTEM"
-                ? message.sender.username
-                : ""}
-            </p>
+          <div key={message._id} className={setMessageClassName(message)}>
+            <h6>{isGroupChat.current ? setMessageHeader(message) : ""}</h6>
             <p>{message.message}</p>
-            <small>
-              {message.sender.username !== "SYSTEM"
-                ? dateFormat(message.createdAt)
-                : ""}
-            </small>
-          </div>
-        </div>
-      );
-    });
-  }
-
-  function mapConversationMessages() {
-    return messages.map((message) => {
-      return (
-        <div className="message-container" key={message._id}>
-          <div
-            key={message._id}
-            className={`message ${
-              message.sender.username === "SYSTEM"
-                ? "system"
-                : message.sender === userID.current
-                ? "current-user"
-                : "other-user"
-            }`}
-          >
-            <p>{message.message}</p>
+            <small>{setMessageDate(message)}</small>
           </div>
         </div>
       );
@@ -234,11 +188,7 @@ function Chat({
         {loading ? (
           <p className="loading">loading chat messages...</p>
         ) : (
-          <ScrollableFeed>
-            {isGroupChat.current
-              ? mapChatroomMessages()
-              : mapConversationMessages()}
-          </ScrollableFeed>
+          <ScrollableFeed>{mapMessages()}</ScrollableFeed>
         )}
       </div>
       <div className="chat-footer">
