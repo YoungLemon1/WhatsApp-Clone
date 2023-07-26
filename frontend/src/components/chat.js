@@ -70,6 +70,7 @@ function Chat({
     if (currentMessageContent.length === 0) return;
     if (!isGroupChat.current && messages.length === 0) {
       const conversation = {
+        _id: chat.id,
         members: chat.members,
       };
       const res = await Axios.post(
