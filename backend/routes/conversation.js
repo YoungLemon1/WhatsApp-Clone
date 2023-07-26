@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
+import mongoose from "mongoose";
 import validate from "./validation/valdiate.js";
 import Conversation from "../models/conversation.js";
 import User from "../models/user.js";
@@ -15,7 +16,8 @@ conversationRouter.get("/", async (req, res) => {
     const conversation = await Conversation.findOne({
       $in: { members: user._id },
     });
-    res.status(200).json(conversation);
+    if (conversation) res.status(200).json(conversation);
+    else res.status(400).json({ error: "Conversation does not exist" });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -106,7 +108,7 @@ conversationRouter.post(
   craeteCoversationValidatioRules,
   validate,
   async (req, res) => {
-    const { members, createdAt, lastUpdatedAt } = req.body;
+    const { _id, members } = req.body;
     try {
       const existingConversation = await Conversation.findOne({
         members: { $all: [...members] },
@@ -114,7 +116,10 @@ conversationRouter.post(
       if (existingConversation) {
         res.status(400).json("error: conversation already exists");
       }
-      const newConversation = new Conversation(req.body);
+      const newConversation = new Conversation({
+        _id: mongoose.Types.ObjectId(_id),
+        members,
+      });
       await newConversation.save();
       res.status(201).json(newConversation);
     } catch (err) {
@@ -158,6 +163,21 @@ conversationRouter.delete("/:id", async (req, res) => {
     }
     res.status(200).json({
       success: "chatroom deleted successfully",
+    });
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: failed to delete chatroom",
+    });
+  }
+});
+
+conversationRouter.delete("/", async (req, res) => {
+  try {
+    const deletedChatroom = await Conversation.deleteMany({});
+    res.status(200).json({
+      success: "chatroom deleted successfully",
+      data: deletedChatroom,
     });
   } catch (err) {
     console.error(err.stack);

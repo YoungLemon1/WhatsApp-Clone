@@ -11,7 +11,7 @@ chatRoomRouter.get("/", async (req, res) => {
       title: chatroomTitle,
     });
     if (chatroom) res.status(200).json(chatroom);
-    else res.status(400).json({ error: "Chat name does not exist" });
+    else res.status(400).json({ error: "Chatroom does not exist" });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
