@@ -103,9 +103,10 @@ function UserPage({ user, setUser }) {
       const members = [user._id, userData._id];
       const sortedMembers = members.map((member) => member.toString()).sort();
       console.log("sorted", sortedMembers);
-      const tempChatId = sortedMembers
-        .reduce((acc, member) => acc + member, "")
-        .substring(0, 24);
+      const tempChatId = sortedMembers.reduce(
+        (acc, member) => acc + member.substring(0, 12),
+        ""
+      );
       console.log("tempId", tempChatId);
       const conversation = {
         id: tempChatId,
