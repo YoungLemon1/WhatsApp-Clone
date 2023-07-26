@@ -103,12 +103,11 @@ function UserPage({ user, setUser }) {
       const members = [user._id, userData._id];
       const sortedMembers = members.map((member) => member.toString()).sort();
       console.log("sorted", sortedMembers);
-      const tempChatId = sortedMembers.reduce(
-        (acc, member) => acc + member,
-        ""
-      );
+      const tempChatId = sortedMembers
+        .reduce((acc, member) => acc + member, "")
+        .substring(0, 24);
       console.log("tempId", tempChatId);
-      const userChat = {
+      const conversation = {
         id: tempChatId,
         members: members,
         title: userData.username,
@@ -116,8 +115,8 @@ function UserPage({ user, setUser }) {
         isGroupChat: false,
         newChat: true,
       };
-      setChatHistory([...chatHistory, userChat]);
-      enterChat(userChat);
+      setChatHistory([...chatHistory, conversation]);
+      enterChat(conversation);
     } else if (chatroomData) {
       const chatroom = {
         id: chatroomData._id,
