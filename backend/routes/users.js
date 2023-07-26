@@ -125,39 +125,7 @@ userRouter.post("/", createUserValidationRules, validate, async (req, res) => {
     });
   }
   // Create a new user
-  const coversationObjectId = new mongoose.Types.ObjectId();
-  let currentUserIdFirst12Chars = coversationObjectId
-    .toString()
-    .substring(0, 12);
-
-  let newUser;
-  let hasMatchingUsers = true;
-
-  while (hasMatchingUsers) {
-    newUser = new UserModel({
-      _id: new mongoose.Types.ObjectId(),
-      username,
-      password,
-      birthdate,
-      email,
-      imageURL,
-      role,
-    });
-
-    const query = {
-      _id: {
-        $regex: new RegExp(`^${currentUserIdFirst12Chars}`),
-      },
-    };
-
-    hasMatchingUsers = await UserModel.exists(query);
-
-    if (hasMatchingUsers) {
-      currentUserIdFirst12Chars = newUser._id.toString().substring(0, 12);
-    }
-  }
-
-  // Save the new user to the database
+  const newUser = new UserModel(req.body);
   try {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
