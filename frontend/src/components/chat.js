@@ -12,7 +12,7 @@ function Chat({
   dateFormat,
 }) {
   const [messages, setMessages] = useState([]);
-  const [messageContent, setMessageContent] = useState("");
+  const [currentMessageContent, setCurrentMessageContent] = useState("");
   const [loading, setLoading] = useState(true);
 
   const userID = useRef(null);
@@ -60,14 +60,14 @@ function Chat({
   }, [chat, loggedUser._id, chat.isGroupChat]);
 
   function emptyMessage() {
-    setMessageContent("");
+    setCurrentMessageContent("");
     const textInput = document.getElementById("message-text");
     textInput.value = "";
   }
 
   async function sendMessage() {
     let conversationID;
-    if (messageContent.length === 0) return;
+    if (currentMessageContent.length === 0) return;
     if (!isGroupChat.current && messages.length === 0) {
       const conversation = {
         members: chat.members,
@@ -82,7 +82,7 @@ function Chat({
 
     const message = {
       sender: userID.current,
-      message: messageContent,
+      message: currentMessageContent,
       ...(isGroupChat.current
         ? { chatroom: chatID.current }
         : { conversation: conversationID || chatID.current }),
@@ -197,7 +197,7 @@ function Chat({
           className="message-text"
           placeholder="Send a message"
           onChange={(event) => {
-            setMessageContent(event.target.value);
+            setCurrentMessageContent(event.target.value);
           }}
           onKeyDown={(event) => {
             event.key === "Enter" && sendMessage();
@@ -205,7 +205,7 @@ function Chat({
         ></input>
         <button
           className="send-btn"
-          disabled={messageContent === ""}
+          disabled={currentMessageContent === ""}
           onClick={sendMessage}
         >
           Send
