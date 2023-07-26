@@ -117,7 +117,7 @@ conversationRouter.post(
         res.status(400).json("error: conversation already exists");
       }
       const newConversation = new Conversation({
-        _id: mongoose.Types.ObjectId(_id),
+        _id: new mongoose.Types.ObjectId(_id),
         members,
       });
       await newConversation.save();
