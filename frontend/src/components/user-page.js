@@ -141,6 +141,9 @@ function UserPage({ user, setUser }) {
     <div id="user-page">
       {!currentChat ? (
         <div>
+          <h1 style={{ display: "inline", float: "left", margin: "0.5rem" }}>
+            {user.username}
+          </h1>
           <div id="logout-container">
             <Button id="logout" onClick={logout}>
               logout
