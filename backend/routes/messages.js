@@ -1,12 +1,17 @@
 import { Router } from "express";
 import { body } from "express-validator";
+import { configDotenv } from "dotenv";
 import validate from "./validation/valdiate.js";
 import mongoose from "mongoose";
 import Message from "../models/message.js";
 import Chatroom from "../models/chatroom.js";
 import Conversation from "../models/conversation.js";
-const messageRouter = Router();
 
+configDotenv();
+
+const messageRouter = Router();
+const SYSTEM_ID = process.env.SYSTEM_ID;
+const systemObjectId = new mongoose.Types.ObjectId(SYSTEM_ID);
 messageRouter.get("/", async (req, res) => {
   try {
     const { chatId } = req.query;
@@ -274,13 +279,26 @@ messageRouter.patch("/", async (req, res) => {
 messageRouter.delete("/", async (req, res) => {
   try {
     const deletedMessages = await Message.deleteMany({});
-    if (!deletedMessages) {
-      return res.status(400).json({
-        error: "no messages exist",
-      });
-    }
-    resres.status(200).json({
+    res.status(200).json({
       success: "message deleted successfully",
+      data: deletedMessages,
+    });
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).json({
+      error: "Internal server error: failed to delete message",
+    });
+  }
+});
+
+messageRouter.delete("/non-system", async (req, res) => {
+  try {
+    const deletedMessages = await Message.deleteMany({
+      sender: { $ne: systemObjectId },
+    });
+    res.status(200).json({
+      success: "message deleted successfully",
+      data: deletedMessages,
     });
   } catch (err) {
     console.error(err.stack);
