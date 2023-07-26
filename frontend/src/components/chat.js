@@ -133,27 +133,33 @@ function Chat({
   }
 
   function setMessageClassName(message) {
+    let senderId;
     let msgString = "message";
     if (isGroupChat.current) {
-      if (message.sender.username === "SYSTEM") return `${msgString} system`;
+      senderId = message.sender._id.toString();
+      if (message.sender.username === "SYSTEM") {
+        return `${msgString} system`;
+      }
+    } else {
+      senderId = message.sender;
     }
     return `${msgString} ${
-      message.sender === loggedUser._id.toString()
-        ? "current-user"
-        : "other-user"
+      senderId === loggedUser._id.toString() ? "current-user" : "other-user"
     }`;
   }
 
   function setMessageHeader(message) {
     const senderId = message.sender._id.toString();
     const senderUsername = message.sender.username;
+    console.log(senderUsername);
     return senderId !== loggedUser._id && senderUsername !== "SYSTEM"
-      ? { senderUsername }
+      ? senderUsername
       : "";
   }
 
   function setMessageDate(message) {
-    if (isGroupChat.current) if (message.sender.username === "SYSTEM") return;
+    if (isGroupChat.current)
+      if (message.sender.username === "SYSTEM") return null;
     return dateFormat(message.createdAt);
   }
 
@@ -161,8 +167,8 @@ function Chat({
     return messages.map((message) => {
       return (
         <div className="message-container" key={message._id}>
-          <div key={message._id} className={setMessageClassName(message)}>
-            <h6>{isGroupChat.current ? setMessageHeader(message) : ""}</h6>
+          <div className={setMessageClassName(message)}>
+            <p>{isGroupChat.current ? setMessageHeader(message) : ""}</p>
             <p>{message.message}</p>
             <small>{setMessageDate(message)}</small>
           </div>
