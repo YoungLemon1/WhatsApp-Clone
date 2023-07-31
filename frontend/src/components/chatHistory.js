@@ -20,10 +20,12 @@ function ChatHistory({
 
       if (chat) {
         chat.lastMessage = message;
-        setChatHistory((prevChatHistory) => [
-          chat,
-          ...prevChatHistory.filter((prevChat) => prevChat.id !== chatId),
-        ]);
+        const index = chatHistory.findIndex((c) => c.id === chat.id);
+        setChatHistory((prevChatHistory) => {
+          const updatedChatHistory = [...prevChatHistory];
+          updatedChatHistory[index] = chat;
+          return updatedChatHistory;
+        });
       } else {
         const newChat = {
           id: chatId,

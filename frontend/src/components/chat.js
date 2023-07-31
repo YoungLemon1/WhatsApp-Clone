@@ -90,7 +90,9 @@ function Chat({
     };
 
     console.log("message payload", message);
-    const recipients = chat.members;
+    const recipients = chat.members.filter(
+      (m) => m !== loggedUser._id.toString()
+    );
     const senderData = {
       username: loggedUser.username,
       imageURL: loggedUser.imageURL,
@@ -134,15 +136,11 @@ function Chat({
   }
 
   function setMessageClassName(message) {
-    let senderId;
+    const senderObjectId = message.sender._id;
+    let senderId = senderObjectId ? senderObjectId.toString() : message.sender;
     let msgString = "message";
-    if (isGroupChat.current) {
-      senderId = message.sender._id.toString();
-      if (message.sender.username === "SYSTEM") {
-        return `${msgString} system`;
-      }
-    } else {
-      senderId = message.sender;
+    if (message.sender.username === "SYSTEM") {
+      return `${msgString} system`;
     }
     return `${msgString} ${
       senderId === loggedUser._id.toString() ? "current-user" : "other-user"
@@ -150,17 +148,20 @@ function Chat({
   }
 
   function setMessageHeader(message) {
-    const senderId = message.sender._id.toString();
+    const senderObjectId = message.sender._id;
+    const senderId = senderObjectId
+      ? senderObjectId.toString()
+      : message.sender;
     const senderUsername = message.sender.username;
     console.log(senderUsername);
-    return senderId !== loggedUser._id && senderUsername !== "SYSTEM"
+    return senderId !== loggedUser._id.toString() && senderUsername !== "SYSTEM"
       ? senderUsername
       : "";
   }
 
   function setMessageDate(message) {
-    if (isGroupChat.current)
-      if (message.sender.username === "SYSTEM") return null;
+    if (isGroupChat.current && message.sender.username === "SYSTEM")
+      return null;
     return dateFormat(message.createdAt);
   }
 

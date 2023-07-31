@@ -117,7 +117,7 @@ function UserPage({ user, setUser }) {
         isGroupChat: false,
         newChat: true,
       };
-      socket.emit("joined_new_conversation", user._id.toString());
+      //socket.emit("joined_new_conversation", user._id.toString());
       setChatHistory([...chatHistory, conversation]);
       enterChat(conversation);
     } else if (chatroomData) {
