@@ -11,6 +11,7 @@ function UserPage({ user, setUser }) {
   const [searchText, setSearchText] = useState("");
   const [currentChat, setCurrentChat] = useState(null);
   const [searchError, setSearchError] = useState("");
+  const [pendingChats, setPendingchats] = useState({});
   const [chatHistoryLoading, setChatHistoryLoading] = useState(true);
   const socket = useRef(null);
 
@@ -116,6 +117,7 @@ function UserPage({ user, setUser }) {
         isGroupChat: false,
         newChat: true,
       };
+      socket.emit("joined_new_conversation", user._id.toString());
       setChatHistory([...chatHistory, conversation]);
       enterChat(conversation);
     } else if (chatroomData) {
