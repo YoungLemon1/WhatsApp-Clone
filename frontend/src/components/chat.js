@@ -46,6 +46,7 @@ function Chat({
           `http://localhost:5000/messages?chatId=${chat.id}`
         );
         const data = res.data;
+        isGroupChat.current = data.isGroupChat;
         chat.members = data.members;
         setMessages(data.messages);
         setLoading(false);
