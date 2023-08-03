@@ -7,7 +7,7 @@ const UserSchema = new Schema({
   },
   password: {
     type: String,
-    require: true,
+    required: true,
   },
   birthdate: {
     type: Date,
