@@ -14,25 +14,29 @@ const SYSTEM_ID = process.env.SYSTEM_ID;
 const systemObjectId = new mongoose.Types.ObjectId(SYSTEM_ID);
 messageRouter.get("/", async (req, res) => {
   try {
-    const { chatId } = req.query;
+    const { chatId, chatStrObjectId } = req.query;
 
-    let isGroupChat;
+    let isChatroom;
     let members;
     let messages;
 
     // Fetch the messages between the logged-in user and the other user
-    const conversation = await Conversation.findById(chatId);
+    if (chatId.length > 24) {
+      const conversation = await Conversation.findById(chatStrObjectId);
 
-    if (conversation) {
-      isGroupChat = false;
-      members = conversation.members;
-      messages = await Message.find({
-        conversation: conversation._id,
-      }).sort({ createdAt: 1 });
+      if (conversation) {
+        isChatroom = false;
+        members = conversation.members;
+        messages = await Message.find({
+          conversation: conversation._id,
+        }).sort({ createdAt: 1 });
+      } else {
+        res.status(400).json({ error: "Invalid chat id" });
+      }
     } else {
       const chatroomm = await Chatroom.findById(chatId);
       if (chatroomm) {
-        isGroupChat = true;
+        isChatroom = true;
         members = chatroomm.members;
         messages = await Message.find({
           chatroom: chatroomm._id,
@@ -44,7 +48,7 @@ messageRouter.get("/", async (req, res) => {
       }
     }
     // Retrieve the user objects for the logged-in user and the other user
-    res.status(200).json({ isGroupChat, members, messages });
+    res.status(200).json({ isChatroom, members, messages });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -67,16 +71,16 @@ messageRouter.get("/", async (req, res) => {
 
 messageRouter.get("/last-messages", async (req, res) => {
   try {
-    const { userID } = req.query;
-    //console.log("user id", userID);
+    const { userId } = req.query;
+    //console.log("user id", userId);
 
     const SYSTEM_ID = process.env.SYSTEM_ID;
     const userConversations = await Conversation.find({
-      members: { $in: [userID] },
+      members: { $in: [userId] },
     }).populate({ path: "members", select: "username imageURL" });
     //console.log("conversations", userConversations);
 
-    const userChatrooms = await Chatroom.find({ members: { $in: [userID] } });
+    const userChatrooms = await Chatroom.find({ members: { $in: [userId] } });
     //console.log("chatrooms", userChatrooms);
 
     const userInteractions = await Message.aggregate([
@@ -147,31 +151,42 @@ messageRouter.get("/last-messages", async (req, res) => {
       const lastMessage = interaction.lastMessage;
       const isGroupChat = lastMessage.chatroom !== undefined;
       let interactionID = null;
-      let interactionWith = null;
+      let strObjectId = null;
+      let title = null;
       let imageURL = null;
       if (!isGroupChat) {
         const conversation = userConversations.find((conversation) =>
           conversation._id.equals(interaction.lastMessage.conversation)
         );
         const otherUser = conversation.members.find(
-          (member) => member._id.toString() != userID
+          (member) => member._id.toString() != userId
         );
-        interactionID = conversation._id.toString();
+        const sortedMembers = conversation.members
+          .map((member) => member.toString())
+          .sort();
+        const conversationId = sortedMembers.reduce(
+          (acc, member) => acc + member,
+          ""
+        );
 
-        interactionWith = otherUser.username;
+        interactionID = conversationId;
+        strObjectId = conversation._id.toString();
+        title = otherUser.username;
         imageURL = otherUser.imageURL;
       } else {
         const chatroom = userChatrooms.find((room) =>
           room._id.equals(interaction.lastMessage.chatroom)
         );
         interactionID = chatroom._id.toString();
-        interactionWith = chatroom.title;
+        strObjectId = interactionID;
+        title = chatroom.title;
         imageURL = chatroom.imageURL;
       }
 
       return {
         id: interactionID,
-        title: interactionWith,
+        strObjectId,
+        title,
         imageURL,
         lastMessage: {
           id: lastMessage._id,

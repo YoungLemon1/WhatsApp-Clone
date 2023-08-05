@@ -6,7 +6,7 @@ function ChatHistory({
   setChatHistory,
   socket,
   chatHistoryLoading,
-  loggedUserID,
+  loggedUserId,
   dateFormat,
   enterChat,
 }) {
@@ -15,20 +15,22 @@ function ChatHistory({
 
     // Add the event listener for receiving messages
     socket.on("receive_message", (message, senderData) => {
-      const chatId = message.conversation || message.chatroom;
-      const chat = chatHistory.find((chat) => chat.id === chatId);
+      const chatStrObjectId = message.chatroom
+        ? message.chatroom
+        : message.conversation;
+      const chat = chatHistory.find(
+        (chat) => chat.strObjectId === chatStrObjectId
+      );
 
       if (chat) {
         chat.lastMessage = message;
-        const index = chatHistory.findIndex((c) => c.id === chat.id);
-        setChatHistory((prevChatHistory) => {
-          const updatedChatHistory = [...prevChatHistory];
-          updatedChatHistory[index] = chat;
-          return updatedChatHistory;
-        });
+        setChatHistory((prevChatHistory) => [
+          chat,
+          ...prevChatHistory.filter((prevChat) => prevChat.id !== chat.id),
+        ]);
       } else {
         const newChat = {
-          id: chatId,
+          id: chatStrObjectId,
           title: senderData.username,
           imageURL: senderData.imageURL,
           lastMessage: message,
@@ -55,7 +57,7 @@ function ChatHistory({
             const lastMessage = chat.lastMessage;
             if (!lastMessage) return null;
             const sender =
-              chat.lastMessage.sender === loggedUserID ? "You: " : "";
+              chat.lastMessage.sender === loggedUserId ? "You: " : "";
             return (
               <div
                 className="chat-history-item"

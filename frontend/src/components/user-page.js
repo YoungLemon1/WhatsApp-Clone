@@ -11,7 +11,6 @@ function UserPage({ user, setUser }) {
   const [searchText, setSearchText] = useState("");
   const [currentChat, setCurrentChat] = useState(null);
   const [searchError, setSearchError] = useState("");
-  const [pendingChats, setPendingchats] = useState({});
   const [chatHistoryLoading, setChatHistoryLoading] = useState(true);
   const socket = useRef(null);
 
@@ -36,7 +35,7 @@ function UserPage({ user, setUser }) {
       try {
         const userId = user._id.toString();
         const res = await Axios.get(
-          `http://localhost:5000/messages/last-messages?userID=${userId}`
+          `http://localhost:5000/messages/last-messages?userId=${userId}`
         );
         const data = res.data;
         setChatHistory(data);
@@ -68,7 +67,7 @@ function UserPage({ user, setUser }) {
     if (!searchText) {
       return;
     }
-    const chat = chatHistory.find((c) => c.name === searchText);
+    const chat = chatHistory.find((c) => c.title === searchText);
     if (chat) {
       enterChat(chat);
       return;
@@ -79,7 +78,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resUserSearch = await Axios.get(
-        `http://localhost:5000/users?username=${searchText}`
+        `http://localhost:5000/users?currentUserId=${user._id.toString()}&otherUserUsername=${searchText}`
       );
       userData = resUserSearch.data;
     } catch (error) {
@@ -104,13 +103,13 @@ function UserPage({ user, setUser }) {
       const members = [user._id, userData._id];
       const sortedMembers = members.map((member) => member.toString()).sort();
       console.log("sorted", sortedMembers);
-      const tempChatId = sortedMembers.reduce(
-        (acc, member) => acc + member.substring(0, 12),
+      const conversationId = sortedMembers.reduce(
+        (acc, member) => acc + member,
         ""
       );
-      console.log("tempId", tempChatId);
+      console.log("tempId", conversationId);
       const conversation = {
-        id: tempChatId,
+        id: conversationId,
         members: members,
         title: userData.username,
         imageURL: userData.imageURL,
@@ -182,7 +181,7 @@ function UserPage({ user, setUser }) {
             setChatHistory={setChatHistory}
             chatHistoryLoading={chatHistoryLoading}
             setChatHistoryLoading={setChatHistoryLoading}
-            loggedUserID={user._id}
+            loggedUserId={user._id}
             dateFormat={dateFormat}
             enterChat={enterChat}
           ></ChatHistory>

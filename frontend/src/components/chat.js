@@ -15,9 +15,9 @@ function Chat({
   const [currentMessageContent, setCurrentMessageContent] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const userID = useRef(null);
-  const chatID = useRef(null);
-  const isGroupChat = useRef(false);
+  const userId = useRef(null);
+  const chatId = useRef(null);
+  const isChatroom = useRef(false);
 
   useEffect(() => {
     // Add the event listener for receiving messages
@@ -34,8 +34,8 @@ function Chat({
   }, [socket, chat, messages]);
 
   useEffect(() => {
-    userID.current = loggedUser._id;
-    chatID.current = chat.id;
+    userId.current = loggedUser._id;
+    chatId.current = chat.id;
     async function fetchMessages() {
       if (chat.newChat) {
         setLoading(false);
@@ -43,10 +43,10 @@ function Chat({
       }
       try {
         const res = await Axios.get(
-          `http://localhost:5000/messages?chatId=${chat.id}`
+          `http://localhost:5000/messages?chatId=${chat.id}&chatStrObjectId=${chat.strObjectId}`
         );
         const data = res.data;
-        isGroupChat.current = data.isGroupChat;
+        isChatroom.current = data.isChatroom;
         chat.members = data.members;
         setMessages(data.messages);
         setLoading(false);
@@ -57,7 +57,7 @@ function Chat({
     }
 
     fetchMessages();
-  }, [chat, loggedUser._id, chat.isGroupChat]);
+  }, [chat, loggedUser._id, chat.isChatroom]);
 
   function emptyMessage() {
     setCurrentMessageContent("");
@@ -66,27 +66,26 @@ function Chat({
   }
 
   async function sendMessage() {
-    let conversationID;
+    let conversationId;
     if (currentMessageContent.length === 0) return;
-    if (!isGroupChat.current && messages.length === 0) {
+    if (!isChatroom.current && messages.length === 0) {
       const conversation = {
-        _id: chat.id,
         members: chat.members,
       };
       const res = await Axios.post(
         "http://localhost:5000/conversations",
         conversation
       );
-      conversationID = res.data._id.toString();
+      conversationId = res.data._id.toString();
       console.log("User conversation created", res.data);
     }
 
     const message = {
-      sender: userID.current,
+      sender: userId.current,
       message: currentMessageContent,
-      ...(isGroupChat.current
-        ? { chatroom: chatID.current }
-        : { conversation: conversationID || chatID.current }),
+      ...(isChatroom.current
+        ? { chatroom: chat.strObjectId }
+        : { conversation: conversationId || chat.strObjectId }),
     };
 
     console.log("message payload", message);
@@ -102,7 +101,7 @@ function Chat({
     console.log("Message created", data);
     chat.lastMessage = data;
     chat.lastUpdatedAt = data.createdAt;
-    const newMessage = !isGroupChat.current
+    const newMessage = !isChatroom.current
       ? data
       : {
           ...data,
@@ -117,20 +116,20 @@ function Chat({
     setMessages([...messages, newMessage]);
     setChatHistory((prevChatHistory) => [
       chat,
-      ...prevChatHistory.filter((prevChat) => prevChat.id !== chatID.current),
+      ...prevChatHistory.filter((prevChat) => prevChat.id !== chatId.current),
     ]);
     console.log("Message recepients", recipients);
     socket.emit("send_message", data, recipients, senderData);
   }
 
   async function exitChat() {
-    if (!isGroupChat.current && messages.length === 0) {
+    if (!isChatroom.current && messages.length === 0) {
       delete chat.members;
       const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
       setChatHistory(updatedChatHistory);
       console.log("chat history", updatedChatHistory);
     } else if (chat.newChat) delete chat.newChat;
-    socket.emit("leave_room", chatID.current);
+    socket.emit("leave_room", chatId.current);
     setCurrentChat(null);
     console.log(`${loggedUser.username} exited chat ${chat.id}`);
   }
@@ -160,8 +159,7 @@ function Chat({
   }
 
   function setMessageDate(message) {
-    if (isGroupChat.current && message.sender.username === "SYSTEM")
-      return null;
+    if (isChatroom.current && message.sender.username === "SYSTEM") return null;
     return dateFormat(message.createdAt);
   }
 
@@ -170,7 +168,7 @@ function Chat({
       return (
         <div className="message-container" key={message._id}>
           <div className={setMessageClassName(message)}>
-            <p>{isGroupChat.current ? setMessageHeader(message) : ""}</p>
+            <p>{isChatroom.current ? setMessageHeader(message) : ""}</p>
             <p>{message.message}</p>
             <small>{setMessageDate(message)}</small>
           </div>

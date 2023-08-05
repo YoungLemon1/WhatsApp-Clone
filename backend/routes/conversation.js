@@ -8,13 +8,15 @@ const conversationRouter = Router();
 
 conversationRouter.get("/", async (req, res) => {
   try {
-    const { username } = req.query;
-    const user = await User.findOne({ username: username });
-    if (!user) {
+    const { currentUserId, otherUserUsername } = req.query;
+    const otherUser = await User.findOne({ username: otherUserUsername });
+    if (!otherUser) {
       return res.status(400).json({ error: "Invalid username" });
     }
+    const otherUserId = otherUser._id.toString();
+    const members = [currentUserId, otherUserId];
     const conversation = await Conversation.findOne({
-      $in: { members: user._id },
+      $in: { members: { $all: members } },
     });
     if (conversation) res.status(200).json(conversation);
     else res.status(400).json({ error: "Conversation does not exist" });
@@ -108,7 +110,7 @@ conversationRouter.post(
   craeteCoversationValidatioRules,
   validate,
   async (req, res) => {
-    const { _id, members } = req.body;
+    const { members } = req.body;
     try {
       const existingConversation = await Conversation.findOne({
         members: { $all: [...members] },
@@ -117,7 +119,6 @@ conversationRouter.post(
         res.status(400).json("error: conversation already exists");
       }
       const newConversation = new Conversation({
-        _id: new mongoose.Types.ObjectId(_id),
         members,
       });
       await newConversation.save();
