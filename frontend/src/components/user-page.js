@@ -78,7 +78,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resUserSearch = await Axios.get(
-        `http://localhost:5000/users?currentUserId=${user._id.toString()}&otherUserUsername=${searchText}`
+        `http://localhost:5000/users?username=${searchText}`
       );
       userData = resUserSearch.data;
     } catch (error) {
@@ -110,6 +110,7 @@ function UserPage({ user, setUser }) {
       console.log("tempId", conversationId);
       const conversation = {
         id: conversationId,
+        strObjectId: null,
         members: members,
         title: userData.username,
         imageURL: userData.imageURL,

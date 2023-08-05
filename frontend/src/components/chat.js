@@ -67,7 +67,6 @@ function Chat({
 
   async function sendMessage() {
     let conversationId;
-    if (currentMessageContent.length === 0) return;
     if (!isChatroom.current && messages.length === 0) {
       const conversation = {
         members: chat.members,
@@ -77,6 +76,7 @@ function Chat({
         conversation
       );
       conversationId = res.data._id.toString();
+      chat.strObjectId = conversationId;
       console.log("User conversation created", res.data);
     }
 
@@ -206,7 +206,9 @@ function Chat({
             setCurrentMessageContent(event.target.value);
           }}
           onKeyDown={(event) => {
-            event.key === "Enter" && sendMessage();
+            if (event.key === "Enter" && currentMessageContent !== "") {
+              sendMessage();
+            }
           }}
         ></input>
         <button
