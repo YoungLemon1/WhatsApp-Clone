@@ -84,46 +84,30 @@ chatroomRouter.post(
   }
 );
 
-chatroomRouter.patch("/chatrooms/:id/lastMessage", async (req, res) => {
+chatroomRouter.patch("/:id", async (req, res) => {
   const { id } = req.params;
-  const { lastMessageId } = req.body;
-
+  const { fieldToUpdate, updatedValue } = req.query;
+  const validFields = Object.keys(Chatroom.schema.obj);
+  if (!validFields.includes(fieldToUpdate)) {
+    return res.status(400).json({ message: `Invalid field: ${fieldToUpdate}` });
+  }
   try {
     const chatroom = await Chatroom.findByIdAndUpdate(
       id,
-      { lastMessage: lastMessageId },
+      { [fieldToUpdate]: updatedValue },
       { new: true }
     );
 
     if (!chatroom) {
       return res.status(404).json({ message: "Chatroom not found" });
     }
+
     res.json({ success: true, data: chatroom });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
-chatroomRouter.patch(
-  "/:id",
-  craeteChatValidatioRules,
-  validate,
-  async (req, res) => {
-    const { fieldToUpdate, updatedValue } = req.body;
-    try {
-      const { id } = req.params;
-      const updateResult = await Chatroom.findByIdAndUpdate(id, {
-        [fieldToUpdate]: updatedValue,
-      });
-      res.status(200).json(updateResult);
-    } catch (err) {
-      console.error(err.stack);
-      res.status(500).json({
-        error: "Internal server error: Failure fetching chatroom",
-      });
-    }
-  }
-);
 chatroomRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {

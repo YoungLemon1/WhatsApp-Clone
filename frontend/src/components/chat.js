@@ -20,6 +20,7 @@ function Chat({
   const chatId = useRef(null);
   const isChatroom = useRef(false);
 
+  //#region lifecycle functions
   useEffect(() => {
     // Add the event listener for receiving messages
     socket.on("receive_message", (message) => {
@@ -60,25 +61,78 @@ function Chat({
     fetchMessages();
   }, [chat, loggedUser._id, chat.isChatroom]);
 
-  function emptyMessage() {
-    setCurrentMessageContent("");
-    const textInput = document.getElementById("message-text");
-    textInput.value = "";
-  }
+  //#endregion
 
-  async function sendMessage() {
-    let conversationId;
-    if (!isChatroom.current && messages.length === 0) {
-      const conversation = {
-        members: chat.members,
-      };
+  //#region server request functions
+  async function createConversation() {
+    const conversation = {
+      members: chat.members,
+    };
+    try {
       const res = await Axios.post(
         "http://localhost:5000/conversations",
         conversation
       );
-      conversationId = res.data._id.toString();
+
+      const data = res.data;
+      console.log("User conversation created", data);
+      return data._id;
+    } catch (err) {
+      console.error("Failed to create conversation");
+    }
+  }
+
+  async function createAndEmitMessage(message, recipients, senderData) {
+    try {
+      const res = await Axios.post("http://localhost:5000/messages", message);
+      const data = res.data;
+      console.log("Message created", data);
+      socket.emit("send_message", data, recipients, senderData);
+      return data;
+    } catch (err) {
+      console.error("Failed to send message", err);
+    }
+  }
+  //#endregion
+
+  /*updates the users chat history and the message list after sending a message
+   and indicates that messages have been sent in this chat. */
+  function updateUIAfterMessageSend(data) {
+    chat.lastMessage = data;
+    const { isHumanSender, ...dataRest } = data;
+    const newMessage = !isChatroom.current
+      ? dataRest
+      : {
+          ...dataRest,
+          sender: {
+            _id: loggedUser._id,
+            username: loggedUser.username,
+            imageURL: loggedUser.imageURL,
+          },
+        };
+    setCurrentMessageContent("");
+    setMessages([...messages, newMessage]);
+    setNewMessages(true);
+    if (data.isHumanSender)
+      setChatHistory((prevChatHistory) => [
+        chat,
+        ...prevChatHistory.filter((prevChat) => prevChat.id !== chatId.current),
+      ]);
+    else setChatHistory([...chatHistory]);
+  }
+
+  // send message and emit to chat and chat history of the rcepients
+  async function sendMessage() {
+    function getRecipients(chat) {
+      return chat.members.filter((m) => m !== loggedUser._id.toString());
+    }
+    if (!isChatroom.current && !chat.strObjectId && messages.length === 0) {
+      const conversationId = await createConversation();
+      if (!conversationId) {
+        console.error("cannot send message. Chat is undefined");
+        return;
+      }
       chat.strObjectId = conversationId;
-      console.log("User conversation created", res.data);
     }
 
     const message = {
@@ -86,71 +140,22 @@ function Chat({
       message: currentMessageContent,
       ...(isChatroom.current
         ? { chatroom: chat.strObjectId }
-        : { conversation: conversationId || chat.strObjectId }),
+        : { conversation: chat.strObjectId }),
     };
 
     console.log("message payload", message);
-    const recipients = chat.members.filter(
-      (m) => m !== loggedUser._id.toString()
-    );
+    const recipients = getRecipients(chat);
     const senderData = {
       username: loggedUser.username,
       imageURL: loggedUser.imageURL,
     };
-    const res = await Axios.post("http://localhost:5000/messages", message);
-    const data = res.data;
+
+    const data = await createAndEmitMessage(message, recipients, senderData);
     console.log("Message created", data);
-    chat.lastMessage = data;
-    chat.lastUpdatedAt = data.createdAt;
-    const newMessage = !isChatroom.current
-      ? data
-      : {
-          ...data,
-          sender: {
-            _id: loggedUser._id,
-            username: loggedUser.username,
-            imageURL: loggedUser.imageURL,
-            role: loggedUser.role,
-          },
-        };
-    emptyMessage();
-    setMessages([...messages, newMessage]);
-    setNewMessages(true);
-    setChatHistory((prevChatHistory) => [
-      chat,
-      ...prevChatHistory.filter((prevChat) => prevChat.id !== chatId.current),
-    ]);
-    console.log("Message recepients", recipients);
-    socket.emit("send_message", data, recipients, senderData);
+    updateUIAfterMessageSend(data);
   }
 
-  async function exitChat() {
-    if (!isChatroom.current && messages.length === 0) {
-      delete chat.members;
-      const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
-      setChatHistory(updatedChatHistory);
-      console.log("chat history", updatedChatHistory);
-    } else if (chat.newChat) delete chat.newChat;
-    if (chat.strObjectId && newMessages) {
-      try {
-        const chatType = !isChatroom.current ? "conversations" : "chatrooms";
-        const lastMessageId = chat.lastMessage._id;
-        const res = await Axios.patch(
-          `http://localhost:5000/${chatType}/${chat.strObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId} `
-        );
-        console.log(
-          "chat updated. success: " + res.data.success,
-          res.data.data
-        );
-      } catch (err) {
-        console.error("update chat failed", err);
-      }
-    }
-    socket.emit("leave_room", chatId.current);
-    setCurrentChat(null);
-    console.log(`${loggedUser.username} exited chat ${chat.id}`);
-  }
-
+  //#region styling and displaying message functions
   function setMessageClassName(message) {
     const senderObjectId = message.sender._id;
     let senderId = senderObjectId ? senderObjectId.toString() : message.sender;
@@ -179,6 +184,7 @@ function Chat({
     if (isChatroom.current && message.sender.username === "SYSTEM") return null;
     return dateFormat(message.createdAt);
   }
+  //#endregion
 
   function mapMessages() {
     return messages.map((message) => {
@@ -192,6 +198,33 @@ function Chat({
         </div>
       );
     });
+  }
+
+  async function exitChat() {
+    if (!isChatroom.current && messages.length === 0) {
+      delete chat.members;
+      const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
+      setChatHistory(updatedChatHistory);
+      console.log("chat history", updatedChatHistory);
+    } else if (chat.newChat) delete chat.newChat;
+    if (chat.strObjectId && newMessages) {
+      try {
+        const chatType = !isChatroom.current ? "conversations" : "chatrooms";
+        const lastMessageId = chat.lastMessage._id;
+        const res = await Axios.patch(
+          `http://localhost:5000/${chatType}/${chat.strObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId} `
+        );
+        console.log(
+          "chat updated. success: " + res.data.success,
+          res.data.data
+        );
+      } catch (err) {
+        console.error("update chat failed", err);
+      }
+    }
+    socket.emit("leave_room", chatId.current);
+    setCurrentChat(null);
+    console.log(`${loggedUser.username} exited chat ${chat.id}`);
   }
 
   return (

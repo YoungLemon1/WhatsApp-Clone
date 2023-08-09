@@ -133,10 +133,12 @@ conversationRouter.post(
 );
 
 conversationRouter.patch("/:id", async (req, res) => {
-  console.log("Inside the PATCH route handler");
   const { id } = req.params;
   const { fieldToUpdate, updatedValue } = req.query;
-
+  const validFields = Object.keys(Conversation.schema.obj);
+  if (!validFields.includes(fieldToUpdate)) {
+    return res.status(400).json({ message: `Invalid field: ${fieldToUpdate}` });
+  }
   try {
     const conversation = await Conversation.findByIdAndUpdate(
       id,
@@ -147,7 +149,6 @@ conversationRouter.patch("/:id", async (req, res) => {
     if (!conversation) {
       return res.status(404).json({ message: "Conversation not found" });
     }
-
     res.json({ success: true, data: conversation });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });

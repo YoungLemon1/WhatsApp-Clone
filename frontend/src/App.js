@@ -10,7 +10,6 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 
 function App() {
   const [user, setUser] = useState(null);
-
   return (
     <LocalizationProvider dateAdapter={AdapterMoment} dateLibrary={moment}>
       {user ? (
