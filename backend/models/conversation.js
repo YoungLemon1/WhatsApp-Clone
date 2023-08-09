@@ -9,14 +9,6 @@ const ConversationSchema = new Schema(
         required: true,
       },
     ],
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-    },
-    lastUpdatedAt: {
-      type: Date,
-      default: Date.now(),
-    },
     lastMessage: {
       type: Schema.Types.ObjectId,
       ref: "Message",
