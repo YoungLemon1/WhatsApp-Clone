@@ -132,6 +132,27 @@ conversationRouter.post(
   }
 );
 
+conversationRouter.put("/conversations/:id/lastmessage", async (req, res) => {
+  const { id } = req.params;
+  const { lastMessage } = req.body;
+
+  try {
+    const conversation = await Conversation.findByIdAndUpdate(
+      id,
+      { lastMessage },
+      { new: true }
+    );
+
+    if (!conversation) {
+      return res.status(404).json({ message: "Conversation not found" });
+    }
+
+    res.json(conversation);
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 conversationRouter.patch(
   "/:id",
   craeteCoversationValidatioRules,

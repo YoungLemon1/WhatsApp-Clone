@@ -72,73 +72,97 @@ messageRouter.get("/", async (req, res) => {
 messageRouter.get("/last-messages", async (req, res) => {
   try {
     const { userId } = req.query;
-    //console.log("user id", userId);
+    console.log("user id", userId);
 
     const SYSTEM_ID = process.env.SYSTEM_ID;
+    const systemObjectId = new mongoose.Types.ObjectId(SYSTEM_ID);
+    /*
     const userConversations = await Conversation.find({
       members: { $in: [userId] },
-    }).populate({ path: "members", select: "username imageURL" });
-    //console.log("conversations", userConversations);
+    })
+      .select("_id members")
+      .lean();
+    const userChatrooms = await Chatroom.find({ members: { $in: [userId] } })
+      .select("_id")
+      .lean();
+    */
 
-    const userChatrooms = await Chatroom.find({ members: { $in: [userId] } });
-    //console.log("chatrooms", userChatrooms);
+    const userInteractions = [];
 
-    const userInteractions = await Message.aggregate([
-      // Match messages for the user where recipient or sender is the user
-      {
-        $match: {
-          $or: [
-            {
-              conversation: {
-                $in: userConversations.map((conversation) => conversation._id),
-              },
-            },
-            {
-              chatroom: {
-                $in: userChatrooms.map((chatroom) => chatroom._id),
-              },
-            },
-          ],
-        },
-      },
-      // group messages by the other user or chatroom
-      {
-        $group: {
-          _id: {
-            $cond: [
-              { $eq: [{ $ifNull: ["$conversation", null] }, null] },
-              "$chatroom",
-              "$conversation",
-            ],
-          },
-          lastMessage: { $last: "$$ROOT" },
-        },
-      },
-      // Perform the additional logic for sorting and finding the sorting message
-      // Sort the userInteractions based on sortingMessage createdAt
-      {
-        $sort: { "lastMessage.createdAt": -1 },
-      },
-    ]);
-
-    userInteractions.map(async (interaction) => {
-      interaction.sortingMessage = interaction.lastMessage;
-      const chatroomId = interaction.lastMessage.chatroom;
-      if (chatroomId) {
-        const chatroomMessages = await Message.find({
-          chatroom: chatroomId,
-        }).populate({ path: "sender", select: "username" });
-        const sortingMessage = chatroomMessages
-          .slice()
-          .reverse()
-          .find(
-            (chatroomMessage) => chatroomMessage.sender.username !== "SYSTEM"
-          );
-        if (sortingMessage) interaction.sortingMessage = sortingMessage;
-        else interaction.sortingMessage = chatroomMessages[0];
-      }
+    // Fetch user's conversations
+    const userConversations = await Conversation.find({
+      members: userId,
+    }).populate({
+      path: "members",
+      select: "username imageURL",
     });
 
+    for (const conversation of userConversations) {
+      const messages = await Message.find({
+        conversation: conversation._id,
+      }).sort({
+        createdAt: -1,
+      });
+
+      // Check if messages exist
+      if (messages && messages.length > 0) {
+        const lastMessage = messages[0]; // As the messages are sorted in descending order by createdAt, the first message is the latest one
+        const reversedMessages = [...messages].reverse();
+        const firstSystemMessage =
+          reversedMessages.find((msg) => msg.sender.equals(systemObjectId)) ||
+          null;
+        const firstHumanMessage = reversedMessages.find(
+          (msg) => !msg.sender.equals(systemObjectId)
+        );
+        const sortingMessage =
+          firstHumanMessage || firstSystemMessage || lastMessage;
+
+        userInteractions.push({
+          _id: conversation._id,
+          type: "conversation",
+          lastMessage: lastMessage,
+          sortingMessage: sortingMessage,
+        });
+      } else {
+        console.log(
+          `No messages found for conversation with id: ${conversation._id}`
+        );
+      }
+    }
+
+    // Fetch user's chatrooms
+    const userChatrooms = await Chatroom.find({ members: userId });
+
+    for (const chatroom of userChatrooms) {
+      const messages = await Message.find({ chatroom: chatroom._id }).sort({
+        createdAt: -1,
+      });
+
+      // Check if messages exist
+      if (messages && messages.length > 0) {
+        const lastMessage = messages[0]; // As the messages are sorted in descending order by createdAt, the first message is the latest one
+        const reversedMessages = [...messages].reverse();
+        const firstSystemMessage =
+          reversedMessages.find((msg) => msg.sender.equals(systemObjectId)) ||
+          null;
+        const firstHumanMessage = reversedMessages.find(
+          (msg) => !msg.sender.equals(systemObjectId)
+        );
+        const sortingMessage =
+          firstHumanMessage || firstSystemMessage || lastMessage;
+
+        userInteractions.push({
+          _id: chatroom._id,
+          type: "chatroom",
+          lastMessage: lastMessage,
+          sortingMessage: sortingMessage,
+        });
+      } else {
+        console.log(`No messages found for chatroom with id: ${chatroom._id}`);
+      }
+    }
+
+    // Sort user interactions by the creation date of the sorting message
     userInteractions.sort(
       (a, b) => b.sortingMessage.createdAt - a.sortingMessage.createdAt
     );
@@ -149,7 +173,7 @@ messageRouter.get("/last-messages", async (req, res) => {
     //console.log("user interactions", userInteractions);
     const chatHistory = userInteractions.map((interaction) => {
       const lastMessage = interaction.lastMessage;
-      const isGroupChat = lastMessage.chatroom !== undefined;
+      const isGroupChat = interaction.type === "chatroom";
       let interactionID = null;
       let strObjectId = null;
       let title = null;
@@ -239,15 +263,8 @@ messageRouter.post(
   createMessageValidationRules,
   validate,
   async (req, res) => {
-    const { sender, conversation, chatroom, message } = req.body;
     try {
-      const newMessage = new Message({
-        sender,
-        conversation,
-        chatroom,
-        message,
-        createdAt: Date.now(),
-      });
+      const newMessage = new Message(req.body);
       await newMessage.save();
 
       res.status(201).json(newMessage);

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { body } from "express-validator";
 import validate from "./validation/valdiate.js";
 import bcrypt, { hash } from "bcrypt";
-import UserModel from "../models/user.js";
+import User from "../models/user.js";
 import mongoose from "mongoose";
 
 const userRouter = Router();
@@ -10,7 +10,7 @@ const userRouter = Router();
 userRouter.get("/", async (req, res) => {
   try {
     const { username } = req.query;
-    const user = await UserModel.findOne({ username: username });
+    const user = await User.findOne({ username: username });
     res.status(200).json(user);
   } catch (err) {
     console.error(err.stack);
@@ -22,7 +22,7 @@ userRouter.get("/", async (req, res) => {
 
 userRouter.get("/", async (req, res) => {
   try {
-    const users = await UserModel.find({});
+    const users = await User.find({});
     res.status(200).json(users);
   } catch (err) {
     console.error(err.stack);
@@ -36,7 +36,7 @@ userRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req;
 
-    const user = await UserModel.findById(id);
+    const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -69,7 +69,7 @@ userRouter.post(
       const { username, password } = req.body;
 
       // Find the user by username
-      const user = await UserModel.findOne({ username: username });
+      const user = await User.findOne({ username: username });
 
       if (!user) {
         res.status(401).json({
@@ -118,14 +118,14 @@ const createUserValidationRules = [
 userRouter.post("/", createUserValidationRules, validate, async (req, res) => {
   const { username, password, birthdate, email, imageURL, role } = req.body;
   // Check if username already exists in the database
-  const existingUser = await UserModel.findOne({ username: username });
+  const existingUser = await User.findOne({ username: username });
   if (existingUser) {
     return res.status(409).json({
       error: "Username already exists",
     });
   }
   // Create a new user
-  const newUser = new UserModel(req.body);
+  const newUser = new User(req.body);
   try {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -156,7 +156,7 @@ userRouter.put(
   async (req, res) => {
     const { id } = req.params;
     const { username, password, birthdate, email, imageURL, role } = req.body;
-    const user = await UserModel.findOne({ _id: id });
+    const user = await User.findOne({ _id: id });
     if (!user) {
       return res.status(409).json({
         error: "Bad request: user does not exist",
@@ -189,7 +189,7 @@ userRouter.patch(
     const { username, password, birthdate, email, imageURL, role } = req.body;
 
     try {
-      const user = await UserModel.findById(id);
+      const user = await User.findById(id);
 
       if (!user) {
         return res.status(400).json({
@@ -246,7 +246,7 @@ userRouter.patch(
     try {
       const { fieldToUpdate, updatedValue } = req.body;
       // Update all users with the provided field and value
-      const updateResult = await UserModel.updateMany(
+      const updateResult = await User.updateMany(
         {},
         { [fieldToUpdate]: updatedValue }
       );
@@ -273,7 +273,7 @@ userRouter.patch(
 userRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedUser = await UserModel.findByIdAndDelete(id);
+    const deletedUser = await User.findByIdAndDelete(id);
     if (!deletedUser) {
       return res.status(400).json({
         error: "User does not exist",

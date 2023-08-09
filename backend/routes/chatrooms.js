@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import validate from "./validation/valdiate.js";
-import ChatRoom from "../models/chatroom.js";
+import Chatroom from "../models/chatroom.js";
 const chatRoomRouter = Router();
 
 chatRoomRouter.get("/", async (req, res) => {
   try {
     const { chatroomTitle } = req.query;
-    const chatroom = await ChatRoom.findOne({
+    const chatroom = await Chatroom.findOne({
       title: chatroomTitle,
     });
     if (chatroom) res.status(200).json(chatroom);
@@ -22,7 +22,7 @@ chatRoomRouter.get("/", async (req, res) => {
 
 chatRoomRouter.get("/", async (req, res) => {
   try {
-    const chatrooms = await ChatRoom.find({});
+    const chatrooms = await Chatroom.find({});
     res.status(200).json(chatrooms);
   } catch (err) {
     console.error(err.stack);
@@ -35,7 +35,7 @@ chatRoomRouter.get("/", async (req, res) => {
 chatRoomRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const chatroom = await ChatRoom.findById(id);
+    const chatroom = await Chatroom.findById(id);
     res.status(200).json(chatroom);
   } catch (err) {
     console.error(err.stack);
@@ -71,7 +71,7 @@ chatRoomRouter.post(
   async (req, res) => {
     const { members, name, imageURL, createdAt, lastUpdatedAt } = req.body;
     try {
-      const newChatroom = new ChatRoom(req.body);
+      const newChatroom = new Chatroom(req.body);
       await newChatroom.save();
 
       res.status(201).json(newChatroom);
@@ -84,6 +84,27 @@ chatRoomRouter.post(
   }
 );
 
+chatRoomRouter.put("/chatrooms/:id/lastmessage", async (req, res) => {
+  const { id } = req.params;
+  const { lastMessage } = req.body;
+
+  try {
+    const chatroom = await Chatroom.findByIdAndUpdate(
+      id,
+      { lastMessage },
+      { new: true }
+    );
+
+    if (!chatroom) {
+      return res.status(404).json({ message: "Chatroom not found" });
+    }
+
+    res.json(chatroom);
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 chatRoomRouter.patch(
   "/:id",
   craeteChatValidatioRules,
@@ -92,10 +113,9 @@ chatRoomRouter.patch(
     const { fieldToUpdate, updatedValue } = req.body;
     try {
       const { id } = req.params;
-      const updateResult = await ChatRoom.findByIdAndUpdate(id, {
+      const updateResult = await Chatroom.findByIdAndUpdate(id, {
         [fieldToUpdate]: updatedValue,
       });
-      updateResult.save();
       res.status(200).json(updateResult);
     } catch (err) {
       console.error(err.stack);
@@ -108,7 +128,7 @@ chatRoomRouter.patch(
 chatRoomRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedChatroom = await ChatRoom.findByIdAndDelete(id);
+    const deletedChatroom = await Chatroom.findByIdAndDelete(id);
     if (!deletedChatroom) {
       return res.status(400).json({
         error: "chatroom does not exist",

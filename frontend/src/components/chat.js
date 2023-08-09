@@ -129,6 +129,18 @@ function Chat({
       setChatHistory(updatedChatHistory);
       console.log("chat history", updatedChatHistory);
     } else if (chat.newChat) delete chat.newChat;
+    if (chat.strObjectId) {
+      try {
+        const chatType = !isChatroom.current ? "conversations" : "chatrooms";
+        const res = await Axios.put(
+          `http://localhost:5000/${chatType}/${chat.strObjectId}/lastMessage:`,
+          chat.lastMessage._id
+        );
+        console.log(res.data);
+      } catch (err) {
+        console.error("update chat failed", err);
+      }
+    }
     socket.emit("leave_room", chatId.current);
     setCurrentChat(null);
     console.log(`${loggedUser.username} exited chat ${chat.id}`);
