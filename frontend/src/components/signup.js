@@ -4,6 +4,7 @@ import Axios from "axios";
 import { Button } from "react-bootstrap";
 import { DatePicker } from "@mui/x-date-pickers";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { API_URL } from "../constants";
 function Signup({ closeModal }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -60,7 +61,7 @@ function Signup({ closeModal }) {
       };
 
       if (imageURL === "") delete user.imageURL;
-      const res = await Axios.post("http://localhost:5000/users", user);
+      const res = await Axios.post(`${API_URL}/users`, user);
       console.log("user created", res.data);
       alert("User created");
       closeModal();

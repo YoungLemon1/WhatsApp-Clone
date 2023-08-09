@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Button, Container } from "react-bootstrap";
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import Axios from "axios";
 import Signup from "./signup";
+import { API_URL } from "../constants";
 function Login({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +31,7 @@ function Login({ setUser }) {
       return;
     }
     try {
-      const res = await Axios.post("http://localhost:5000/users/auth", {
+      const res = await Axios.post(`${API_URL}/users/auth`, {
         username,
         password,
       });

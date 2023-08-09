@@ -5,6 +5,7 @@ import moment from "moment";
 import { Button } from "react-bootstrap";
 import { io } from "socket.io-client";
 import ChatHistory from "./chatHistory";
+import { API_URL } from "../constants";
 
 function UserPage({ user, setUser }) {
   const [chatHistory, setChatHistory] = useState([]);
@@ -36,7 +37,7 @@ function UserPage({ user, setUser }) {
       try {
         const userId = user._id.toString();
         const res = await Axios.get(
-          `http://localhost:5000/messages/last-messages?userId=${userId}`
+          `${API_URL}/messages/last-messages?userId=${userId}`
         );
         const data = res.data;
         setChatHistory(data);
@@ -125,7 +126,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resUserSearch = await Axios.get(
-        `http://localhost:5000/users?username=${searchText}`
+        `http://${API_URL}/users?username=${searchText}`
       );
       userData = resUserSearch.data;
     } catch (error) {
@@ -135,7 +136,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resChatroomSearch = await Axios.get(
-        `http://localhost:5000/chatrooms?chatroomTitle=${searchText}`
+        `http://${API_URL}/chatrooms?chatroomTitle=${searchText}`
       );
       chatroomData = resChatroomSearch.data;
     } catch (error) {

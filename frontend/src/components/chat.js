@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Axios from "axios";
 import ScrollableFeed from "react-scrollable-feed";
+import { API_URL } from "../constants";
 
 function Chat({
   chat,
@@ -45,7 +46,7 @@ function Chat({
       }
       try {
         const res = await Axios.get(
-          `http://localhost:5000/messages?chatId=${chat.id}&chatStrObjectId=${chat.strObjectId}`
+          `${API_URL}/messages?chatId=${chat.id}&chatStrObjectId=${chat.strObjectId}`
         );
         const data = res.data;
         isChatroom.current = data.isChatroom;
@@ -69,10 +70,7 @@ function Chat({
       members: chat.members,
     };
     try {
-      const res = await Axios.post(
-        "http://localhost:5000/conversations",
-        conversation
-      );
+      const res = await Axios.post(`${API_URL}/conversations`, conversation);
 
       const data = res.data;
       console.log("User conversation created", data);
@@ -84,7 +82,7 @@ function Chat({
 
   async function createAndEmitMessage(message, recipients, senderData) {
     try {
-      const res = await Axios.post("http://localhost:5000/messages", message);
+      const res = await Axios.post(`${API_URL}/messages`, message);
       const data = res.data;
       console.log("Message created", data);
       socket.emit("send_message", data, recipients, senderData);
@@ -212,7 +210,7 @@ function Chat({
         const chatType = !isChatroom.current ? "conversations" : "chatrooms";
         const lastMessageId = chat.lastMessage._id;
         const res = await Axios.patch(
-          `http://localhost:5000/${chatType}/${chat.strObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId} `
+          `${API_URL}/${chatType}/${chat.strObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId} `
         );
         console.log(
           "chat updated. success: " + res.data.success,

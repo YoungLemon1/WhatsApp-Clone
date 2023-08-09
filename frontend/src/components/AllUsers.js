@@ -1,8 +1,9 @@
 import React from "react";
 import moment from "moment";
 import Axios from "axios";
+import { API_URL } from "../constants";
 function AllUsers() {
-  const res = Axios.get("http://localhost:5000/users");
+  const res = Axios.get(`${API_URL}/users`);
   const users = res.data;
   return (
     <div id="all-users">
