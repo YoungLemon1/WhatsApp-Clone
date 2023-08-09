@@ -132,14 +132,15 @@ conversationRouter.post(
   }
 );
 
-conversationRouter.put("/conversations/:id/lastmessage", async (req, res) => {
+conversationRouter.patch("/:id", async (req, res) => {
+  console.log("Inside the PATCH route handler");
   const { id } = req.params;
-  const { lastMessage } = req.body;
+  const { fieldToUpdate, updatedValue } = req.query;
 
   try {
     const conversation = await Conversation.findByIdAndUpdate(
       id,
-      { lastMessage },
+      { [fieldToUpdate]: updatedValue },
       { new: true }
     );
 
@@ -147,32 +148,11 @@ conversationRouter.put("/conversations/:id/lastmessage", async (req, res) => {
       return res.status(404).json({ message: "Conversation not found" });
     }
 
-    res.json(conversation);
+    res.json({ success: true, data: conversation });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
-conversationRouter.patch(
-  "/:id",
-  craeteCoversationValidatioRules,
-  validate,
-  async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updateResult = await Conversation.findByIdAndUpdate(id, {
-        [fieldToUpdate]: updatedValue,
-      });
-      updateResult.save();
-      res.status(200).json(updateResult);
-    } catch (err) {
-      console.error(err.stack);
-      res.status(500).json({
-        error: "Internal server error: Failure fetching chatroom",
-      });
-    }
-  }
-);
 
 conversationRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;

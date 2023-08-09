@@ -14,6 +14,7 @@ function Chat({
   const [messages, setMessages] = useState([]);
   const [currentMessageContent, setCurrentMessageContent] = useState("");
   const [loading, setLoading] = useState(true);
+  const [newMessages, setNewMessages] = useState(false);
 
   const userId = useRef(null);
   const chatId = useRef(null);
@@ -114,6 +115,7 @@ function Chat({
         };
     emptyMessage();
     setMessages([...messages, newMessage]);
+    setNewMessages(true);
     setChatHistory((prevChatHistory) => [
       chat,
       ...prevChatHistory.filter((prevChat) => prevChat.id !== chatId.current),
@@ -129,14 +131,17 @@ function Chat({
       setChatHistory(updatedChatHistory);
       console.log("chat history", updatedChatHistory);
     } else if (chat.newChat) delete chat.newChat;
-    if (chat.strObjectId) {
+    if (chat.strObjectId && newMessages) {
       try {
         const chatType = !isChatroom.current ? "conversations" : "chatrooms";
-        const res = await Axios.put(
-          `http://localhost:5000/${chatType}/${chat.strObjectId}/lastMessage:`,
-          chat.lastMessage._id
+        const lastMessageId = chat.lastMessage._id;
+        const res = await Axios.patch(
+          `http://localhost:5000/${chatType}/${chat.strObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId} `
         );
-        console.log(res.data);
+        console.log(
+          "chat updated. success: " + res.data.success,
+          res.data.data
+        );
       } catch (err) {
         console.error("update chat failed", err);
       }

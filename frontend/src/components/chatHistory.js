@@ -24,10 +24,16 @@ function ChatHistory({
 
       if (chat) {
         chat.lastMessage = message;
-        setChatHistory((prevChatHistory) => [
-          chat,
-          ...prevChatHistory.filter((prevChat) => prevChat.id !== chat.id),
-        ]);
+        console.log(message);
+        if (message.isHumanSender) {
+          setChatHistory((prevChatHistory) => [
+            chat,
+            ...prevChatHistory.filter((prevChat) => prevChat.id !== chat.id),
+          ]);
+        } else {
+          // If the sender is the system, only update the lastMessage property
+          setChatHistory([...chatHistory]);
+        }
       } else {
         const members = [loggedUserId.toString(), message.sender];
         const sortedMembers = members.map((member) => member.toString()).sort();
@@ -35,7 +41,7 @@ function ChatHistory({
         const chatId = sortedMembers.reduce((acc, member) => acc + member, "");
         const newChat = {
           id: chatId,
-          strObjectId: message.conversation,
+          strObjectId: chatStrObjectId,
           title: senderData.username,
           imageURL: senderData.imageURL,
           lastMessage: message,

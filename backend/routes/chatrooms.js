@@ -2,9 +2,9 @@ import { Router } from "express";
 import { body } from "express-validator";
 import validate from "./validation/valdiate.js";
 import Chatroom from "../models/chatroom.js";
-const chatRoomRouter = Router();
+const chatroomRouter = Router();
 
-chatRoomRouter.get("/", async (req, res) => {
+chatroomRouter.get("/", async (req, res) => {
   try {
     const { chatroomTitle } = req.query;
     const chatroom = await Chatroom.findOne({
@@ -20,7 +20,7 @@ chatRoomRouter.get("/", async (req, res) => {
   }
 });
 
-chatRoomRouter.get("/", async (req, res) => {
+chatroomRouter.get("/", async (req, res) => {
   try {
     const chatrooms = await Chatroom.find({});
     res.status(200).json(chatrooms);
@@ -32,7 +32,7 @@ chatRoomRouter.get("/", async (req, res) => {
   }
 });
 
-chatRoomRouter.get("/:id", async (req, res) => {
+chatroomRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const chatroom = await Chatroom.findById(id);
@@ -64,7 +64,7 @@ const craeteChatValidatioRules = [
   body("imageURL").optional().trim().escape(),
 ];
 
-chatRoomRouter.post(
+chatroomRouter.post(
   "/",
   craeteChatValidatioRules,
   validate,
@@ -84,28 +84,27 @@ chatRoomRouter.post(
   }
 );
 
-chatRoomRouter.put("/chatrooms/:id/lastmessage", async (req, res) => {
+chatroomRouter.patch("/chatrooms/:id/lastMessage", async (req, res) => {
   const { id } = req.params;
-  const { lastMessage } = req.body;
+  const { lastMessageId } = req.body;
 
   try {
     const chatroom = await Chatroom.findByIdAndUpdate(
       id,
-      { lastMessage },
+      { lastMessage: lastMessageId },
       { new: true }
     );
 
     if (!chatroom) {
       return res.status(404).json({ message: "Chatroom not found" });
     }
-
-    res.json(chatroom);
+    res.json({ success: true, data: chatroom });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
-chatRoomRouter.patch(
+chatroomRouter.patch(
   "/:id",
   craeteChatValidatioRules,
   validate,
@@ -125,7 +124,7 @@ chatRoomRouter.patch(
     }
   }
 );
-chatRoomRouter.delete("/:id", async (req, res) => {
+chatroomRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const deletedChatroom = await Chatroom.findByIdAndDelete(id);
@@ -145,4 +144,4 @@ chatRoomRouter.delete("/:id", async (req, res) => {
   }
 });
 
-export default chatRoomRouter;
+export default chatroomRouter;

@@ -267,7 +267,11 @@ messageRouter.post(
       const newMessage = new Message(req.body);
       await newMessage.save();
 
-      res.status(201).json(newMessage);
+      const responseMessage = {
+        ...newMessage.toObject(), // Assuming message is a Mongoose document
+        isHumanSender: !newMessage.sender.equals(systemObjectId),
+      };
+      res.status(201).json(responseMessage);
     } catch (err) {
       console.error(err.stack);
       res.status(500).json({
