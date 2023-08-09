@@ -14,9 +14,10 @@ function UserPage({ user, setUser }) {
   const [chatHistoryLoading, setChatHistoryLoading] = useState(true);
   const socket = useRef(null);
 
+  //#region lifecycle functions
   useEffect(() => {
     // Initialize the socket connection
-    socket.current = io("http://localhost:5000");
+    socket.current = io(process.env.REACT_APP_API_URL);
     // Clean up the socket connection on component unmount
     return () => {
       socket.current.disconnect();
@@ -52,15 +53,61 @@ function UserPage({ user, setUser }) {
     // Fetch the initial chat history and add event listener on socket change
   }, [socket, setChatHistory, user._id]);
 
-  function dateFormat(date) {
-    if (date) {
-      return moment(date).format("HH:mm");
-    } else return "";
-  }
+  useEffect(() => {
+    if (!socket) return;
+    // Add the event listener for receiving messages
+    socket.current.on("receive_message", (message, senderData) => {
+      const chatStrObjectId = message.conversation
+        ? message.conversation
+        : message.chatroom;
+      const chat = chatHistory.find(
+        (chat) => chat.strObjectId === chatStrObjectId
+      );
 
-  function logout() {
-    console.log(`${user.username} logged out successefully`);
-    setUser(null);
+      if (chat) {
+        chat.lastMessage = message;
+        console.log(message);
+        if (message.isHumanSender) {
+          setChatHistory((prevChatHistory) => [
+            chat,
+            ...prevChatHistory.filter((prevChat) => prevChat.id !== chat.id),
+          ]);
+        } else {
+          // If the sender is the system, only update the lastMessage property
+          setChatHistory([...chatHistory]);
+        }
+      } else {
+        const members = [user._id.toString(), message.sender];
+        const sortedMembers = members.map((member) => member.toString()).sort();
+        console.log("sorted", sortedMembers);
+        const chatId = sortedMembers.reduce((acc, member) => acc + member, "");
+        const newChat = {
+          id: chatId,
+          strObjectId: chatStrObjectId,
+          title: senderData.username,
+          imageURL: senderData.imageURL,
+          lastMessage: message,
+        };
+        setChatHistory((prevChatHistory) => [newChat, ...prevChatHistory]);
+      }
+    });
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      if (socket) {
+        socket.current.off("receive_message");
+      }
+    };
+  }, [socket, chatHistory, setChatHistory, user._id]);
+
+  //#endregion
+
+  //#region enter chat functions
+  function enterChat(chat) {
+    setSearchText("");
+    socket.current.emit("join_room", chat.id);
+    setCurrentChat(chat);
+    console.log(`${user.username} entered chat ${chat.id}`);
   }
 
   async function tryEnterChat() {
@@ -123,21 +170,28 @@ function UserPage({ user, setUser }) {
     } else if (chatroomData) {
       const chatroom = {
         id: chatroomData._id,
+        strObjectId: chatroomData._id,
         members: chatroomData.members,
         title: chatroomData.title,
         imageURL: chatroomData.imageURL,
         isGroupChat: true,
+        newChat: true,
       };
       setChatHistory([...chatHistory, chatroom]);
       enterChat(chatroom);
     } else setSearchError("No search results found");
   }
+  //#endregion
 
-  function enterChat(chat) {
-    setSearchText("");
-    socket.current.emit("join_room", chat.id);
-    setCurrentChat(chat);
-    console.log(`${user.username} entered chat ${chat.id}`);
+  function dateFormat(date) {
+    if (date) {
+      return moment(date).format("HH:mm");
+    } else return "";
+  }
+
+  function logout() {
+    console.log(`${user.username} logged out successefully`);
+    setUser(null);
   }
 
   return (
@@ -178,8 +232,6 @@ function UserPage({ user, setUser }) {
           </div>
           <ChatHistory
             chatHistory={chatHistory}
-            socket={socket.current}
-            setChatHistory={setChatHistory}
             chatHistoryLoading={chatHistoryLoading}
             setChatHistoryLoading={setChatHistoryLoading}
             loggedUserId={user._id}
