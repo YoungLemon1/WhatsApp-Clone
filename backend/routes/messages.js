@@ -72,19 +72,12 @@ messageRouter.get("/", async (req, res) => {
 messageRouter.get("/user-chat-history", async (req, res) => {
   try {
     const { userId } = req.query;
-    console.log("user id", userId);
 
     const SYSTEM_ID = process.env.SYSTEM_ID;
     const systemObjectId = new mongoose.Types.ObjectId(SYSTEM_ID);
 
-    const userConversations = await Conversation.find({
-      members: { $in: [userId] },
-    }).populate({ path: "members", select: "username imageURL" });
-
-    const userChatrooms = await Chatroom.find({ members: { $in: [userId] } });
-
     const aggregateInteractions = async (collection, type, idField) => {
-      return collection.aggregate([
+      const pipeline = [
         { $match: { members: new mongoose.Types.ObjectId(userId) } },
         {
           $lookup: {
@@ -99,6 +92,7 @@ messageRouter.get("/user-chat-history", async (req, res) => {
         {
           $group: {
             _id: `$_id`,
+            members: { $first: "$members" },
             lastMessage: { $first: "$messages" },
             firstSystemMessage: {
               $first: {
@@ -123,6 +117,7 @@ messageRouter.get("/user-chat-history", async (req, res) => {
         {
           $project: {
             type: type,
+            members: 1,
             lastMessage: "$lastMessage",
             sortingMessage: {
               $ifNull: [
@@ -134,7 +129,21 @@ messageRouter.get("/user-chat-history", async (req, res) => {
             },
           },
         },
-      ]);
+      ];
+
+      // Additional lookup for Conversations to get the user details
+      if (type === "conversation") {
+        pipeline.push({
+          $lookup: {
+            from: "users",
+            localField: "members",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        });
+      }
+
+      return collection.aggregate(pipeline);
     };
 
     const userConversationInteractions = await aggregateInteractions(
@@ -148,12 +157,12 @@ messageRouter.get("/user-chat-history", async (req, res) => {
       "chatroom"
     );
 
-    console.log("user conversations", userConversationInteractions);
-    console.log("user chatrooms", userChatroomInteractions);
     const userInteractions = [
       ...userConversationInteractions,
       ...userChatroomInteractions,
     ];
+
+    // ... (rest of the code)
 
     // Sort user interactions by the creation date of the sorting message in descending order
     userInteractions.sort(
@@ -172,15 +181,13 @@ messageRouter.get("/user-chat-history", async (req, res) => {
       let title = null;
       let imageURL = null;
       if (!isGroupChat) {
-        console.log("crash");
-        const conversation = userConversations.find((conversation) =>
+        const conversation = userConversationInteractions.find((conversation) =>
           conversation._id.equals(interaction.lastMessage.conversation)
         );
-        console.log("after crash");
-        const otherUser = conversation.members.find(
+        const otherUser = conversation.userDetails.find(
           (member) => member._id.toString() != userId
         );
-        const sortedMemberIds = conversation.members
+        const sortedMemberIds = conversation.userDetails
           .map((member) => member._id.toString())
           .sort();
         const conversationId = sortedMemberIds.reduce(
@@ -194,7 +201,7 @@ messageRouter.get("/user-chat-history", async (req, res) => {
         title = otherUser.username;
         imageURL = otherUser.imageURL;
       } else {
-        const chatroom = userChatrooms.find((room) =>
+        const chatroom = userChatroomInteractions.find((room) =>
           room._id.equals(interaction.lastMessage.chatroom)
         );
         interactionID = chatroom._id.toString();
