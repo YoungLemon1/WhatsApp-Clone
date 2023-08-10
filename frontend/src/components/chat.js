@@ -38,7 +38,7 @@ function Chat({
   useEffect(() => {
     userId.current = loggedUser._id;
     async function fetchMessages() {
-      if (chat.newChat) {
+      if (chat.new) {
         setLoading(false);
         return;
       }
@@ -227,7 +227,7 @@ function Chat({
   }
 
   async function exitChat() {
-    if (chat.newChat) delete chat.newChat;
+    if (chat.new) delete chat.new;
     socket.emit("leave_room", chat.id);
     setCurrentChat(null);
     console.log(`${loggedUser.username} exited chat ${chat.id}`);
