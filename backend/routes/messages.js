@@ -76,17 +76,16 @@ messageRouter.get("/last-messages", async (req, res) => {
 
     const SYSTEM_ID = process.env.SYSTEM_ID;
     const systemObjectId = new mongoose.Types.ObjectId(SYSTEM_ID);
+
     /*
     const userConversations = await Conversation.find({
-      members: { $in: [userId] },
-    })
-      .select("_id members")
-      .lean();
-    const userChatrooms = await Chatroom.find({ members: { $in: [userId] } })
-      .select("_id")
-      .lean();
-    */
-
+      members: userId,
+    }).populate({
+      path: "members",
+      select: "username imageURL",
+    });
+    const userChatrooms = await Chatroom.find({ members: userId });
+*/
     const userInteractions = [];
 
     // Fetch user's conversations
