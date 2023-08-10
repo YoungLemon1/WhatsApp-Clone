@@ -185,13 +185,14 @@ messageRouter.get("/last-messages", async (req, res) => {
         const otherUser = conversation.members.find(
           (member) => member._id.toString() != userId
         );
-        const sortedMembers = conversation.members
-          .map((member) => member.toString())
+        const sortedMemberIds = conversation.members
+          .map((member) => member._id.toString())
           .sort();
-        const conversationId = sortedMembers.reduce(
+        const conversationId = sortedMemberIds.reduce(
           (acc, member) => acc + member,
           ""
         );
+        console.log("conversation id:", conversationId);
 
         interactionID = conversationId;
         strObjectId = conversation._id.toString();
@@ -268,10 +269,10 @@ messageRouter.post(
       await newMessage.save();
 
       const responseMessage = {
-        ...newMessage.toObject(), // Assuming message is a Mongoose document
+        ...newMessage.toObject(),
         isHumanSender: !newMessage.sender.equals(systemObjectId),
       };
-      res.status(201).json(responseMessage);
+      res.status(201).json({ data: responseMessage, success: true });
     } catch (err) {
       console.error(err.stack);
       res.status(500).json({

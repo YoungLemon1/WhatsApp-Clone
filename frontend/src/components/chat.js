@@ -18,7 +18,6 @@ function Chat({
   const [newMessages, setNewMessages] = useState(false);
 
   const userId = useRef(null);
-  const chatId = useRef(null);
   const isChatroom = useRef(false);
 
   //#region lifecycle functions
@@ -38,7 +37,6 @@ function Chat({
 
   useEffect(() => {
     userId.current = loggedUser._id;
-    chatId.current = chat.id;
     async function fetchMessages() {
       if (chat.newChat) {
         setLoading(false);
@@ -64,19 +62,18 @@ function Chat({
 
   //#endregion
 
-  //#region server request functions
-  async function createConversation() {
-    const conversation = {
-      members: chat.members,
-    };
-    try {
-      const res = await Axios.post(`${API_URL}/conversations`, conversation);
+  //#region Server request functions
 
-      const data = res.data;
-      console.log("User conversation created", data);
-      return data._id;
+  async function createConversation() {
+    try {
+      const response = await Axios.post(`${API_URL}/conversations`, {
+        members: chat.members,
+      });
+      console.log("User conversation created", response.data);
+      return response.data._id;
     } catch (err) {
-      console.error("Failed to create conversation");
+      console.error("Failed to create conversation", err);
+      alert("Failed to create a new conversation. Please try again.");
     }
   }
 
@@ -84,73 +81,104 @@ function Chat({
     try {
       const res = await Axios.post(`${API_URL}/messages`, message);
       const data = res.data;
-      console.log("Message created", data);
-      socket.emit("send_message", data, recipients, senderData);
+      socket.emit("send_message", data.data, recipients, senderData, chat.id);
       return data;
     } catch (err) {
       console.error("Failed to send message", err);
+      alert("Failed to send the message. Please try again.");
+    }
+  }
+
+  async function updateLastMessage(lastMessageId) {
+    try {
+      const chatType = !isChatroom.current ? "conversations" : "chatrooms";
+      const res = await Axios.patch(
+        `${API_URL}/${chatType}/${chat.strObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId}`
+      );
+      console.log("Chat updated:", res.data.success, res.data.data);
+      return res.data.success;
+    } catch (err) {
+      console.error("Failed to update chat", err);
+    }
+  }
+
+  //#endregion
+
+  //#region UI Updates
+  // updates the chat resets the current message content.
+  function updateChatAndMessageContent(newMessage) {
+    chat.lastMessage = newMessage;
+    setNewMessages(true);
+    setCurrentMessageContent("");
+  }
+
+  // In case of an error, rolls back the UI to its previous state.
+  function rollbackUIAfterFailedMessage(prevLastMessage, prevChatHistory) {
+    chat.lastMessage = prevLastMessage;
+    setMessages((prevMessages) => [...prevMessages.slice(0, -1)]);
+    setChatHistory(prevChatHistory);
+  }
+
+  // Updates the chat history based on the message's sender type.
+  function updateChatHistoryAfterMessageSend(responseData) {
+    const { isHumanSender } = responseData.data;
+    if (isHumanSender) {
+      setChatHistory((prevChatHistory) => [
+        chat,
+        ...prevChatHistory.filter((prevChat) => prevChat.id !== chat.id),
+      ]);
+    } else {
+      setChatHistory((prevChatHistory) => [...prevChatHistory]);
     }
   }
   //#endregion
 
-  /*updates the users chat history and the message list after sending a message
-   and indicates that messages have been sent in this chat. */
-  function updateUIAfterMessageSend(data) {
-    chat.lastMessage = data;
-    const { isHumanSender, ...dataRest } = data;
-    const newMessage = !isChatroom.current
-      ? dataRest
-      : {
-          ...dataRest,
-          sender: {
-            _id: loggedUser._id,
-            username: loggedUser.username,
-            imageURL: loggedUser.imageURL,
-          },
-        };
-    setCurrentMessageContent("");
-    setMessages([...messages, newMessage]);
-    setNewMessages(true);
-    if (data.isHumanSender)
-      setChatHistory((prevChatHistory) => [
-        chat,
-        ...prevChatHistory.filter((prevChat) => prevChat.id !== chatId.current),
-      ]);
-    else setChatHistory([...chatHistory]);
-  }
-
-  // send message and emit to chat and chat history of the rcepients
+  // Main function to send a message and update UI accordingly.
   async function sendMessage() {
-    function getRecipients(chat) {
-      return chat.members.filter((m) => m !== loggedUser._id.toString());
-    }
+    const getRecipients = (chat) =>
+      chat.members.filter((m) => m !== loggedUser._id.toString());
+    const chatType = !isChatroom.current ? "conversation" : "chatroom";
+
     if (!isChatroom.current && !chat.strObjectId && messages.length === 0) {
       const conversationId = await createConversation();
-      if (!conversationId) {
-        console.error("cannot send message. Chat is undefined");
-        return;
-      }
+      if (!conversationId) return; // Error handling is done inside createConversation.
+
       chat.strObjectId = conversationId;
     }
 
-    const message = {
+    const prevLastMessage = chat.lastMessage;
+    const prevChatHistory = [...chatHistory];
+
+    const messagePayload = {
       sender: userId.current,
       message: currentMessageContent,
-      ...(isChatroom.current
-        ? { chatroom: chat.strObjectId }
-        : { conversation: chat.strObjectId }),
+      [chatType]: chat.strObjectId,
     };
 
-    console.log("message payload", message);
-    const recipients = getRecipients(chat);
-    const senderData = {
+    console.log(messagePayload);
+
+    const senderInfo = {
       username: loggedUser.username,
       imageURL: loggedUser.imageURL,
     };
 
-    const data = await createAndEmitMessage(message, recipients, senderData);
-    console.log("Message created", data);
-    updateUIAfterMessageSend(data);
+    updateChatAndMessageContent(messagePayload);
+
+    const responseData = await createAndEmitMessage(
+      messagePayload,
+      getRecipients(chat),
+      senderInfo
+    );
+
+    if (responseData && responseData.success) {
+      const newMessage = responseData.data;
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      console.log("message created", newMessage);
+      await updateLastMessage(newMessage._id);
+      updateChatHistoryAfterMessageSend(responseData);
+    } else {
+      rollbackUIAfterFailedMessage(prevLastMessage, prevChatHistory);
+    }
   }
 
   //#region styling and displaying message functions
@@ -199,28 +227,8 @@ function Chat({
   }
 
   async function exitChat() {
-    if (!isChatroom.current && messages.length === 0) {
-      delete chat.members;
-      const updatedChatHistory = chatHistory.filter((c) => c.id !== chat.id);
-      setChatHistory(updatedChatHistory);
-      console.log("chat history", updatedChatHistory);
-    } else if (chat.newChat) delete chat.newChat;
-    if (chat.strObjectId && newMessages) {
-      try {
-        const chatType = !isChatroom.current ? "conversations" : "chatrooms";
-        const lastMessageId = chat.lastMessage._id;
-        const res = await Axios.patch(
-          `${API_URL}/${chatType}/${chat.strObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId} `
-        );
-        console.log(
-          "chat updated. success: " + res.data.success,
-          res.data.data
-        );
-      } catch (err) {
-        console.error("update chat failed", err);
-      }
-    }
-    socket.emit("leave_room", chatId.current);
+    if (chat.newChat) delete chat.newChat;
+    socket.emit("leave_room", chat.id);
     setCurrentChat(null);
     console.log(`${loggedUser.username} exited chat ${chat.id}`);
   }
@@ -250,6 +258,7 @@ function Chat({
           id="message-text"
           className="message-text"
           placeholder="Send a message"
+          value={currentMessageContent}
           onChange={(event) => {
             setCurrentMessageContent(event.target.value);
           }}

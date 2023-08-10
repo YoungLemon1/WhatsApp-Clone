@@ -9,6 +9,7 @@ import messageRouter from "./routes/messages.js";
 import chatroomRouter from "./routes/chatrooms.js";
 import conversationRouter from "./routes/conversation.js";
 import { log } from "console";
+import Conversation from "./models/conversation.js";
 
 configDotenv();
 
@@ -45,12 +46,18 @@ io.on("connection", (socket) => {
     socket.leave(data);
     console.log(`user ${socket.id} left room ${data}`);
   });
-  socket.on("send_message", (message, recipients, senderData) => {
+  socket.on("send_message", (message, recipients, senderData, chatId) => {
     const recipientSockets = recipients.map(
       (recipient) => usersSockets[recipient]
     );
-    recipientSockets.forEach((recipient) => {
-      socket.to(recipient).emit("receive_message", message, senderData);
+    console.log(chatId);
+    socket.to(chatId).emit("receive_message", message, senderData);
+
+    // Emit to individual users for updating their chat history
+    recipients.forEach((recipientId) => {
+      socket
+        .to(usersSockets[recipientId])
+        .emit("update_chat_history", message, senderData, chatId);
     });
   });
   socket.on("disconnect", () => {

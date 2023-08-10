@@ -6,6 +6,7 @@ import { Button } from "react-bootstrap";
 import { io } from "socket.io-client";
 import ChatHistory from "./chatHistory";
 import { API_URL } from "../constants";
+import { colors } from "@mui/material";
 
 function UserPage({ user, setUser }) {
   const [chatHistory, setChatHistory] = useState([]);
@@ -18,7 +19,7 @@ function UserPage({ user, setUser }) {
   //#region lifecycle functions
   useEffect(() => {
     // Initialize the socket connection
-    socket.current = io(process.env.REACT_APP_API_URL);
+    socket.current = io(API_URL);
     // Clean up the socket connection on component unmount
     return () => {
       socket.current.disconnect();
@@ -57,31 +58,28 @@ function UserPage({ user, setUser }) {
   useEffect(() => {
     if (!socket) return;
     // Add the event listener for receiving messages
-    socket.current.on("receive_message", (message, senderData) => {
+    socket.current.on("update_chat_history", (message, senderData, chatId) => {
+      console.log("updating chatHistory");
       const chatStrObjectId = message.conversation
         ? message.conversation
         : message.chatroom;
-      const chat = chatHistory.find(
+      //checks if the chat already exists in the database
+      const existingChat = chatHistory.find(
         (chat) => chat.strObjectId === chatStrObjectId
       );
 
-      if (chat) {
-        chat.lastMessage = message;
-        console.log(message);
+      if (existingChat) {
+        existingChat.lastMessage = message;
         if (message.isHumanSender) {
           setChatHistory((prevChatHistory) => [
-            chat,
-            ...prevChatHistory.filter((prevChat) => prevChat.id !== chat.id),
+            existingChat,
+            ...prevChatHistory.filter((chat) => chat.id !== existingChat.id),
           ]);
         } else {
           // If the sender is the system, only update the lastMessage property
           setChatHistory([...chatHistory]);
         }
       } else {
-        const members = [user._id.toString(), message.sender];
-        const sortedMembers = members.map((member) => member.toString()).sort();
-        console.log("sorted", sortedMembers);
-        const chatId = sortedMembers.reduce((acc, member) => acc + member, "");
         const newChat = {
           id: chatId,
           strObjectId: chatStrObjectId,
@@ -96,7 +94,7 @@ function UserPage({ user, setUser }) {
     // Clean up the event listener when the component unmounts
     return () => {
       if (socket) {
-        socket.current.off("receive_message");
+        socket.current.off("update_chat_history");
       }
     };
   }, [socket, chatHistory, setChatHistory, user._id]);
@@ -106,6 +104,7 @@ function UserPage({ user, setUser }) {
   //#region enter chat functions
   function enterChat(chat) {
     setSearchText("");
+    console.log("chat id", chat.id);
     socket.current.emit("join_room", chat.id);
     setCurrentChat(chat);
     console.log(`${user.username} entered chat ${chat.id}`);
@@ -126,7 +125,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resUserSearch = await Axios.get(
-        `http://${API_URL}/users?username=${searchText}`
+        `${API_URL}/users?username=${searchText}`
       );
       userData = resUserSearch.data;
     } catch (error) {
@@ -136,7 +135,7 @@ function UserPage({ user, setUser }) {
 
     try {
       const resChatroomSearch = await Axios.get(
-        `http://${API_URL}/chatrooms?chatroomTitle=${searchText}`
+        `${API_URL}/chatrooms?chatroomTitle=${searchText}`
       );
       chatroomData = resChatroomSearch.data;
     } catch (error) {
@@ -155,7 +154,6 @@ function UserPage({ user, setUser }) {
         (acc, member) => acc + member,
         ""
       );
-      console.log("tempId", conversationId);
       const conversation = {
         id: conversationId,
         strObjectId: null,
@@ -165,8 +163,6 @@ function UserPage({ user, setUser }) {
         isGroupChat: false,
         newChat: true,
       };
-      //socket.emit("joined_new_conversation", user._id.toString());
-      setChatHistory([...chatHistory, conversation]);
       enterChat(conversation);
     } else if (chatroomData) {
       const chatroom = {
@@ -178,7 +174,6 @@ function UserPage({ user, setUser }) {
         isGroupChat: true,
         newChat: true,
       };
-      setChatHistory([...chatHistory, chatroom]);
       enterChat(chatroom);
     } else setSearchError("No search results found");
   }
