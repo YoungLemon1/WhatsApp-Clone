@@ -138,7 +138,7 @@ messageRouter.get("/user-chat-history", async (req, res) => {
             from: "users",
             localField: "members",
             foreignField: "_id",
-            as: "userDetails",
+            as: "usersDetails",
           },
         });
       }
@@ -184,10 +184,10 @@ messageRouter.get("/user-chat-history", async (req, res) => {
         const conversation = userConversationInteractions.find((conversation) =>
           conversation._id.equals(interaction.lastMessage.conversation)
         );
-        const otherUser = conversation.userDetails.find(
+        const otherUser = conversation.usersDetails.find(
           (member) => member._id.toString() != userId
         );
-        const sortedMemberIds = conversation.userDetails
+        const sortedMemberIds = conversation.usersDetails
           .map((member) => member._id.toString())
           .sort();
         const conversationId = sortedMemberIds.reduce(
