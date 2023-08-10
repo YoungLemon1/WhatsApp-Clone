@@ -37,7 +37,7 @@ function UserPage({ user, setUser }) {
       try {
         const userId = user._id.toString();
         const res = await Axios.get(
-          `${API_URL}/messages/last-messages?userId=${userId}`
+          `${API_URL}/messages/user-chat-history?userId=${userId}`
         );
         const data = res.data;
         setChatHistory(data);
