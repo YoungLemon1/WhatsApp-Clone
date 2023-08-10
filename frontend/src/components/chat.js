@@ -23,17 +23,17 @@ function Chat({
   //#region lifecycle functions
   useEffect(() => {
     // Add the event listener for receiving messages
-    socket.on("receive_message", (message) => {
-      console.log("meesage received", message);
-      chat.lastMessage = message;
-      setMessages([...messages, message]);
+    socket.on("receive_message", (newMessage) => {
+      console.log("meesage received", newMessage);
+      setCurrentChat((prevChat) => ({ ...prevChat, lastMessage: newMessage }));
+      setMessages([...messages, newMessage]);
     });
 
     // Clean up the event listener when the component unmounts
     return () => {
       socket.off("receive_message");
     };
-  }, [socket, chat, messages]);
+  }, [socket, setCurrentChat, messages]);
 
   useEffect(() => {
     userId.current = loggedUser._id;
@@ -107,14 +107,17 @@ function Chat({
   //#region UI Updates
   // updates the chat resets the current message content.
   function updateChatAndMessageContent(newMessage) {
-    chat.lastMessage = newMessage;
+    setCurrentChat((prevChat) => ({ ...prevChat, lastMessage: newMessage }));
     setNewMessages(true);
     setCurrentMessageContent("");
   }
 
   // In case of an error, rolls back the UI to its previous state.
   function rollbackUIAfterFailedMessage(prevLastMessage, prevChatHistory) {
-    chat.lastMessage = prevLastMessage;
+    setCurrentChat((prevChat) => ({
+      ...prevChat,
+      lastMessage: prevLastMessage,
+    }));
     setMessages((prevMessages) => [...prevMessages.slice(0, -1)]);
     setChatHistory(prevChatHistory);
   }
@@ -143,7 +146,10 @@ function Chat({
       const conversationId = await createConversation();
       if (!conversationId) return; // Error handling is done inside createConversation.
 
-      chat.strObjectId = conversationId;
+      setCurrentChat((prevChat) => ({
+        ...prevChat,
+        strObjectId: conversationId,
+      }));
     }
 
     const prevLastMessage = chat.lastMessage;
@@ -227,7 +233,7 @@ function Chat({
   }
 
   async function exitChat() {
-    if (chat.new) delete chat.new;
+    if (chat.new) setCurrentChat({ new: undefined });
     socket.emit("leave_room", chat.id);
     setCurrentChat(null);
     console.log(`${loggedUser.username} exited chat ${chat.id}`);
