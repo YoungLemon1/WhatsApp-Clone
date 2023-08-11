@@ -177,10 +177,7 @@ function Chat({
       const conversationId = await createConversation();
       if (!conversationId) return; // Error handling is done inside createConversation.
 
-      setCurrentChat((prevChat) => ({
-        ...prevChat,
-        strObjectId: conversationId,
-      }));
+      updateChatStrObjectId(conversationId);
     }
 
     const prevLastMessage = chat.lastMessage;
