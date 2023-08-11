@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Axios from "axios";
 import ScrollableFeed from "react-scrollable-feed";
 import { API_URL } from "../constants";
@@ -15,25 +15,51 @@ function Chat({
   const [messages, setMessages] = useState([]);
   const [currentMessageContent, setCurrentMessageContent] = useState("");
   const [loading, setLoading] = useState(true);
-  const [newMessages, setNewMessages] = useState(false);
+  //const [newMessages, setNewMessages] = useState(false);
 
   const userId = useRef(null);
   const isChatroom = useRef(false);
+  //const prevLastMessage = useRef(chat.lastMessage);
+  const addMessage = (message) => {
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
+
+  const updateChatLastMessage = useCallback(
+    (message) => {
+      setCurrentChat((prevChat) => ({
+        ...prevChat,
+        lastMessage: message,
+      }));
+    },
+    [setCurrentChat]
+  );
+
+  const updateChatStrObjectId = useCallback(
+    (strObjectId) => {
+      setCurrentChat((prevChat) => ({
+        ...prevChat,
+        strObjectId,
+      }));
+    },
+    [setCurrentChat]
+  );
 
   //#region lifecycle functions
   useEffect(() => {
     // Add the event listener for receiving messages
-    socket.on("receive_message", (newMessage) => {
-      console.log("meesage received", newMessage);
-      setCurrentChat((prevChat) => ({ ...prevChat, lastMessage: newMessage }));
-      setMessages([...messages, newMessage]);
-    });
-
-    // Clean up the event listener when the component unmounts
-    return () => {
-      socket.off("receive_message");
+    const handleReceiveMessage = (message) => {
+      console.log("meesage received", message);
+      addMessage(message);
+      updateChatLastMessage(message);
     };
-  }, [socket, setCurrentChat, messages]);
+
+    socket.on("receive_message", handleReceiveMessage);
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+    };
+  }, [socket, updateChatLastMessage]);
+
+  // Clean up the event listener when the component unmounts
 
   useEffect(() => {
     userId.current = loggedUser._id;
@@ -66,11 +92,12 @@ function Chat({
 
   async function createConversation() {
     try {
-      const response = await Axios.post(`${API_URL}/conversations`, {
+      const res = await Axios.post(`${API_URL}/conversations`, {
         members: chat.members,
       });
-      console.log("User conversation created", response.data);
-      return response.data._id;
+      const data = res.data;
+      console.log("User conversation created", data);
+      return data._id;
     } catch (err) {
       console.error("Failed to create conversation", err);
       alert("Failed to create a new conversation. Please try again.");
@@ -106,10 +133,10 @@ function Chat({
 
   //#region UI Updates
   // updates the chat resets the current message content.
-  function updateChatAndMessageContent(newMessage) {
-    setCurrentChat((prevChat) => ({ ...prevChat, lastMessage: newMessage }));
-    setNewMessages(true);
+  function updateUIAfterSendMessage(newMessage) {
     setCurrentMessageContent("");
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setCurrentChat((prevChat) => ({ ...prevChat, lastMessage: newMessage }));
   }
 
   // In case of an error, rolls back the UI to its previous state.
@@ -119,13 +146,17 @@ function Chat({
       lastMessage: prevLastMessage,
     }));
     setMessages((prevMessages) => [...prevMessages.slice(0, -1)]);
-    setChatHistory(prevChatHistory);
+    setChatHistory((prevChatHistory) => [...prevChatHistory]);
   }
 
   // Updates the chat history based on the message's sender type.
   function updateChatHistoryAfterMessageSend(responseData) {
-    const { isHumanSender } = responseData.data;
+    const { isHumanSender, ...restData } = responseData.data;
     if (isHumanSender) {
+      setCurrentChat((prevChat) => ({
+        ...prevChat,
+        lastMessage: restData,
+      }));
       setChatHistory((prevChatHistory) => [
         chat,
         ...prevChatHistory.filter((prevChat) => prevChat.id !== chat.id),
@@ -168,8 +199,6 @@ function Chat({
       imageURL: loggedUser.imageURL,
     };
 
-    updateChatAndMessageContent(messagePayload);
-
     const responseData = await createAndEmitMessage(
       messagePayload,
       getRecipients(chat),
@@ -178,10 +207,10 @@ function Chat({
 
     if (responseData && responseData.success) {
       const newMessage = responseData.data;
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-      console.log("message created", newMessage);
+      updateUIAfterSendMessage(newMessage);
       await updateLastMessage(newMessage._id);
       updateChatHistoryAfterMessageSend(responseData);
+      console.log("message created", newMessage);
     } else {
       rollbackUIAfterFailedMessage(prevLastMessage, prevChatHistory);
     }
