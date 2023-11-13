@@ -13,9 +13,17 @@ const ConversationSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Message",
     },
+    activeMembers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
+
+ConversationSchema.index({ members: 1 });
 
 const Conversation = model("Conversation", ConversationSchema);
 

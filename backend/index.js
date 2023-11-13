@@ -8,8 +8,6 @@ import userRouter from "./routes/users.js";
 import messageRouter from "./routes/messages.js";
 import chatroomRouter from "./routes/chatrooms.js";
 import conversationRouter from "./routes/conversation.js";
-import { log } from "console";
-import Conversation from "./models/conversation.js";
 
 configDotenv();
 
@@ -27,15 +25,15 @@ const io = new Server(server, {
   },
 });
 
-const usersSockets = {};
+const userSockets = {};
 
 io.on("connection", (socket) => {
   console.log(`socket id ${socket.id} connected`);
 
   socket.on("user_connected", (userId) => {
     console.log("user connected", userId);
-    usersSockets[userId] = socket.id;
-    console.log("user sokcets", usersSockets);
+    userSockets[userId] = socket.id;
+    console.log("user sokcets", userSockets);
   });
 
   socket.on("join_room", (data) => {
@@ -46,29 +44,30 @@ io.on("connection", (socket) => {
     socket.leave(data);
     console.log(`user ${socket.id} left room ${data}`);
   });
-  socket.on("send_message", (message, recipients, senderData, chatId) => {
-    const recipientSockets = recipients.map(
-      (recipient) => usersSockets[recipient]
-    );
-    console.log(chatId);
+  socket.on("send_message", (message, members, senderData, chatId) => {
+    console.log(`userSockets`, userSockets);
+    const memberSockets = members
+      //.filter((member) => userSockets.some((m) => m))
+      .map((member) => userSockets[member]);
+    console.log(memberSockets);
     socket.to(chatId).emit("receive_message", message, senderData);
-
     // Emit to individual users for updating their chat history
-    recipients.forEach((recipientId) => {
+    if (!memberSockets.includes(socket.id)) {
+      memberSockets.push(socket.id);
+    }
+    memberSockets.forEach((memberSocket) => {
       socket
-        .to(usersSockets[recipientId])
+        .to(memberSocket)
         .emit("update_chat_history", message, senderData, chatId);
     });
+
+    // Emit to sender for updating their chat history
+    socket.emit("update_chat_history", message, senderData, chatId);
   });
   socket.on("disconnect", () => {
     console.log(`socket id ${socket.id} disconnected`);
 
-    const userId = Object.keys(usersSockets).find(
-      (key) => usersSockets[key] === socket.id
-    );
-    if (userId) {
-      delete usersSockets[userId];
-    }
+    delete userSockets[userId];
   });
 });
 

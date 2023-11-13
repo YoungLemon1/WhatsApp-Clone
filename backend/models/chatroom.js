@@ -2,11 +2,35 @@ import { Schema, model } from "mongoose";
 
 const ChatroomSchema = new Schema(
   {
+    admin: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    moderators: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    description: {
+      type: String,
+    },
+    isPrivate: {
+      type: Boolean,
+      default: false,
+    },
     members: [
       {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true,
+      },
+    ],
+    activeMembers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
       },
     ],
     title: {
@@ -15,8 +39,7 @@ const ChatroomSchema = new Schema(
     },
     imageURL: {
       type: String,
-      default:
-        "https://cdn6.aptoide.com/imgs/1/2/2/1221bc0bdd2354b42b293317ff2adbcf_icon.png",
+      default: process.env.DEFAULT_GROUP_IMG_URL,
     },
     lastMessage: {
       type: Schema.Types.ObjectId,
@@ -25,6 +48,8 @@ const ChatroomSchema = new Schema(
   },
   { timestamps: true }
 );
+
+ChatroomSchema.index({ members: 1, title: 1, isPrivate: -1 });
 
 const Chatroom = model("ChatRoom", ChatroomSchema);
 

@@ -237,6 +237,7 @@ label {
 }
 
 .profile-img {
+  float: left;
   margin: 0.5rem;
   width: 2rem;
   height: 2rem;

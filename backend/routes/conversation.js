@@ -117,6 +117,7 @@ conversationRouter.post(
       });
       if (existingConversation) {
         res.status(400).json("error: conversation already exists");
+        return;
       }
       const newConversation = new Conversation({
         members,

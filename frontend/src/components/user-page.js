@@ -62,7 +62,6 @@ function UserPage({ user, setUser }) {
     }
 
     const handleUpdateChatHistory = (message, senderData, chatId) => {
-      console.log("updating chatHistory");
       const chatStrObjectId =
         message.conversation !== undefined
           ? message.conversation
@@ -110,6 +109,11 @@ function UserPage({ user, setUser }) {
   }, [socket]);
 
   //#endregion
+  useEffect(() => {
+    console.log("current chat", currentChat);
+    if (currentChat)
+      console.log(`${user.username} entered chat ${currentChat.id}`);
+  }, [currentChat, user.username]);
 
   //#region enter chat functions
   function enterChat(chat) {
@@ -117,15 +121,22 @@ function UserPage({ user, setUser }) {
     console.log("chat id", chat.id);
     socket.current.emit("join_room", chat.id);
     setCurrentChat(chat);
-    console.log(`${user.username} entered chat ${chat.id}`);
   }
 
   async function tryEnterChat() {
     if (!searchText) {
       return;
     }
-    const chat = chatHistory.find((c) => c.title === searchText);
-    if (chat) {
+    const searchChat = chatHistory.find((c) => c.title === searchText);
+    if (searchChat) {
+      const isGroupChat = searchChat.id.length > 24;
+      const chatType = isGroupChat ? "conversation" : "chatroom";
+      const res = await Axios.get(
+        `${API_URL}/${chatType}/${currentChat.strObjectId}`
+      );
+      const data = res.data;
+      const members = data.members;
+      const chat = { ...searchChat, isGroupChat, members };
       enterChat(chat);
       return;
     }
@@ -208,9 +219,16 @@ function UserPage({ user, setUser }) {
     <div id="user-page">
       {!currentChat ? (
         <div>
-          <h1 style={{ display: "inline", float: "left", margin: "0.5rem" }}>
-            {user.username}
-          </h1>
+          <div>
+            <img
+              className="profile-img"
+              src={user.imageURL}
+              alt="user profile"
+            ></img>
+            <h5 style={{ display: "inline", float: "left", margin: "0.5rem" }}>
+              {user.username}
+            </h5>
+          </div>
           <div id="logout-container">
             <Button id="logout" onClick={logout}>
               logout
@@ -251,7 +269,7 @@ function UserPage({ user, setUser }) {
         </div>
       ) : (
         <Chat
-          chat={currentChat}
+          currentChat={currentChat}
           setCurrentChat={setCurrentChat}
           socket={socket.current}
           loggedUser={user}

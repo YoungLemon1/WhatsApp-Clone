@@ -14,6 +14,7 @@ function ChatHistory({
       ) : (
         <ScrollableFeed>
           {chatHistory.map((chat) => {
+            if (!chat.title) console.log(chat);
             const lastMessage = chat.lastMessage;
             if (!lastMessage) return null;
             const sender =

@@ -6,18 +6,19 @@ import mongoose from "mongoose";
 import Message from "../models/message.js";
 import Chatroom from "../models/chatroom.js";
 import Conversation from "../models/conversation.js";
+import User from "../models/user.js";
 
 configDotenv();
 
 const messageRouter = Router();
 const SYSTEM_ID = process.env.SYSTEM_ID;
 const systemObjectId = new mongoose.Types.ObjectId(SYSTEM_ID);
+
 messageRouter.get("/", async (req, res) => {
   try {
     const { chatId, chatStrObjectId } = req.query;
 
     let isChatroom;
-    let members;
     let messages;
 
     // Fetch the messages between the logged-in user and the other user
@@ -26,7 +27,6 @@ messageRouter.get("/", async (req, res) => {
 
       if (conversation) {
         isChatroom = false;
-        members = conversation.members;
         messages = await Message.find({
           conversation: conversation._id,
         }).sort({ createdAt: 1 });
@@ -34,12 +34,11 @@ messageRouter.get("/", async (req, res) => {
         res.status(400).json({ error: "Invalid chat id" });
       }
     } else {
-      const chatroomm = await Chatroom.findById(chatId);
-      if (chatroomm) {
+      const chatroom = await Chatroom.findById(chatId);
+      if (chatroom) {
         isChatroom = true;
-        members = chatroomm.members;
         messages = await Message.find({
-          chatroom: chatroomm._id,
+          chatroom: chatroom._id,
         })
           .sort({ createdAt: 1 })
           .populate({ path: "sender", select: "username imageURL role" });
@@ -48,7 +47,7 @@ messageRouter.get("/", async (req, res) => {
       }
     }
     // Retrieve the user objects for the logged-in user and the other user
-    res.status(200).json({ isChatroom, members, messages });
+    res.status(200).json({ isChatroom, messages });
   } catch (err) {
     console.error(err.stack);
     res.status(500).json({
@@ -169,11 +168,12 @@ messageRouter.get("/user-chat-history", async (req, res) => {
       (a, b) => b.sortingMessage.createdAt - a.sortingMessage.createdAt
     );
 
-    console.log("User interactions", userInteractions);
+    //console.log("User interactions", userInteractions);
 
     // Create the final chat history array
     //console.log("user interactions", userInteractions);
-    const chatHistory = userInteractions.map((interaction) => {
+
+    const chatHistoryPromises = userInteractions.map(async (interaction) => {
       const lastMessage = interaction.lastMessage;
       const isGroupChat = interaction.type === "chatroom";
       let interactionID = null;
@@ -194,17 +194,14 @@ messageRouter.get("/user-chat-history", async (req, res) => {
           (acc, member) => acc + member,
           ""
         );
-        console.log("conversation id:", conversationId);
 
         interactionID = conversationId;
         strObjectId = conversation._id.toString();
         title = otherUser.username;
         imageURL = otherUser.imageURL;
       } else {
-        const chatroom = userChatroomInteractions.find((room) =>
-          room._id.equals(interaction.lastMessage.chatroom)
-        );
-        interactionID = chatroom._id.toString();
+        const chatroom = await Chatroom.findById(interaction._id);
+        interactionID = chatroom._id;
         strObjectId = interactionID;
         title = chatroom.title;
         imageURL = chatroom.imageURL;
@@ -224,6 +221,9 @@ messageRouter.get("/user-chat-history", async (req, res) => {
       };
     });
 
+    const chatHistory = await Promise.all(chatHistoryPromises);
+
+    console.log(chatHistory);
     res.status(200).json(chatHistory);
   } catch (err) {
     console.error(err.stack);
@@ -261,14 +261,24 @@ const createMessageValidationRules = [
   }),
 ];
 
+const getChat = (conversationId, chatroomId) =>
+  conversationId
+    ? Conversation.findById(conversationId)
+    : Chatroom.findById(chatroomId);
+
 messageRouter.post(
   "/",
   createMessageValidationRules,
   validate,
   async (req, res) => {
     try {
+      const { sender, conversation, chatroom } = req.body;
       const newMessage = new Message(req.body);
-      await newMessage.save();
+      const userSender = User.findById(sender);
+      const chat = getChat(conversation, chatroom);
+      if (userSender && chat) await newMessage.save();
+      else if (!userSender) res.status(400).json({ error: "invalid user id" });
+      else res.status(400).json({ error: "invalid chat id" });
 
       const responseMessage = {
         ...newMessage.toObject(),

@@ -1,39 +1,37 @@
 import { Schema, model } from "mongoose";
-const UserSchema = new Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  birthdate: {
-    type: Date,
-    required: false,
-  },
-  email: {
-    type: String,
-    required: false,
-  },
-  imageURL: {
-    type: String,
-    required: false,
-    default:
-      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-  },
-  conatcts: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+const UserSchema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
     },
-  ],
-  role: {
-    type: String,
-    required: true,
+    password: {
+      type: String,
+      required: true,
+    },
+    birthdate: {
+      type: Date,
+    },
+    phone: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
+    imageURL: {
+      type: String,
+      default: process.env.DEFAULT_USER_IMG_URL,
+    },
+    friendList: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
-});
+  { timestamps: true }
+);
 
 const User = model("User", UserSchema);
 export default User;
