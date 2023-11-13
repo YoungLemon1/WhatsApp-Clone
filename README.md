@@ -1,6 +1,6 @@
 # chat
 
-This app is a messageing app that is similar to whatsapp and messanger. User's can log in, send and receive live messages with a timestamp. Each user has a chat history that cointains his last messages from private chats and group chats.
+This app is a real-time chat app that is similar to WhatsApp and Facebook Messenger. Users can send and receive messages. Each user has a chat history that contains the last messages from their private chats and group chats.
 
 # technologies
 
