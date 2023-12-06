@@ -118,7 +118,10 @@ function UserPage({ user, setUser }) {
   //#region enter chat functions
   function enterChat(chat) {
     setSearchText("");
+    console.log("composed chat", chat);
     console.log("chat id", chat.id);
+    console.log("chat isGroupChat", chat.isGroupChat);
+    console.log("chat members 1", chat.members);
     socket.current.emit("join_room", chat.id);
     setCurrentChat(chat);
   }
@@ -130,13 +133,10 @@ function UserPage({ user, setUser }) {
     const searchChat = chatHistory.find((c) => c.title === searchText);
     if (searchChat) {
       const isGroupChat = searchChat.id.length > 24;
-      const chatType = isGroupChat ? "conversation" : "chatroom";
-      const res = await Axios.get(
-        `${API_URL}/${chatType}/${currentChat.strObjectId}`
-      );
-      const data = res.data;
-      const members = data.members;
-      const chat = { ...searchChat, isGroupChat, members };
+      const chat = {
+        ...searchChat,
+        isGroupChat: isGroupChat,
+      };
       enterChat(chat);
       return;
     }

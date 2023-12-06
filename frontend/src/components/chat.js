@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import Axios from "axios";
+import uuid from "uuid4";
 import ScrollableFeed from "react-scrollable-feed";
 import { API_URL } from "../constants";
 
@@ -15,10 +16,10 @@ function Chat({
   const [messages, setMessages] = useState([]);
   const [currentMessageContent, setCurrentMessageContent] = useState("");
   const [loading, setLoading] = useState(true);
-  const currentChatRef = useRef(currentChat);
 
   //const [newMessages, setNewMessages] = useState(false);
-  const userId = useRef(null);
+  const currentChatRef = useRef(currentChat);
+  const userId = useRef(loggedUser._id);
   //const prevLastMessage = useRef(chat.lastMessage);
   const messagePayloadValid = (messagePayload) =>
     messagePayload.sender &&
@@ -49,17 +50,32 @@ function Chat({
     },
     [setCurrentChat]
   );
-
-  useEffect(() => {
-    if (
-      currentChatRef.current.id !== currentChat.id ||
-      currentChatRef.current.strObjectId !== currentChat.strObjectId
-    ) {
-      currentChatRef.current = currentChat;
-    }
-  }, [currentChat]);
-
   //#region lifecycle functions
+  useEffect(() => {
+    // Update the ref every time currentChat changes
+    currentChatRef.current = currentChat;
+
+    const fetchMessages = async () => {
+      try {
+        const res = await Axios.get(
+          `${API_URL}/messages?chatId=${currentChat.id}&chatStrObjectId=${currentChat.strObjectId}`
+        );
+        setMessages(res.data.messages);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch messages", error);
+        setLoading(false);
+      }
+    };
+
+    // Only fetch messages if it's not a new chat
+    if (!currentChat.new) {
+      fetchMessages();
+    } else {
+      setLoading(false);
+    }
+  }, [currentChat, loggedUser._id]); // Depends on currentChat and loggedUser._id
+
   useEffect(() => {
     // Add the event listener for receiving messages
     const handleReceiveMessage = (message) => {
@@ -75,32 +91,6 @@ function Chat({
   }, [socket, updateCurrentChatLastMessage]);
 
   // Clean up the event listener when the component unmounts
-
-  //fetch messages
-  useEffect(() => {
-    userId.current = loggedUser._id;
-    async function fetchMessages() {
-      const res = await Axios.get(
-        `${API_URL}/messages?chatId=${currentChatRef.current.id}&chatStrObjectId=${currentChatRef.current.strObjectId}`
-      );
-      return res.data.messages;
-    }
-
-    if (currentChatRef.current.new) {
-      setLoading(false);
-      return;
-    }
-
-    fetchMessages()
-      .then((resMessages) => {
-        console.log(resMessages);
-        setMessages(resMessages);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch messages", error);
-      });
-  }, [loggedUser._id]);
 
   //#endregion
 
@@ -129,6 +119,7 @@ function Chat({
     )
       alert("Failed to send the message");
     */
+    console.log("members exist", !!members);
     try {
       const res = await Axios.post(`${API_URL}/messages`, message);
       const data = res.data;
@@ -148,6 +139,7 @@ function Chat({
 
   async function updateLastMessage(lastMessageId) {
     try {
+      console.log("Is group chat", currentChat.isGroupChat);
       const chatType = !currentChat.isGroupChat ? "conversations" : "chatrooms";
       const res = await Axios.patch(
         `${API_URL}/${chatType}/${currentChatRef.current.strObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId}`
@@ -169,6 +161,12 @@ function Chat({
       ...prevChat,
       lastMessage: newMessage,
     }));
+    // Replace the last message (optimistic update) with the one from the server
+    setMessages((prevMessages) => {
+      return prevMessages.map((message, index) =>
+        index === prevMessages.length - 1 ? newMessage : message
+      );
+    });
   }
 
   // In case of an error, rolls back the UI to its previous state.
@@ -227,6 +225,9 @@ function Chat({
       imageURL: loggedUser.imageURL,
     };
 
+    console.log("chat members ref exists", !!currentChatRef.current.members);
+    console.log("chat members exists", !!currentChat.members);
+
     const responseData = await createAndEmitMessage(
       messagePayload,
       currentChatRef.current.members,
@@ -263,7 +264,6 @@ function Chat({
       ? senderObjectId.toString()
       : message.sender;
     const senderUsername = message.sender.username;
-    console.log(senderUsername);
     return senderId !== loggedUser._id.toString() && senderUsername !== "SYSTEM"
       ? senderUsername
       : "";
@@ -278,9 +278,9 @@ function Chat({
 
   function mapMessages() {
     return messages.map((message) => {
-      //console.log(`messageId ${message._id}`);
+      const msg_uuid = uuid();
       return (
-        <div className="message-container" key={message._id}>
+        <div className="message-container" key={msg_uuid}>
           <div className={setMessageClassName(message)}>
             <p>{currentChat.isGroupChat ? setMessageHeader(message) : ""}</p>
             <p>{message.message}</p>

@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
   socket.on("user_connected", (userId) => {
     console.log("user connected", userId);
     userSockets[userId] = socket.id;
-    console.log("user sokcets", userSockets);
+    console.log("user sockets", userSockets);
   });
 
   socket.on("join_room", (data) => {
@@ -45,11 +45,11 @@ io.on("connection", (socket) => {
     console.log(`user ${socket.id} left room ${data}`);
   });
   socket.on("send_message", (message, members, senderData, chatId) => {
-    console.log(`userSockets`, userSockets);
-    const memberSockets = members
-      //.filter((member) => userSockets.some((m) => m))
-      .map((member) => userSockets[member]);
-    console.log(memberSockets);
+    console.log("message exists", !!message);
+    console.log("members exists", !!members);
+    console.log("senderData exists", !!senderData);
+    console.log("chatId exists", !!chatId);
+    const memberSockets = members.map((member) => userSockets[member]);
     socket.to(chatId).emit("receive_message", message, senderData);
     // Emit to individual users for updating their chat history
     if (!memberSockets.includes(socket.id)) {
@@ -67,7 +67,12 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`socket id ${socket.id} disconnected`);
 
-    delete userSockets[userId];
+    const userId = Object.keys(userSockets).find(
+      (key) => userSockets[key] === socket.id
+    );
+    if (userId) {
+      delete userSockets[userId];
+    }
   });
 });
 

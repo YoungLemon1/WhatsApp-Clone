@@ -150,6 +150,7 @@ conversationRouter.patch("/:id", async (req, res) => {
     if (!conversation) {
       return res.status(404).json({ message: "Conversation not found" });
     }
+
     res.json({ success: true, data: conversation });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });

@@ -176,6 +176,7 @@ messageRouter.get("/user-chat-history", async (req, res) => {
     const chatHistoryPromises = userInteractions.map(async (interaction) => {
       const lastMessage = interaction.lastMessage;
       const isGroupChat = interaction.type === "chatroom";
+      const members = interaction.members;
       let interactionID = null;
       let strObjectId = null;
       let title = null;
@@ -211,7 +212,9 @@ messageRouter.get("/user-chat-history", async (req, res) => {
         id: interactionID,
         strObjectId,
         title,
+        members,
         imageURL,
+        isGroupChat,
         lastMessage: {
           id: lastMessage._id,
           sender: lastMessage.sender,
