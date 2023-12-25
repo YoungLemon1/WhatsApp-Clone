@@ -61,16 +61,18 @@ function UserPage({ user, setUser }) {
       return chatHistory.findIndex((chat) => chat.id === chatId);
     }
 
-    const handleUpdateChatHistory = (message, senderData, chatId) => {
-      const chatStrObjectId =
-        message.conversation !== undefined
-          ? message.conversation
-          : message.chatroom;
-
+    const handleUpdateChatHistory = (
+      message,
+      senderProfileData,
+      chatProfileData,
+      chatId,
+      chatStrObjectId,
+      members,
+      isGroupChat
+    ) => {
       setChatHistory((prevChatHistory) => {
         const chatIndex = getChatIndex(prevChatHistory, chatId);
         const isExistingChat = chatIndex !== -1;
-
         if (isExistingChat) {
           const updatedChat = {
             ...prevChatHistory[chatIndex],
@@ -88,11 +90,15 @@ function UserPage({ user, setUser }) {
             return updatedChatHistory;
           }
         } else {
+          const newChatProfile =
+            message.sender === user._id ? chatProfileData : senderProfileData;
           const newChat = {
             id: chatId,
             strObjectId: chatStrObjectId,
-            title: senderData.username,
-            imageURL: senderData.imageURL,
+            members,
+            isGroupChat,
+            title: newChatProfile.title,
+            imageURL: newChatProfile.imageURL,
             lastMessage: message,
           };
           return [newChat, ...prevChatHistory];
@@ -106,7 +112,7 @@ function UserPage({ user, setUser }) {
     return () => {
       socket.current.off("update_chat_history", handleUpdateChatHistory);
     };
-  }, [socket]);
+  }, [socket, user._id]);
 
   //#endregion
   useEffect(() => {
@@ -121,7 +127,7 @@ function UserPage({ user, setUser }) {
     console.log("composed chat", chat);
     console.log("chat id", chat.id);
     console.log("chat isGroupChat", chat.isGroupChat);
-    console.log("chat members 1", chat.members);
+    console.log("chat members", chat.members);
     socket.current.emit("join_room", chat.id);
     setCurrentChat(chat);
   }
@@ -179,7 +185,7 @@ function UserPage({ user, setUser }) {
       const conversation = {
         id: conversationId,
         strObjectId: null,
-        members: members,
+        members: sortedMembers,
         title: userData.username,
         imageURL: userData.imageURL,
         isGroupChat: false,

@@ -32,6 +32,9 @@ function ChatHistory({
                     alt={`${chat.title} profile`}
                   ></img>
                   <h4>{chat.title}</h4>
+                  <h6 className="badge" hidden={true}>
+                    New
+                  </h6>
                 </div>
                 <div id="last-message">
                   <p>{sender + lastMessage.message}</p>

@@ -124,6 +124,7 @@ conversationRouter.post(
       });
       await newConversation.save();
       res.status(201).json(newConversation);
+      return;
     } catch (err) {
       console.error(err.stack);
       res.status(500).json({
@@ -137,6 +138,10 @@ conversationRouter.patch("/:id", async (req, res) => {
   const { id } = req.params;
   const { fieldToUpdate, updatedValue } = req.query;
   const validFields = Object.keys(Conversation.schema.obj);
+  if (!id)
+    return res
+      .status(400)
+      .json({ message: "id parameter is null or undefined" });
   if (!validFields.includes(fieldToUpdate)) {
     return res.status(400).json({ message: `Invalid field: ${fieldToUpdate}` });
   }

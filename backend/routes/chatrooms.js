@@ -88,6 +88,10 @@ chatroomRouter.patch("/:id", async (req, res) => {
   const { id } = req.params;
   const { fieldToUpdate, updatedValue } = req.query;
   const validFields = Object.keys(Chatroom.schema.obj);
+  if (!id)
+    return res
+      .status(400)
+      .json({ message: "id parameter is null or undefined" });
   if (!validFields.includes(fieldToUpdate)) {
     return res.status(400).json({ message: `Invalid field: ${fieldToUpdate}` });
   }

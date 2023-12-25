@@ -1,4 +1,7 @@
 import { Schema, model } from "mongoose";
+import { configDotenv } from "dotenv";
+configDotenv();
+const DEFAULT_IMAGE_URL = process.env.DEFAULT_USER_IMG_URL;
 const UserSchema = new Schema(
   {
     username: {
@@ -19,9 +22,12 @@ const UserSchema = new Schema(
     email: {
       type: String,
     },
+    role: {
+      type: String,
+    },
     imageURL: {
       type: String,
-      default: process.env.DEFAULT_USER_IMG_URL,
+      default: DEFAULT_IMAGE_URL,
     },
     friendList: [
       {

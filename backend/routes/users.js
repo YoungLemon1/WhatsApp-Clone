@@ -111,13 +111,15 @@ const createUserValidationRules = [
       "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
     )
     .trim(),
-  body("email").trim().normalizeEmail(),
+  body("email").trim(),
   // Add more validation rules as needed
 ];
 
 userRouter.post("/", createUserValidationRules, validate, async (req, res) => {
-  const { username, password, birthdate, email, imageURL, role } = req.body;
+  const { username, password } = req.body;
   // Check if username already exists in the database
+  console.log(req.body);
+  console.log(req.body.imageURL);
   const existingUser = await User.findOne({ username: username });
   if (existingUser) {
     return res.status(409).json({
@@ -126,6 +128,7 @@ userRouter.post("/", createUserValidationRules, validate, async (req, res) => {
   }
   // Create a new user
   const newUser = new User(req.body);
+  console.log("new User", newUser);
   try {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);

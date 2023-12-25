@@ -168,11 +168,6 @@ messageRouter.get("/user-chat-history", async (req, res) => {
       (a, b) => b.sortingMessage.createdAt - a.sortingMessage.createdAt
     );
 
-    //console.log("User interactions", userInteractions);
-
-    // Create the final chat history array
-    //console.log("user interactions", userInteractions);
-
     const chatHistoryPromises = userInteractions.map(async (interaction) => {
       const lastMessage = interaction.lastMessage;
       const isGroupChat = interaction.type === "chatroom";
@@ -226,7 +221,6 @@ messageRouter.get("/user-chat-history", async (req, res) => {
 
     const chatHistory = await Promise.all(chatHistoryPromises);
 
-    console.log(chatHistory);
     res.status(200).json(chatHistory);
   } catch (err) {
     console.error(err.stack);

@@ -61,6 +61,7 @@ function Signup({ closeModal }) {
       };
 
       if (imageURL === "") delete user.imageURL;
+      if (email === "") delete user.email;
       const res = await Axios.post(`${API_URL}/users`, user);
       console.log("user created", res.data);
       alert("User created");

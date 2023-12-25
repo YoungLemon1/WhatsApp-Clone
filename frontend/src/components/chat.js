@@ -18,14 +18,17 @@ function Chat({
   const [loading, setLoading] = useState(true);
 
   //const [newMessages, setNewMessages] = useState(false);
-  const currentChatRef = useRef(currentChat);
   const userId = useRef(loggedUser._id);
   //const prevLastMessage = useRef(chat.lastMessage);
   const messagePayloadValid = (messagePayload) =>
     messagePayload.sender &&
     messagePayload.message &&
     (messagePayload.conversation || messagePayload.chatroom) &&
-    !(messagePayload.conversation && messagePayload.chatroom);
+    !(messagePayload.conversation && messagePayload.chatroom) &&
+    typeof messagePayload.sender === "string" &&
+    typeof messagePayload.message === "string" &&
+    (typeof messagePayload.conversation === "string" ||
+      typeof messagePayload.chatroom === "string");
 
   const addMessage = (message) => {
     setMessages((prevMessages) => [...prevMessages, message]);
@@ -53,7 +56,6 @@ function Chat({
   //#region lifecycle functions
   useEffect(() => {
     // Update the ref every time currentChat changes
-    currentChatRef.current = currentChat;
 
     const fetchMessages = async () => {
       try {
@@ -80,6 +82,7 @@ function Chat({
     // Add the event listener for receiving messages
     const handleReceiveMessage = (message) => {
       console.log("meesage received", message);
+      console.log("current chat", currentChat);
       addMessage(message);
       updateCurrentChatLastMessage(message);
     };
@@ -88,9 +91,22 @@ function Chat({
     return () => {
       socket.off("receive_message", handleReceiveMessage);
     };
-  }, [socket, updateCurrentChatLastMessage]);
+  }, [socket, updateCurrentChatLastMessage, currentChat]);
 
   // Clean up the event listener when the component unmounts
+
+  useEffect(() => {
+    // Add the event listener for receiving messages
+    const handleUpdateNewChat = (chatStrObjectId) => {
+      updateCurrentChatStrObjId(chatStrObjectId);
+      console.log("chat new strObjId received:", chatStrObjectId);
+    };
+
+    socket.on("update_new_chat", handleUpdateNewChat);
+    return () => {
+      socket.off("update_new_chat", handleUpdateNewChat);
+    };
+  }, [socket, updateCurrentChatStrObjId]);
 
   //#endregion
 
@@ -110,25 +126,28 @@ function Chat({
     }
   }
 
-  async function createAndEmitMessage(message, members, senderData) {
-    /*
-    if (
-      !message.sender ||
-      !message.message ||
-      !message.conversation & !message.chatroom
-    )
-      alert("Failed to send the message");
-    */
-    console.log("members exist", !!members);
+  async function createAndEmitMessage(
+    message,
+    currentStrObjectId,
+    senderProfileData,
+    chatProfileData
+  ) {
     try {
-      const res = await Axios.post(`${API_URL}/messages`, message);
+      const res = await Axios.post(
+        `${API_URL}/messages`,
+        message,
+        currentStrObjectId
+      );
       const data = res.data;
       socket.emit(
         "send_message",
         data.data,
-        members,
-        senderData,
-        currentChat.id
+        senderProfileData,
+        chatProfileData,
+        currentChat.id,
+        currentStrObjectId,
+        currentChat.members,
+        currentChat.isGroupChat
       );
       return data;
     } catch (err) {
@@ -137,12 +156,12 @@ function Chat({
     }
   }
 
-  async function updateLastMessage(lastMessageId) {
+  async function updateLastMessage(currentStrObjectId, lastMessageId) {
     try {
       console.log("Is group chat", currentChat.isGroupChat);
       const chatType = !currentChat.isGroupChat ? "conversations" : "chatrooms";
       const res = await Axios.patch(
-        `${API_URL}/${chatType}/${currentChatRef.current.strObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId}`
+        `${API_URL}/${chatType}/${currentStrObjectId}?fieldToUpdate=lastMessage&updatedValue=${lastMessageId}`
       );
       console.log("Chat updated:", res.data.success, res.data.data);
       return res.data.success;
@@ -198,8 +217,8 @@ function Chat({
         console.error("Failed to create conversation.");
         return; // Exit the function if there's no conversationId
       }
-
       updateCurrentChatStrObjId(currentStrObjectId);
+      socket.emit("new_chat", currentChat.id, currentStrObjectId);
     }
 
     const messagePayload = {
@@ -210,8 +229,14 @@ function Chat({
 
     if (!messagePayloadValid(messagePayload)) {
       setCurrentMessageContent(currentMessageContent);
+      console.error(
+        "Create message failed: Invalid message base object",
+        messagePayload
+      );
       return;
     }
+
+    console.log("message payload", messagePayload);
 
     // Save the previous state in case we need to rollback
     const prevLastMessage = currentChat.lastMessage;
@@ -220,25 +245,30 @@ function Chat({
     // Optimistically update UI with the new message
     setMessages((prevMessages) => [...prevMessages, messagePayload]);
 
-    const senderInfo = {
-      username: loggedUser.username,
+    const senderProfileData = {
+      title: loggedUser.username,
       imageURL: loggedUser.imageURL,
     };
 
-    console.log("chat members ref exists", !!currentChatRef.current.members);
+    const chatProfileData = {
+      title: currentChat.title,
+      imageURL: currentChat.imageURL,
+    };
+
     console.log("chat members exists", !!currentChat.members);
 
     const responseData = await createAndEmitMessage(
       messagePayload,
-      currentChatRef.current.members,
-      senderInfo
+      currentStrObjectId,
+      senderProfileData,
+      chatProfileData
     );
 
     if (responseData && responseData.success) {
       const newMessage = responseData.data;
       updateUIAfterSendMessage(newMessage);
       updateCurrentChatLastMessage(newMessage);
-      await updateLastMessage(newMessage._id);
+      await updateLastMessage(currentStrObjectId, newMessage._id);
       console.log("message created", newMessage);
     } else {
       rollbackUIAfterFailedMessage(prevLastMessage, prevChatHistory);
@@ -293,14 +323,14 @@ function Chat({
 
   async function exitChat() {
     if (currentChat.new) {
-      await setCurrentChat((prevChat) => ({
+      setCurrentChat((prevChat) => ({
         ...prevChat,
         new: undefined,
       }));
     }
     console.log("chat id" + currentChat.id);
     await socket.emit("leave_room", currentChat.id);
-    await setCurrentChat(null);
+    setCurrentChat(null);
     console.log("chat id" + currentChat.id);
     console.log(`${loggedUser.username} exited chat ${currentChat.id}`);
   }

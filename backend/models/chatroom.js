@@ -1,4 +1,6 @@
 import { Schema, model } from "mongoose";
+import { configDotenv } from "dotenv";
+configDotenv();
 
 const ChatroomSchema = new Schema(
   {
