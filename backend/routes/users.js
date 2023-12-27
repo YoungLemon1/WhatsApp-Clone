@@ -111,7 +111,6 @@ const createUserValidationRules = [
       "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
     )
     .trim(),
-  body("email").trim(),
   // Add more validation rules as needed
 ];
 
@@ -182,58 +181,34 @@ userRouter.put(
   }
 );
 
-// PATCH user route
-userRouter.patch(
-  "/:id",
-  createUserValidationRules,
-  validate,
-  async (req, res) => {
-    const { id } = req.params;
-    const { username, password, birthdate, email, imageURL, role } = req.body;
-
-    try {
-      const user = await User.findById(id);
-
-      if (!user) {
-        return res.status(400).json({
-          error: "Bad request: user does not exist",
-        });
-      }
-
-      if (username) {
-        user.username = username;
-      }
-      if (password) {
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-        user.password = hashedPassword;
-      }
-      if (birthdate) {
-        user.birthdate = birthdate;
-      }
-      if (email) {
-        user.email = email;
-      }
-      if (imageURL) {
-        user.imageURL = imageURL;
-      }
-      if (role) {
-        user.role = role;
-      }
-
-      await user.save();
-
-      res.status(200).json(user);
-    } catch (err) {
-      console.error(err.stack);
-      res.status(500).json({
-        error: "Internal server error: failed to update user",
-      });
-    }
+userRouter.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { fieldToUpdate, updatedValue } = req.query;
+  const validFields = Object.keys(userRouter.schema.obj);
+  if (!id)
+    return res
+      .status(400)
+      .json({ message: "id parameter is null or undefined" });
+  if (!validFields.includes(fieldToUpdate)) {
+    return res.status(400).json({ message: `Invalid field: ${fieldToUpdate}` });
   }
-);
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { [fieldToUpdate]: updatedValue },
+      { new: true }
+    );
 
-// PATCH All users route
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ success: true, data: user });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 // PATCH All users validation rules
 const updateAllUsersValidationRules = [
   body("field").notEmpty().withMessage("Field is required").escape(),

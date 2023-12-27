@@ -72,27 +72,50 @@
 
 .user-form small {
   display: block;
+  height: 25px;
+  padding: 0;
   color: red;
 }
 
 .user-form label {
   display: block;
   font-size: medium;
-  padding: 0.2rem;
+  margin-top: 8px;
+  padding: 0.4rem;
+  padding-bottom: 0.1rem;
 }
 
-.user-form input:not(.date-picker *) {
-  margin-top: 0.2rem;
-  margin-bottom: 0.5rem;
+.user-form input {
+  margin: 0.2rem;
   width: 12rem;
-  border: darkgray solid 1px;
+  border: solid 1px;
   border-radius: 5px;
   padding: 0.25rem;
 }
 
+#signup-modal .container input:required:invalid {
+  border-color: rgb(226, 68, 57);
+}
+
+#signup-modal .user-form #password {
+  padding-left: 25px;
+}
+
+.container .icon-button {
+  margin: 0.2rem;
+  padding: 0.2rem;
+}
+
+.container .date-picker input {
+  padding: 10px;
+  border: none;
+  outline: none;
+}
+
 .user-form button {
   display: inline-block;
-  margin-top: 1.5rem;
+  margin-top: 0.2rem;
+  margin-top: 10%;
   margin-bottom: 1.5rem;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
@@ -108,8 +131,13 @@
   background-color: inherit;
 }
 
+.user-form .close-button:focus {
+  background-color: rgb(255, 255, 255);
+}
+
 .user-form .close-button:hover {
-  background-color: #a3aaacb0;
+  background-color: #9e9e9eb0;
+  border-color: initial;
 }
 
 .user-form form div {
@@ -120,13 +148,17 @@
   width: 13rem;
 }
 
+.user-form .date-picker button {
+  margin: 8px;
+}
+
 .login-container {
   position: relative;
 }
 
 #signup-modal {
   position: absolute;
-  height: min-content;
+  height: 50rem;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -135,13 +167,21 @@
   padding: 2rem;
 }
 
+#login.user-form .container {
+  padding-left: 25%;
+}
+
+#signup-modal.user-form .container {
+  padding-left: 26%;
+}
+
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(71, 71, 71, 0.5);
+  background-color: rgba(71, 71, 71, 0.918);
   z-index: 5;
 }
 
@@ -151,7 +191,17 @@
 
 #login input,
 label {
-  margin: 0.5rem;
+  margin: 0.25rem;
+  margin-left: 0;
+}
+
+#user-page {
+  height: 100vh;
+  background-color: #494864;
+}
+
+#profile-header {
+  color: white;
 }
 
 #logout-container {
@@ -163,7 +213,7 @@ label {
 #logout-container #logout {
   display: block;
   border: none;
-  color: black;
+  color: rgb(255, 255, 255);
   background-color: inherit;
   margin-top: 0.4rem;
   margin-right: 1.5rem;
@@ -172,7 +222,14 @@ label {
 }
 
 #logout-container #logout:hover {
-  background-color: rgba(235, 232, 232, 0.918);
+  opacity: 0.8;
+  background-color: #37328067;
+}
+
+#no-messages-placeholder {
+  display: inline-flex;
+  height: 60rem;
+  width: 100%;
 }
 
 #error-container {
@@ -202,6 +259,23 @@ label {
   vertical-align: middle;
 }
 
+#user-page #no-messages-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  width: 100%;
+  margin-top: 100px;
+}
+#user-page #no-messages-placeholder * {
+  align-self: center;
+  margin: 20px;
+}
+
+#user-page #no-messages-placeholder #placeholder-icon {
+  height: 30%;
+  width: 30%;
+}
+
 #user-page #chat-history {
   height: 30rem;
 }
@@ -219,6 +293,11 @@ label {
 #user-page #chat-history .chat-history-item:hover {
   background-color: rgba(147, 148, 150, 0.212);
   cursor: pointer;
+}
+
+.toggle-password-icon {
+  display: flex;
+  justify-items: flex-end;
 }
 
 .chat-search {
@@ -253,17 +332,28 @@ label {
   border-radius: 50%;
 }
 
+#chat-history * {
+  color: #ffffff;
+}
+
 .chat-window .chat-header {
-  background-color: #026783;
+  background-color: #2c0a8a2a;
   height: max-content;
   display: flex;
 }
 .chat-window .chat-header * {
   display: inline;
+  color: white;
+  vertical-align: middle;
+  padding: 3px;
 }
 
-.chat-window .chat-header .chat-name {
-  margin: 0.25rem;
+.chat-window .chat-name {
+  height: 100%;
+}
+
+.chat-window #message-text {
+  width: 100%;
 }
 
 .chat-window .chat-header .chat-name p {
@@ -274,13 +364,14 @@ label {
 }
 
 .chat-window .chat-header .exit-btn {
-  background-color: none;
+  background-color: inherit;
+  border-color: inherit;
   border-radius: 50%;
   margin: 0.5rem;
 }
 
 .chat-window .chat-body {
-  height: 45rem;
+  height: 73rem;
   overflow: auto;
   width: 100%;
   padding-left: 5rem;
@@ -320,17 +411,17 @@ label {
 
 .chat-window .chat-body .message.current-user {
   align-self: flex-start;
-  background-color: #06702f;
+  background-color: #470d6962;
 }
 
 .chat-window .chat-body .message.other-user {
   align-self: flex-end;
-  background-color: #a3aaacdc;
+  background-color: #6a6d6ddc;
 }
 
 .chat-window .chat-body .message.system {
   align-self: center;
-  background-color: #9fd1f3f1;
+  background-color: #5c3cb4b0;
 }
 
 .chat-window .chat-footer {
@@ -341,7 +432,13 @@ label {
 
 .chat-window .chat-footer * {
   margin-top: 0rem;
-  margin-bottom: 0rem;
+  margin-bottom: 0.15rem;
   margin-left: 0.2rem;
   margin-right: 0.2rem;
+}
+
+.chat-window .chat-footer .send-btn {
+  border-radius: 50%;
+  text-align: center;
+  vertical-align: middle;
 }

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import mongoose from "mongoose";
 import validate from "./validation/valdiate.js";
 import Conversation from "../models/conversation.js";
 import User from "../models/user.js";

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import Axios from "axios";
 import uuid from "uuid4";
+import { Button } from "react-bootstrap";
 import ScrollableFeed from "react-scrollable-feed";
 import { API_URL } from "../constants";
 
@@ -338,9 +339,9 @@ function Chat({
   return (
     <div className="chat-window">
       <div className="chat-header">
-        <button className="exit-btn" onClick={exitChat}>
+        <Button className="exit-btn" onClick={exitChat}>
           ←
-        </button>
+        </Button>
         <img
           className="profile-img"
           src={currentChat.imageURL}
@@ -377,7 +378,7 @@ function Chat({
           disabled={currentMessageContent === ""}
           onClick={sendMessage}
         >
-          Send
+          ➤
         </button>
       </div>
     </div>

@@ -1,13 +1,18 @@
 import React from "react";
 import { useState } from "react";
 import Axios from "axios";
-import { Button } from "react-bootstrap";
+import { Button, Container, Form } from "react-bootstrap";
 import { DatePicker } from "@mui/x-date-pickers";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Input, InputAdornment, IconButton } from "@mui/material";
+import { Icon } from "react-icons-kit";
+import { eye, eyeOff } from "react-icons-kit/feather";
 import { API_URL } from "../constants";
 function Signup({ closeModal }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordShown, setPasswordShown] = useState(false);
+  const [icon, setIcon] = useState(eye);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -17,8 +22,15 @@ function Signup({ closeModal }) {
   const [email, setEmail] = useState("");
   const [imageURL, setImageURL] = useState("");
   const role = "user";
+
   const handleBirthDateChange = (date) => {
     setBirthdate(date);
+  };
+
+  const handleTogglePasswordHidden = () => {
+    const newIcon = !passwordShown ? eyeOff : eye;
+    setPasswordShown(!passwordShown);
+    setIcon(newIcon);
   };
 
   function validatePassword(password) {
@@ -31,11 +43,9 @@ function Signup({ closeModal }) {
   function validateNewUser() {
     if (!username) {
       console.error("Error: empty username");
-      setUsernameError("Please enter your username");
       return false;
     } else if (!password) {
       console.error("Error: empty password");
-      setPasswordError("Please enter your password");
       return false;
     } else if (password !== passwordConfirmation) {
       console.error("Error: passwords don't match");
@@ -47,9 +57,21 @@ function Signup({ closeModal }) {
     return true;
   }
 
+  function formErrorSetter() {
+    if (!username) {
+      setUsernameError("username is invalid");
+    } else if (!password) {
+      setPasswordError("password is invalid");
+    } else if (password !== passwordConfirmation) {
+      setPasswordConfirmationError("passwords must match");
+    }
+  }
+
   async function createUser(event) {
     event.preventDefault();
-    if (!validateNewUser()) return;
+    if (!validateNewUser()) {
+      formErrorSetter();
+    }
     try {
       const user = {
         username,
@@ -62,6 +84,7 @@ function Signup({ closeModal }) {
 
       if (imageURL === "") delete user.imageURL;
       if (email === "") delete user.email;
+      console.log("new user", user);
       const res = await Axios.post(`${API_URL}/users`, user);
       console.log("user created", res.data);
       alert("User created");
@@ -78,94 +101,128 @@ function Signup({ closeModal }) {
   }
 
   return (
-    <div className="form-container">
-      <form id="signup-modal" className="user-form" onSubmit={createUser}>
-        <button className="close-button" onClick={closeModal}>
+    <Container className="form-container">
+      <Form id="signup-modal" className="user-form" onSubmit={createUser}>
+        <Button className="close-button" onClick={closeModal}>
           X
-        </button>
+        </Button>
         <h3>Create New User</h3>
-        <label htmlFor="username">Username</label>
-        <input
-          required
-          minLength={2}
-          id="username"
-          name="username"
-          onChange={(event) => setUsername(event.target.value)}
-        ></input>
+        <Container id="username-container" className="container">
+          <label htmlFor="username">Username</label>
+          <Input
+            required
+            minLength={2}
+            id="username"
+            name="username"
+            className="required-field"
+            disableUnderline={true}
+            onChange={(event) => setUsername(event.target.value)}
+          ></Input>
+        </Container>
         <small>{usernameError}</small>
-        <label htmlFor="password">Password</label>
-        <input
-          required
-          minLength={6}
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          onChange={(event) => {
-            const newPassword = event.target.value;
-            setPassword(newPassword);
-            if (newPassword && !validatePassword(newPassword)) {
-              setPasswordError(
-                "Password must have at least 6 characters, including one lowercase letter, one uppercase letter, and one number."
-              );
-            } else {
-              setPasswordError("");
+        <Container id="password-container" className="container">
+          <label htmlFor="password">Password</label>
+          <Input
+            required
+            minLength={6}
+            id="password"
+            name="password"
+            className="required-field"
+            disableUnderline={true}
+            type={passwordShown ? "text" : "password"}
+            autoComplete="new-password"
+            onChange={(event) => {
+              const currentPassword = event.target.value;
+              setPassword(currentPassword);
+              if (currentPassword && !validatePassword(currentPassword)) {
+                setPasswordError(
+                  "Password must have at least 6 characters: one lowercase letter, one uppercase letter, and one number."
+                );
+              } else {
+                setPasswordError("");
+              }
+              if (
+                passwordConfirmation &&
+                currentPassword !== passwordConfirmation
+              ) {
+                setPasswordConfirmationError("Passwords must match");
+              } else {
+                setPasswordConfirmationError("");
+              }
+            }}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  className="icon-button"
+                  aria-label="toggle password visibility"
+                  onClick={handleTogglePasswordHidden}
+                  edge="end"
+                >
+                  <Icon icon={icon} />
+                </IconButton>
+              </InputAdornment>
             }
-            if (passwordConfirmation && newPassword !== passwordConfirmation) {
-              setPasswordConfirmationError("Passwords must match");
-            } else {
-              setPasswordConfirmationError("");
-            }
-          }}
-        ></input>
+          ></Input>
+        </Container>
         <small>{passwordError}</small>
-        <label htmlFor="password-confirmation">Password confirmation</label>
-        <input
-          required
-          minLength={6}
-          id="password-confirmation"
-          name="password-confirmation"
-          type="password"
-          autoComplete="new-password-confirmation"
-          onChange={(event) => {
-            const newPasswordConfirmation = event.target.value;
-            setPasswordConfirmation(newPasswordConfirmation);
-            if (password !== newPasswordConfirmation) {
-              setPasswordConfirmationError("Passwords must match");
-            } else {
-              setPasswordConfirmationError("");
-            }
-          }}
-        ></input>
-        <small>{passwordConfirmationError}</small>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          onChange={(event) => setEmail(event.target.value)}
-        ></input>
-        <label htmlFor="imageURL">Image URl</label>
-        <input
-          id="imageURL"
-          name="imageURL"
-          type="url"
-          onChange={(event) => setImageURL(event.target.value)}
-        ></input>
-        <label htmlFor="birthdate">Birthdate</label>
-        <DatePicker
-          id="birthdate"
-          name="birthdate"
-          className="date-picker"
-          selected={birthdate}
-          dateFormat="dd/MM/yyyy"
-          onChange={handleBirthDateChange}
-        ></DatePicker>
+        <Container id="password-confirmation-container" className="container">
+          <label htmlFor="password-confirmation">Password confirmation</label>
+          <Input
+            minLength={6}
+            id="password-confirmation"
+            name="password-confirmation"
+            type="password"
+            disableUnderline={true}
+            autoComplete="current-password-confirmation"
+            onChange={(event) => {
+              const currentPasswordConfirmation = event.target.value;
+              setPasswordConfirmation(currentPasswordConfirmation);
+              if (password !== currentPasswordConfirmation) {
+                setPasswordConfirmationError("Passwords must match");
+              } else {
+                setPasswordConfirmationError("");
+              }
+            }}
+          ></Input>
+          <small>{passwordConfirmationError}</small>
+        </Container>
+        <Container id="email-container" className="container">
+          <label htmlFor="email">Email</label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            disableUnderline={true}
+            onChange={(event) => setEmail(event.target.value)}
+          ></Input>
+        </Container>
+        <Container id="imageURL-container" className="container">
+          <label htmlFor="imageURL">Image URl</label>
+          <Input
+            id="imageURL"
+            name="imageURL"
+            type="url"
+            disableUnderline={true}
+            onChange={(event) => setImageURL(event.target.value)}
+          ></Input>
+        </Container>
+        <Container id="birthdate-container" className="container">
+          <label htmlFor="birthdate">Birthdate</label>
+          <DatePicker
+            id="birthdate"
+            name="birthdate"
+            className="date-picker"
+            selected={birthdate}
+            disableUnderline={true}
+            onChange={handleBirthDateChange}
+            format="DD-MM-YYYY"
+          ></DatePicker>
+        </Container>
         <Button className="submit-btn" type="submit" variant="success">
           Sign Up
         </Button>
-      </form>
-    </div>
+      </Form>
+    </Container>
   );
 }
 

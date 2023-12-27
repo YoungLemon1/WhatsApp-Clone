@@ -1,16 +1,27 @@
 import React, { useState } from "react";
-import { Button, Container } from "react-bootstrap";
+import { Button, Container, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Axios from "axios";
 import Signup from "./signup";
 import { API_URL } from "../constants";
+import { Input, InputAdornment, IconButton } from "@mui/material";
+import { Icon } from "react-icons-kit";
+import { eye, eyeOff } from "react-icons-kit/feather";
 function Login({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState();
+  const [passwordShown, setPasswordShown] = useState(false);
   const [passwordError, setPasswordError] = useState();
   const [error, setError] = useState("");
+  const [icon, setIcon] = useState(eye);
   const [showSignupModal, setShowSignupModal] = useState(false);
+
+  const handleTogglePasswordHidden = () => {
+    const newIcon = !passwordShown ? eyeOff : eye;
+    setPasswordShown(!passwordShown);
+    setIcon(newIcon);
+  };
 
   const openModal = () => {
     setShowSignupModal(true);
@@ -54,32 +65,50 @@ function Login({ setUser }) {
   }
 
   return (
-    <div className="form-container login-container">
-      <form id="login" className="user-form">
-        <h1>Chat and Play</h1>
+    <Container className="form-container login-container">
+      <Form id="login" className="user-form">
+        <h1 id="app-header">Chat and Play</h1>
         <Container id="error-container">{error}</Container>
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          name="username"
-          required
-          onChange={(event) => {
-            setUsername(event.target.value);
-            setUsernameError("");
-          }}
-        ></input>
+        <Container>
+          <label htmlFor="username">Username</label>
+          <Input
+            id="username"
+            name="username"
+            required
+            disableUnderline={true}
+            onChange={(event) => {
+              setUsername(event.target.value);
+              setUsernameError("");
+            }}
+          ></Input>
+        </Container>
         <small>{usernameError}</small>
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          onChange={(event) => {
-            setPassword(event.target.value);
-            setPasswordError("");
-          }}
-        ></input>
+        <Container>
+          <label htmlFor="password">Password</label>
+          <Input
+            id="password"
+            name="password"
+            type={passwordShown ? "text" : "password"}
+            required
+            disableUnderline={true}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              setPasswordError("");
+            }}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  className="icon-button"
+                  aria-label="toggle password visibility"
+                  onClick={handleTogglePasswordHidden}
+                  edge="end"
+                >
+                  <Icon icon={icon} />
+                </IconButton>
+              </InputAdornment>
+            }
+          ></Input>
+        </Container>
         <small>{passwordError}</small>
         <div>
           <Button className="submit-btn" variant="success" onClick={loginUser}>
@@ -94,10 +123,10 @@ function Login({ setUser }) {
             Create account
           </Button>
         </div>
-      </form>
+      </Form>
       {showSignupModal && <Signup closeModal={closeModal}></Signup>}
       {showSignupModal && <div className="overlay" onClick={closeModal}></div>}
-    </div>
+    </Container>
   );
 }
 

@@ -6,12 +6,14 @@ import { Button } from "react-bootstrap";
 import { io } from "socket.io-client";
 import ChatHistory from "./chatHistory";
 import { API_URL } from "../constants";
+import { BsFillChatRightTextFill } from "react-icons/bs";
 
 function UserPage({ user, setUser }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [currentChat, setCurrentChat] = useState(null);
   const [searchError, setSearchError] = useState("");
+  const [isChatHistoryEmpty, setIsChatHistoryEmpty] = useState(false);
   const [chatHistoryLoading, setChatHistoryLoading] = useState(true);
   const socket = useRef(null);
 
@@ -42,6 +44,7 @@ function UserPage({ user, setUser }) {
         const data = res.data;
         setChatHistory(data);
         console.log("successfully fetched user chat history", data);
+        if (data.length === 0) setIsChatHistoryEmpty(true);
       } catch (error) {
         console.error("Failed to fetch user chat history", error);
       }
@@ -114,12 +117,12 @@ function UserPage({ user, setUser }) {
     };
   }, [socket, user._id]);
 
-  //#endregion
   useEffect(() => {
     console.log("current chat", currentChat);
     if (currentChat)
       console.log(`${user.username} entered chat ${currentChat.id}`);
   }, [currentChat, user.username]);
+  //#endregion
 
   //#region enter chat functions
   function enterChat(chat) {
@@ -231,7 +234,10 @@ function UserPage({ user, setUser }) {
               src={user.imageURL}
               alt="user profile"
             ></img>
-            <h5 style={{ display: "inline", float: "left", margin: "0.5rem" }}>
+            <h5
+              id="profile-header"
+              style={{ display: "inline", float: "left", margin: "0.5rem" }}
+            >
               {user.username}
             </h5>
           </div>
@@ -264,6 +270,14 @@ function UserPage({ user, setUser }) {
             </div>
             <div className="search-error">{searchError}</div>
           </div>
+          {isChatHistoryEmpty && (
+            <div id="no-messages-placeholder">
+              <BsFillChatRightTextFill id="placeholder-icon" />
+              <h2>
+                No messages Yet. Be the first one to start a conversation!
+              </h2>
+            </div>
+          )}
           <ChatHistory
             chatHistory={chatHistory}
             chatHistoryLoading={chatHistoryLoading}
