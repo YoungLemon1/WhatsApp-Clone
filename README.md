@@ -3,6 +3,6 @@ Real-time chat app that is similar to WhatsApp and Facebook Messenger. Users can
 
 # Tech Stack
 
-*server-side: Node.js, SocketIO
-*client-side: React.js
-*DB: MongoDB
+server-side: Node.js, SocketIO
+client-side: React.js
+DB: MongoDB
