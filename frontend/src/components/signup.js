@@ -172,6 +172,7 @@ function Signup({ closeModal }) {
             id="password-confirmation"
             name="password-confirmation"
             type="password"
+            required
             disableUnderline={true}
             autoComplete="current-password-confirmation"
             onChange={(event) => {

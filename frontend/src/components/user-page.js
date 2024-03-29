@@ -73,6 +73,7 @@ function UserPage({ user, setUser }) {
       members,
       isGroupChat
     ) => {
+      setIsChatHistoryEmpty(false);
       setChatHistory((prevChatHistory) => {
         const chatIndex = getChatIndex(prevChatHistory, chatId);
         const isExistingChat = chatIndex !== -1;

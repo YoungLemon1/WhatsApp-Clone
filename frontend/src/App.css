@@ -50,6 +50,11 @@
   text-decoration: none;
 }
 
+#app-icon {
+  width: 40px;
+  height: 40px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -228,11 +233,16 @@ label {
 
 #no-messages-placeholder {
   display: inline-flex;
-  height: 60rem;
+  height: 40rem;
   width: 100%;
 }
 
+#no-messages-placeholder * {
+  color: rgb(217, 211, 236);
+}
+
 #error-container {
+  font-size: smaller;
   text-align: center;
   color: red;
 }
@@ -250,6 +260,7 @@ label {
 #last-message {
   display: flex;
   justify-items: flex-start;
+  padding-left: 1.5rem;
 }
 
 #last-message:not(small) * {
@@ -295,6 +306,14 @@ label {
   cursor: pointer;
 }
 
+#user-page #chat-history .unread-marker-container {
+  width: 0.5rem;
+}
+
+#user-page #chat-history .unread-marker {
+  color: #3630f1;
+}
+
 .toggle-password-icon {
   display: flex;
   justify-items: flex-end;
@@ -305,6 +324,10 @@ label {
   flex-direction: column;
   align-items: center;
   margin: 1rem;
+}
+
+.search-error {
+  color: white;
 }
 
 .badge {
@@ -322,6 +345,7 @@ label {
 
 .loading {
   margin: 0.3rem;
+  color: white;
 }
 
 .profile-img {
@@ -367,11 +391,12 @@ label {
   background-color: inherit;
   border-color: inherit;
   border-radius: 50%;
+  padding: 0.3rem;
   margin: 0.5rem;
 }
 
 .chat-window .chat-body {
-  height: 73rem;
+  height: 46rem;
   overflow: auto;
   width: 100%;
   padding-left: 5rem;
@@ -428,6 +453,10 @@ label {
   display: flex;
   justify-content: center;
   margin: 0.5rem;
+}
+
+.chat-window .message-sender-title {
+  color: rgb(182, 144, 194);
 }
 
 .chat-window .chat-footer * {

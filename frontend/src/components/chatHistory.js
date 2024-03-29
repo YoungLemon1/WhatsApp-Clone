@@ -1,4 +1,5 @@
 import ScrollableFeed from "react-scrollable-feed";
+import { VscCircleFilled } from "react-icons/vsc";
 
 function ChatHistory({
   chatHistory,
@@ -26,6 +27,9 @@ function ChatHistory({
                 onClick={() => enterChat(chat)}
               >
                 <div id="conversation-details">
+                  <div className="unread-marker-container">
+                    {chat.new && <VscCircleFilled className="unread-marker" />}
+                  </div>
                   <img
                     className="profile-img"
                     src={chat.imageURL}

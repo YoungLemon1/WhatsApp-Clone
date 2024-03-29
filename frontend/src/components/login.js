@@ -3,6 +3,7 @@ import { Button, Container, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Axios from "axios";
 import Signup from "./signup";
+import { HiChat } from "react-icons/hi";
 import { API_URL } from "../constants";
 import { Input, InputAdornment, IconButton } from "@mui/material";
 import { Icon } from "react-icons-kit";
@@ -67,8 +68,9 @@ function Login({ setUser }) {
   return (
     <Container className="form-container login-container">
       <Form id="login" className="user-form">
-        <h1 id="app-header">Chat and Play</h1>
-        <Container id="error-container">{error}</Container>
+        <HiChat id="app-icon" />
+        <h1 id="app-header">MiChat</h1>
+        <div id="error-container">{error}</div>
         <Container>
           <label htmlFor="username">Username</label>
           <Input

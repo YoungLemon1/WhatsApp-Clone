@@ -313,8 +313,10 @@ function Chat({
       return (
         <div className="message-container" key={msg_uuid}>
           <div className={setMessageClassName(message)}>
-            <p>{currentChat.isGroupChat ? setMessageHeader(message) : ""}</p>
-            <p>{message.message}</p>
+            <p className="message-sender-title">
+              {currentChat.isGroupChat ? setMessageHeader(message) : ""}
+            </p>
+            <p className="message-text">{message.message}</p>
             <small>{setMessageDate(message)}</small>
           </div>
         </div>
